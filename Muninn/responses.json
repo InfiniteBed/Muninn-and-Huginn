@@ -1,0 +1,52 @@
+{
+    "message_rewards": {
+        "100": "😳 Wow {nick}! You sent 100 messages in the server!\n\"*{message}*\"",
+        "200": "🎖️ Congratulations {nick}! You sent 200 messages in the server!\n\"*{message}*\"",
+        "300": "Congratulations on 300 messages! Here's a cupcake 🧁\n\"*{message}*\"",
+        "400": "Wow, 400 messages, {nick}! Keep the convo going!!\n\"*{message}*\"",
+        "500": "Gadzooks! 500 messages already, {nick}!? Keep going!\n\"*{message}*\"",
+        "600": "You made it to 600 messages, {nick}! Don't stop.\n\"*{message}*\"",
+        "700": "Bravo! 700 messages from {nick}!\n\"*{message}*\"",
+        "800": "Behold! {nick}'s 800th message!\n\"*{message}*\"",
+        "900": "Everyone make sure to congratulate {nick} on sending 900 messages! 🙌\n\"*{message}*\"",
+        "1000": "## Woah!!!\n**{nick} sent 1,000 messages!**\n\"*{message}*\"",
+        "1200": "how embarrassing! you can’t shut up! wear the badge with both pride and shame for sending 1,200 messages.\n\"*{message}*\"",
+        "1400": "Only 1,400 messages, {nick}? Those are rookie numbers, keep going!\n\"*{message}*\"",
+        "1600": "1,600 messages {nick}? Don't your hands hurt from texting so much?\n\"*{message}*\"",
+        "1800": "Congrats on 1,800 messages, {nick}! You should probably go outside now...\n\"*{message}*\"",
+        "2000": "# 2,000 messages!?!?\nWow {nick}!!!!\n\"*{message}*\"",
+        "2200": "Hey, {nick}, 2,200 messages! You're making @Infinite_Bed run out of reward messages!   Don't stop, of course\n\"*{message}*\"",
+        "2400": "Thanks for keeping me employed with your 2,400 messages, {nick}!\n\"*{message}*\"",
+        "2600": "{nick} ur fingers wont grow biceps so why try???\n\"*{message}*\"",
+        "2800": "{nick} yap much?\n\"*{message}*\"",
+        "3000": "{nick} give up.\n\"*{message}*\"",
+        "3200": "{nick} you should spend time talking to the Lord instead of this...\n\"*{message}*\"",
+        "3400": "{nick} five big booms for 3,400 messages!\nBOOM\nBOOM\nBOOM\nBOOM\nBOOM.\n\"*{message}*\"",
+        "3600": "{nick} BOOMBASTIC!”\n\"*{message}*\"",
+        "3800": "{nick} u have a lot of opinions”\n\"*{message}*\"",
+        "4000": "{nick} do you… have any hobbies?”\n\"*{message}*\"",
+        "4200": "{nick} whether you spammed or are chronically on your phone, you get a reward for 4,200 messages:”\n\"*{message}*\"",
+        "4400": "{nick} SHUT UP! no one in the chat cares that you said”\n\"*{message}*\"",
+        "4600": "{nick} i hope both sides of your pillow are cold because you deserve it for reaching 4,600 messages”\n\"*{message}*\"",
+        "4800": "{nick} Hey, it could be worse! You could be at 4,800 messages! Oh wait... you are...\n\"*{message}*\"",
+        "5200": "5200 messages, {nick}? Aren't you, like, in class or something?\n\"*{message}*\""
+    },
+    "thank_you_responses": {
+        "normal": [
+            "You're welcome, {user}! 😊",
+            "No problem, {user}! Happy to help! 👍",
+            "Anytime, {user}! 😺",
+            "Glad I could help, {user}! 😄"
+        ],
+        "excessive": [
+            "Okay buddy chill",
+            "uhhh ok",
+            "It's getting kinda wierd {user}",
+            "youre welcome???",
+            "please stop",
+            "k",
+            "please stop thanking me {user}",
+            "stop"
+        ]
+    }
+}

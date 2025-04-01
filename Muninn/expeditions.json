@@ -1,0 +1,173 @@
+[
+    {
+        "name": "The Great Catsby",
+        "description": "Duchess Trailter's eight cats all ran away while she was out picking prunes. Help her find them, and she might give {name} a small reward.",
+        "cost": 0,
+        "location": "Castle Town Mardo",
+        "hours": 3,
+        "ability_test": "Dexterity",
+        "difficulty": "easy",
+        "results": {
+            "major fail": {
+                "text": [
+                    "{name} wasn't able to find a single cat.",
+                    "In fact, Duchess Trailter is convinced {name} only scared her cat off more."
+                ],
+                "coins": 0,
+                "contributor": "Ben"
+            },
+            "fail": {
+                "text": [
+                    "{name} wasn't able to find a single cat.",
+                    "The Duchess being rich and old, she still rewarded {name}'s efforts with a small amount of coin."
+                ],
+                "coins": 5,
+                "contributor": "Ben"
+            },
+            "success": {
+                "text": [
+                    "{name} was able to find all of Duchess Trailter's cats, albeit not without a few scratches.",
+                    "She's well-pleased with {name}'s efforts."
+                ],
+                "coins": 20,
+                "health": -2,
+                "contributor": "Ben"
+            },
+            "major success": {
+                "text": [
+                    "{name} was able to find all Trailter's cats, and {name} even brought back a few more strays for her to take care of.",
+                    "She rewards {name}'s efforts greatly."
+                ],
+                "coins": 30,
+                "contributor": "Ben"
+            }
+        }
+    },
+    {
+        "name": "Panhandling",
+        "description": "{name} could always sit on the street and beg strangers for money…",
+        "cost": 0,
+        "hours": 2,
+        "ability_test": "Constitution",
+        "difficulty": "easy",
+        "results": {
+            "major fail": {
+                "text": [
+                    "{name} sat down on the street to beg for money.",
+                    "It felt strange to be begging on the streets when there were perfectly good jobs for {pronoun} to take.",
+                    "{name} seemed to be making a decent amount of money, which both excited and worried {pronoun}.",
+                    "{pronoun} shook {name}'s coin-laden tin can at anyone who passed. Not many gave up their cash, but some did.",
+                    "Right as {name} got up to walk back home, a stranger jumped {pronoun} while {pronoun} was panhandling!",
+                    "To add insult to injury, he stole all {name}'s profits while {pronoun} was down."
+                ],
+                "coins": -30,
+                "health": -10,
+                "contributor": "Ben"
+            },
+            "fail": {
+                "text": [
+                    "{name} sat down on the street to beg for money.",
+                    "It felt strange to be begging on the streets when there were perfectly good jobs for {pronoun} to take.",
+                    "{name} seemed to be making a decent amount of money, which both excited and worried {pronoun}.",
+                    "{pronoun} shook {name}'s coin-laden tin can at anyone who passed. Not many gave up their cash, but some did.",
+                    "A pickpocket nabbed {name}'s profits while {pronoun} was dozing. He slipped away long before {pronoun} woke.",
+                    "{name} looked inside {pronoun_possessive} empty tin can. {pronoun} can’t say {pronoun} didn’t deserve this."
+                ],
+                "coins": -10,
+                "contributor": "Ben"
+            },
+            "success": {
+                "text": [
+                    "{name} sat down on the street to beg for money.",
+                    "It felt strange to be begging on the streets when there were perfectly good jobs for {pronoun} to take.",
+                    "{name} seemed to be making a decent amount of money, which both excited and worried {pronoun}.",
+                    "{pronoun} shook {name}'s coin-laden tin can at anyone who passed. Not many gave up their cash, but some did.",
+                    "{name} made a small amount of cash from panhandling. {pronoun} can’t help but feel that it wasn’t worth the time."
+                ],
+                "coins": 5,
+                "contributor": "Ben"
+            },
+            "major success": {
+                "text": [
+                    "{name} sat down on the street to beg for money.",
+                    "It felt strange to be begging on the streets when there were perfectly good jobs for {pronoun} to take.",
+                    "{name} seemed to be making a decent amount of money, which both excited and worried {pronoun}.",
+                    "{pronoun} shook {name}'s coin-laden tin can at anyone who passed. Not many gave up their cash, but some did.",
+                    "In the end, {name} came out with a decent amount of money.",
+                    "{pronoun} for sure doesn’t ever want to do this again, but the small cash for doing absolutely nothing was nice.",
+                    "Still, {pronoun} feels it was a massive waste of time."
+                ],
+                "coins": 12,
+                "contributor": "Ben"
+            }
+        }
+    },
+    {
+        "name": "Pushing the Envelope",
+        "description": "The letterman's guild is running low on workers. {name} may be able to offer a helping hand.",
+        "cost": 0,
+        "hours": 6,
+        "ability_test": "Strength",
+        "difficulty": "easy",
+        "results": {
+            "major fail": {
+                "text": [
+                    "The moment {name} stepped into the Post Collective‘s head building, {pronoun} knew it was a major mistake. {pronoun} nearly collided into a halfling letterman running out the door with a satchel full of letters.",
+                    "Inside was a reflection of the former letterman. Everyone was in a rush, collecting, sorting, organizing, and sending out letters. Everyone seemed to sigh in relief at {name}'s arrival.",
+                    "{pronoun_possessive} attention was diverted to a tall elf carrying bin after bin to the mail carriers from the still-growing pile of incoming letters. Simultaneously barking orders to overwhelmed workers and still carrying bins, he called out to {name}.",
+                    "“Traveller! Over here!” He called as a demand, and not a request.",
+                    "When {pronoun} snapped to his side, he set {pronoun} to work carrying box after box from the incoming pile over to the sorters. {pronoun} turned to the elf to ask for help, but he was gone as soon as {pronoun} began helping.",
+                    "{pronoun} groaned every time a pile of letters was dropped on top of the existing pile, erasing {pronoun_possessive} hard-earned progress. {pronoun} bit down the panic as {pronoun} witnessed the pile grow and grow the more {pronoun} worked. {pronoun} worked faster and rushed more, but it still wasn’t enough. {pronoun} knew {pronoun} desperately needed some help, but the elf was busy managing the letter runners. {pronoun} was practically drowning in letters by the end of the day. {pronoun} was sure {pronoun} noticed the letter sorters shoot {pronoun} some concerned or frustrated looks.",
+                    "By the end of the evening rush, there was still a massive pile remaining. An incredulous look was all over the elf’s face.",
+                    "\"You barely helped at all! I can’t pay you for such… unsatisfactory work. Please leave.”",
+                    "The memory of half-drowning in letters will haunt {pronoun}."
+                ],
+                "coins": 0,
+                "contributor": "Ben"
+            },
+            "fail": {
+                "text": [
+                    "The moment {name} stepped into the Post Collective‘s head building, {pronoun} knew it was a mistake. {pronoun} nearly collided into a halfling letterman running out the door with a satchel full of letters.",
+                    "Inside was a reflection of the former letterman. Everyone was in a rush, collecting, sorting, organizing, and sending out letters. Everyone seemed to sigh in relief at {name}'s arrival.",
+                    "{pronoun_possessive} attention was diverted to a tall elf carrying bin after bin to the mail carriers from the still-growing pile of incoming letters. Simultaneously barking orders to overwhelmed workers and still carrying bins, he called out to {name}.",
+                    "“Traveller! Over here!” He called as a demand, and not a request.",
+                    "When {pronoun} snapped to his side, he set {pronoun} to work carrying box after box from the incoming pile over to the sorters. {pronoun} sighed every time a pile of letters was dropped on top of the existing pile, erasing {pronoun_possessive} hard-earned progress.",
+                    "\"Keep moving!\" The elf commanded.",
+                    "{pronoun} bit down the panic as {pronoun} witnessed the pile grow and grow the more {pronoun} worked. {pronoun} worked faster and rushed more, but it still wasn’t enough. Eventually, the elf noticed {pronoun_possessive} struggle and stepped in to offer another hand.",
+                    "By the end of the evening rush, they both were still shuttling letters. From the inbound pile to the letter sorters. Eventually, as the pile began to shrink, he called {pronoun} aside.",
+                    "\"You were slow… but at least you helped. Somewhat. Here is your payment.” He handed {pronoun} a small pile of money, and showed {pronoun} out the door.",
+                    "{name} is absolutely exhausted, and {pronoun} wish {pronoun} could’ve helped more, but at least {pronoun} got a little coin out of it."
+                ],
+                "coins": 8,
+                "contributor": "Ben"
+            },
+            "success": {
+                "text": [
+                    "The moment {name} stepped into the Post Collective‘s head building, {pronoun} knew it was a mistake. {pronoun} nearly collided into a halfling letterman running out the door. Everyone inside was in a rush, collecting, sorting, organizing, and sending out letters. Everyone seemed to sigh in relief at {name}'s arrival.",
+                    "{pronoun_possessive} attention was diverted to a tall elf barking orders to overwhelmed workers and still carrying bins.",
+                    "“Traveller! Over here!” He called as a demand, and not a request.",
+                    "He set {pronoun_possessive} to work carrying boxes from the incoming pile to the sorters. {pronoun} groaned every time a pile of letters was dropped on top of the existing pile, erasing {pronoun_possessive} hard-earned progress. The work was grueling and relentless. Only until the late evening was {pronoun} allowed reprieve. Another worker was finally able to take over, so {pronoun} took a break.",
+                    "\"You were slow,\" the elf said, \"Nonetheless, you helped us. Here is your payment.” He handed {pronoun_possessive} a decently sized money bag.",
+                    "{name} is absolutely exhausted, but {pronoun} feels well-rewarded by the coin."
+                ],
+                "coins": 25,
+                "contributor": "Ben"
+            },
+            "major success": {
+                "text": [
+                    "The moment {name} stepped into the Post Collective‘s head building, {pronoun} knew they needed some help. {pronoun} nearly collided into a halfling letterman running out the door with a satchel full of letters.",
+                    "Inside was a reflection of the former letterman. Everyone was in a rush, collecting, sorting, organizing, and sending out letters. Everyone seemed to sigh in relief at {name}'s arrival.",
+                    "{pronoun_possessive} attention was diverted to a tall elf carrying bin after bin to the mail carriers from the still-growing pile of incoming letters. Simultaneously barking orders to overwhelmed workers and still carrying bins, he called out to {name}.",
+                    "“Traveller! Over here!” He called as a demand, and not a request.",
+                    "When {pronoun} snapped to his side, he set {pronoun_possessive} to work carrying box after box from the incoming pile over to the sorters. {pronoun} sighed every time a pile of letters was dropped on top of the existing pile, erasing {pronoun_possessive} hard-earned progress.",
+                    "\"Keep moving!\" The elf commanded.",
+                    "The work was relentless, but {pronoun} knew it wasn’t impossible. Around noon the pile began to shrink, allowing another worker to take over. After a quick lunch break, the elf quickly showed how to properly sort mail, which {pronoun} started immediately. It was less physically strenuous work, but it was far more mentally strenuous work. Interpreting and understanding the scribbles on each letter was difficult work, but {pronoun} didn’t find a letter {pronoun} couldn’t sort. {pronoun} was certain {pronoun} caught a few of the sorters pushing the more difficult letters {pronoun_possessive} way; even.",
+                    "By evening, the work hours ended, and people started to head home. The elf pulled {pronoun} aside to give {pronoun_possessive}  {pronoun_possessive} pay. “Well done.” He handed {pronoun} a pretty hefty money bag, and showed {pronoun} out the door.",
+                    "{name} is tired, but {pronoun} feels well-rewarded by the coin, and satisfied {pronoun} was able to help."
+                ],
+                "coins": 45,
+                "contributor": "Ben"
+            }
+        }
+    }
+]

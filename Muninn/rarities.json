@@ -1,0 +1,61 @@
+[
+    {
+        "quality": "Very Low",
+        "chance": 5,
+        "price_mod": -25,
+        "modifier": -50,
+        "rarities": [
+            "Horrible",
+            "Awful",
+            "Disgusting"
+        ]
+    },
+    {
+        "quality": "Low",
+        "chance": 40,
+        "price_mod": -10,
+        "modifier": -20,
+        "rarities":[
+            "Cracked",
+            "Broken",
+            "Used",
+            "Bad",
+            "Poor Shape",
+            "Unfortunate"
+        ]
+    },
+    {
+        "quality": "Medium",
+        "chance": 100,
+        "price_mod": 0,
+        "modifier": 0,
+        "rarities":[
+            "Mediocre",
+            "So-So",
+            "Good Enough"
+        ]
+    },
+    {
+        "quality": "High",
+        "chance": 50,
+        "price_mod": 100,
+        "modifier": 50,
+        "rarities":[
+            "Well Made",
+            "Well Cooked",
+            "Medium-Rare",
+            "Great"
+        ]
+    },
+    {
+        "quality": "Very High",
+        "chance": 5,
+        "price_mod": 200,
+        "modifier": 100,
+        "rarities":[
+            "Awesome",
+            "There's-Nothing-Like-It",
+            "Expertly Crafted"
+        ]
+    }
+]

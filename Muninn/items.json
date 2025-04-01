@@ -1,0 +1,189 @@
+[
+  {
+    "name": "Health Elixir",
+    "description": "Looks like a communion cup, with a plastic seal over the top. It glows a soft red.",
+    "slot": "consumable",
+    "shop": true,
+    "base_heal": 5,
+    "base_price": 5
+  },
+  {
+    "name": "Health Potion",
+    "description": "A palm sized spherical bottle, filled with a shimmering red liquid. The glass is warm to the touch.",
+    "slot": "consumable",
+    "shop": true,
+    "base_heal": 10,
+    "base_price": 10
+  },
+  {
+    "name": "Health Jug",
+    "description": "",
+    "slot": "consumable",
+    "shop": true,
+    "base_heal": 10,
+    "base_price": 20
+  },
+  {
+    "name": "Health Gallon",
+    "description": "",
+    "slot": "consumable",
+    "shop": false,
+    "base_heal": 10,
+    "base_price": 40
+  },
+  {
+    "name": "Health Tub",
+    "description": "",
+    "slot": "consumable",
+    "shop": false,
+    "base_heal": 10,
+    "base_price": 80
+  },
+  {
+    "name": "Steel Helmet",
+    "description": "A knight's helmet. Protects the head from particularly vicious blows.",
+    "slot": "head",
+    "shop": true,
+    "base_defense": 2,
+    "base_price": 100
+  },
+  {
+    "name": "Steel Chestplate",
+    "description": "A knight's chest piece. Protects the chest from hard blows and sharp point.",
+    "slot": "upper",
+    "shop": true,
+    "base_defense": 2,
+    "base_price": 100
+  },
+  {
+    "name": "Steel Greaves",
+    "description": "A knight's greaves. Protects the legs from sweeping attacks.",
+    "slot": "lower",
+    "shop": true,
+    "base_defense": 2,
+    "base_price": 100
+  },
+  {
+    "name": "Steel Boots",
+    "description": "A knight's boots. Protects the feet.",
+    "slot": "feet",
+    "shop": true,
+    "base_defense": 2,
+    "base_price": 100
+  },
+  {
+    "name": "Left Fist",
+    "description": "Your left fist.",
+    "shop": false,
+    "slot": "hand",
+    "base_price": 99999,
+    "actions": [
+      {
+        "name": "Punch",
+        "description": "Take a swing at your enemy, gangsta style.",
+        "damage": 4,
+        "defense": -2
+      }
+    ]
+  },
+  {
+    "name": "Right Fist",
+    "description": "Your right fist.",
+    "shop": false,
+    "slot": "hand",
+    "base_price": 99999,
+    "actions": [
+      {
+        "name": "Hook",
+        "description": "LEFT HOOK! RIGHT HOOK!!!",
+        "damage": 4,
+        "defense": -2
+      }
+    ]
+  },
+  {
+    "name": "Training Sword",
+    "description": "A wooden sword used to train squires.",
+    "shop": true,
+    "slot": "hand",
+    "base_price": 50,
+    "actions": [
+      {
+        "name": "Swing",
+        "description": "Take a slice at your enemy.",
+        "damage": 5,
+        "defense": -1
+      },
+      {
+        "name": "Parry",
+        "description": "Extend your sword to block the enemy's attack.",
+        "damage": 2,
+        "defense": 6
+      }
+    ]
+  },
+  {
+    "name": "Steel Sword",
+    "description": "A basic iron sword for melee attacks",
+    "shop": true,
+    "slot": "hand",
+    "base_price": 50,
+    "actions": [
+      {
+        "name": "Swing",
+        "description": "Take a slice at your enemy.",
+        "damage": 12,
+        "defense": -1
+      },
+      {
+        "name": "Parry",
+        "description": "Extend your sword to block the enemy's attack.",
+        "damage": 4,
+        "defense": 6
+      }
+    ]
+  },
+  {
+    "name": "Poleaxe",
+    "description": "A long-handled weapon with an axe-head at the end.",
+    "shop": true,
+    "slot": "hand",
+    "base_price": 50,
+    "actions": [
+      {
+        "name": "Swing",
+        "description": "Swing the axehead at your enemy, all long-distance-like.",
+        "damage": 12,
+        "defense": 4
+      },
+      {
+        "name": "Handle Smack",
+        "description": "Get up close and personal, and butt your opponent with the handle of your poleaxe.",
+        "damage": 4,
+        "defense": 6
+      }
+    ]
+  },
+  {
+    "name": "Katana",
+    "description": "A weapon originating from Japan that takes skill to strike effectively.",
+    "shop": true,
+    "slot": "hand",
+    "base_price": 50,
+    "actions": [
+      {
+        "name": "Slice",
+        "description": "Launch an over-arm attack at your enemy.",
+        "damage": 8,
+        "defense": 2
+      },
+      {
+        "name": "Stab",
+        "description": "Thrust the katana into your enemy.",
+        "damage": 12,
+        "defense": -4
+      }
+    ]
+  }
+]
+
