@@ -168,5 +168,7 @@ async def on_message(message):
         await message.channel.send(response.format(user=message.author.mention))
 
     await bot.process_commands(message)
+    if message.content.startswith(bot.command_prefix):
+        print(f"Command executed: {message.content} by {message.author} in {message.guild.name if message.guild else 'DM'}")
 
 asyncio.run(main())
