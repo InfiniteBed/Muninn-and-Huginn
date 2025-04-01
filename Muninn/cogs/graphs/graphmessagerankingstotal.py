@@ -78,9 +78,9 @@ class GraphMessageRankingsTotal(commands.Cog):
             # Generate the ranking graph
             plt.figure(figsize=(10, 6))
             plt.barh(user_names, message_counts, color='skyblue')
-            plt.xlabel("Messages Sent")
-            plt.ylabel("User")
-            plt.title("User Ranking Based on Messages Sent (All Time)")
+            plt.xlabel("Messages Sent", fontproperties=prop)
+            plt.ylabel("User", fontproperties=prop)
+            plt.title("User Ranking Based on Messages Sent (All Time)", fontproperties=prop)
 
             # Check if the graph file exists, and remove it if it does
             file_path = "cogs/graphs/user_ranking_all_time.png"

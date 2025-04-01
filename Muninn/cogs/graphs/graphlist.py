@@ -20,6 +20,7 @@ class GraphListCog(commands.Cog):
             "User Activity `!g_user_activity_month (Optional: User)`": "Show a user's activity over the past 30 days.",
             "User Rankings `!g_user_rankings`": "Show a guild's rankings by messages sent.",
             "User Rankings `!g_emoji_rankings`": "Show a guild's rankings by emojis used.",
+            "Meal Statistics `!meal_graph`": "Show statistics of meals sent, chosen, and skipped.",
         }
 
         # Add each graph to the embed

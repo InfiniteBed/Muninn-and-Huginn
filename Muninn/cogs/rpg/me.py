@@ -39,10 +39,10 @@ class Status(commands.Cog):
         file = discord.File(f"/usr/src/bot/profile_images/{user.id}.png", filename="image.png") if has_custom_image else None
 
         # Main page embed
-        main_embed = discord.Embed(title=user_stats['profile_name'], color=embed_color)
+        main_embed = discord.Embed(title=f"{user_stats['profile_name']} - Level {user_stats['level']}", color=embed_color)
         main_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
         main_embed.add_field(name="Health", value=user_stats['health_display'], inline=True)
-        main_embed.add_field(name="Level", value=user_stats['level'], inline=True)
+        main_embed.add_field(name="Coins", value=f"{user_stats['coins']} coins", inline=True)  # Added coins field
         main_embed.add_field(name="Expedition", value="Active" if user_stats['activity'] else "Idle", inline=True)
 
         # Expedition page embed
@@ -348,7 +348,7 @@ class Status(commands.Cog):
                         return
 
                     # Calculate expedition results
-                    result, roll_for_result, name, pronoun, pronoun_possessive = await self.parent_cog.calculate_expedition_results(
+                    result, roll_for_result, name, pronoun, pronoun_possessive, formatted_text = await self.parent_cog.calculate_expedition_results(
                         self.profile_user, self.expedition_name
                     )
 
@@ -361,33 +361,63 @@ class Status(commands.Cog):
                     }
                     embed_color = color_map.get(roll_for_result, discord.Color.blue())
 
-                    # Prepare the results embed
-                    results_embed = discord.Embed(
-                        title="Expedition Results",
-                        description="Here are the results of your completed expedition!",
-                        color=embed_color
-                    )
-                    results_embed.add_field(name="Outcome", value=roll_for_result.replace("_", " ").title(), inline=False)
-                    results_embed.add_field(name="Coins Earned", value=f"{result.get('coins', 0)} coins", inline=True)
-                    results_embed.add_field(name="Damage Taken", value=f"{result.get('health', 0)} health", inline=True)
+                    # Prepare the results embeds
+                    embeds = []
+                    current_description = ""
+                    for paragraph in formatted_text:
+                        if len(current_description) + len(paragraph) + 2 > 4096:  # Split if adding the paragraph exceeds 4096 characters
+                            embed = discord.Embed(
+                                title="Expedition Results",
+                                description=current_description,
+                                color=embed_color
+                            )
+                            embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
+                            embeds.append(embed)
+                            current_description = paragraph
+                        else:
+                            current_description += f"\n\n{paragraph}"
 
-                    # Format and add the story text
-                    story_texts = [
-                        paragraph.format(name=name, pronoun=pronoun, pronoun_possessive=pronoun_possessive)
-                        for paragraph in result.get('text', ['No result text available.'])
-                    ]
-                    results_embed.description += "\n\n" + "\n\n".join(story_texts)
+                    # Add the last embed if there's remaining content
+                    if current_description:
+                        embed = discord.Embed(
+                            title="Expedition Results",
+                            description=current_description,
+                            color=embed_color
+                        )
+                        embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
+                        embeds.append(embed)
+
+                    # Add outcome, coins, and damage to the first embed
+                    if embeds:
+                        embeds[0].add_field(name="Outcome", value=roll_for_result.replace("_", " ").title(), inline=False)
+                        embeds[0].add_field(name="Coins Earned", value=f"{result.get('coins', 0)} coins", inline=True)
+                        embeds[0].add_field(name="Damage Taken", value=f"{result.get('health', 0)} health", inline=True)
 
                     # Remove all buttons after showing results
                     self.clear_items()
-                    await interaction.response.edit_message(embed=results_embed, view=self)
+
+                    # Send the embeds sequentially
+                    try:
+                        for embed in embeds:
+                            if interaction.response.is_done():
+                                await interaction.followup.send(embed=embed)
+                            else:
+                                await interaction.response.send_message(embed=embed)
+                    except discord.errors.NotFound:
+                        print("[ERROR] Interaction webhook expired or invalid. Unable to send expedition results.")
+
+                    # Delete the expedition from the database
+                    await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
 
         navigation_view = NavigationView(user, expedition_completed, expedition_name=expedition_name, parent_cog=self, main_embed=main_embed)
         await ctx.send(file=file, embed=main_embed, view=navigation_view)
 
     async def calculate_expedition_results(self, user, expedition_name):
         expedition = await self.list_manager.get_expedition(expedition_name)
+        print (expedition_name)
+        print (expedition)
         if "error" in expedition:
+            print(f"[ERROR] Expedition not found: {expedition_name}")
             return {"error": "Expedition not found"}
 
         user_stats = await self.stats_manager.fetch_user_stats(user)
@@ -446,6 +476,19 @@ class Status(commands.Cog):
             print(f"[DEBUG] Updated inventory for user {user_id}: {updated_inventory}")
         except sqlite3.Error as e:
             print(f"[ERROR] Failed to update inventory in database: {e}")
+        finally:
+            conn.close()
+
+    async def delete_expedition_from_database(self, user_id):
+        """Delete the user's expedition from the database."""
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+        try:
+            cursor.execute("UPDATE stats SET activity = NULL WHERE user_id = ?", (user_id,))
+            conn.commit()
+            print(f"[DEBUG] Deleted expedition for user {user_id}")
+        except sqlite3.Error as e:
+            print(f"[ERROR] Failed to delete expedition from database: {e}")
         finally:
             conn.close()
 

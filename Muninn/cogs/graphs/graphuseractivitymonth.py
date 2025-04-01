@@ -92,10 +92,10 @@ class GraphUserActivityMonth(commands.Cog):
             # Generate the graph
             plt.figure(figsize=(8, 5))
             plt.bar(all_dates_datetime, message_counts)  # Use datetime objects here
-            plt.xlabel("Date")
-            plt.ylabel("Messages Sent")
-            plt.title(f"Message Activity for {user.display_name}")
-            plt.xticks(rotation=45)
+            plt.xlabel("Date", fontproperties=prop)
+            plt.ylabel("Messages Sent", fontproperties=prop)
+            plt.title(f"Message Activity for {user.display_name}", fontproperties=prop)
+            plt.xticks(rotation=45, fontproperties=prop)
             plt.grid(axis="y")
 
             # Check if the graph file exists, and remove it if it does

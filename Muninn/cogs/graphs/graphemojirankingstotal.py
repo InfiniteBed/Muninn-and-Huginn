@@ -68,6 +68,7 @@ class GraphEmojiRankingsTotal(commands.Cog):
             plt.barh(user_names, emoji_count, color="deeppink")
             plt.xlabel("Emojis Sent", fontproperties=prop)  # Use prop for font styling
             plt.title("User Ranking Based on Total Emojis Sent (All Time)", fontproperties=prop)
+            plt.yticks(fontproperties=prop)
 
             # Check if the graph file exists, and remove it if it does
             file_path = "cogs/graphs/user_ranking_all_time.png"
