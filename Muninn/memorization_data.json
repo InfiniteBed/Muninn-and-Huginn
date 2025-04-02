@@ -1,0 +1,96 @@
+{
+    "Science [SAMPLE]": {
+        "Physics Basics": {
+            "author": 123456789012345678,
+            "types": ["Multiple Choice (All Words)", "Sequential Practice (All Words)"],
+            "skip_non_essential": false,
+            "items": [
+                {
+                    "title": "Newton's First Law",
+                    "body": "An object in motion stays in motion unless acted upon by an external force.",
+                    "solutions": []
+                },
+                {
+                    "title": "Speed Formula",
+                    "body": "Speed equals distance divided by time.",
+                    "solutions": []
+                }
+            ]
+        },
+        "Chemistry Terms": {
+            "author": 987654321098765432,
+            "types": ["Fill in the Blank (Single Word)"],
+            "skip_non_essential": true,
+            "items": [
+                {
+                    "title": "Periodic Table",
+                    "body": "The periodic table organizes elements by their atomic number.",
+                    "solutions": ["atomic"]
+                }
+            ]
+        }
+    },
+    "History [SAMPLE]": {
+        "World War II": {
+            "author": 112233445566778899,
+            "types": ["Multiple Choice (Single Word)"],
+            "skip_non_essential": false,
+            "items": [
+                {
+                    "title": "D-Day",
+                    "body": "D-Day occurred on June 6, 1944.",
+                    "solutions": ["1944"]
+                }
+            ]
+        }
+    },
+    "New Testament Survey": {
+        "Verse Quiz 3": {
+            "author": 867261583871836161,
+            "types": ["Fill in the Blank (All Words)", "Sequential Practice (All Words)", "Multiple Choice (All Words)"],
+            "skip_non_essential": true,
+            "items": [
+                {
+                    "title": "Titus 3:5",
+                    "body": "Not by works of righteousness which we have done, but according to his mercy he saved us, by the washing of regeneration, and renewing of the Holy Ghost;",
+                    "solutions": []
+                },
+                {
+                    "title": "Hebrews 11:1",
+                    "body": "Now faith is the substance of things hoped for, the evidence of things not seen.",
+                    "solutions": []
+                },
+                {
+                    "title": "James 1:5",
+                    "body": "If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.",
+                    "solutions": []
+                },
+                {
+                    "title": "1 Peter 1:2",
+                    "body": "Elect according to the foreknowledge of God the Father, through sanctification of the Spirit, unto obedience and sprinkling of the blood of Jesus Christ: Grace unto you, and peace, be multiplied.",
+                    "solutions": []
+                },
+                {
+                    "title": "2 Peter 3:16",
+                    "body": "As also in all his epistles, speaking in them of these things; in which are some things hard to be understood, which they that are unlearned and unstable wrest, as they do also the other scriptures, unto their own destruction.",
+                    "solutions": []
+                },
+                {
+                    "title": "1 John 2:15",
+                    "body": "Love not the world, neither the things that are in the world. If any man love the world, the love of the Father is not in him.",
+                    "solutions": []
+                },
+                {
+                    "title": "Jude 3",
+                    "body": "Beloved, when I gave all diligence to write unto you of the common salvation, it was needful for me to write unto you, and exhort you that ye should earnestly contend for the faith which was once delivered unto the saints.",
+                    "solutions": []
+                },
+                {
+                    "title": "Revelation 3:20",
+                    "body": "Behold, I stand at the door, and knock: if any man hear my voice, and open the door, I will come in to him, and will sup with him, and he with me.",
+                    "solutions": []
+                }
+            ]
+        }
+    }
+}
