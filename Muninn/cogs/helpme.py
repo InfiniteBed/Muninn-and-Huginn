@@ -35,6 +35,14 @@ class Help(commands.Cog):
                     "board": {"description": "`!board` - Visit the expedition board, where you can take on expeditions for money."},
                     "battle": {"description": "`!battle (Player)` - Battle another player for cash."}
                 }
+            },
+            "Memorization Commands": {
+                "shorthands": ["memorization", "mem"],
+                "commands": {
+                    "create_set": {"description": "`!create_set <group> <set_name> <skip_non_essential> <memorization_types>` - Create a new memorization set."},
+                    "add_item": {"description": "`!add_item <group> <set_name> <title> <body> <solutions>` - Add an item to a memorization set."},
+                    "practice": {"description": "`!practice [group]` - Start practicing a memorization set."}
+                }
             }
         }
 
