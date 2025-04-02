@@ -1,0 +1,44 @@
+{
+    "Science": {
+        "Physics Basics": {
+            "author": 123456789012345678,
+            "type": "Multiple Choice (all words)",
+            "items": [
+                {
+                    "title": "Newton's First Law",
+                    "body": "An object in motion stays in motion unless acted upon by an external force.",
+                    "solutions": []
+                },
+                {
+                    "title": "Speed Formula",
+                    "body": "Speed equals distance divided by time.",
+                    "solutions": []
+                }
+            ]
+        },
+        "Chemistry Terms": {
+            "author": 987654321098765432,
+            "type": "Fill in the Blank (one word)",
+            "items": [
+                {
+                    "title": "Periodic Table",
+                    "body": "The periodic table organizes elements by their atomic number.",
+                    "solutions": ["atomic"]
+                }
+            ]
+        }
+    },
+    "History": {
+        "World War II": {
+            "author": 112233445566778899,
+            "type": "Multiple Choice (one word)",
+            "items": [
+                {
+                    "title": "D-Day",
+                    "body": "D-Day occurred on June 6, 1944.",
+                    "solutions": ["1944"]
+                }
+            ]
+        }
+    }
+}

@@ -34,11 +34,9 @@ class FoodCog(commands.Cog):
         self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
         self._initialize_database()
         self.reaction_timeout = 300  # Timeout for reactions in seconds
-        print("FoodCog initialized with scheduled meal times and reaction detection.")
 
     def cog_unload(self):   
         self.food_scheduler.cancel()
-        print("FoodCog unloaded and scheduler stopped.")
 
     def _initialize_database(self):
         """Initialize the SQLite database and create the meals table if it doesn't exist."""
@@ -54,12 +52,10 @@ class FoodCog(commands.Cog):
                 )
             """)
             conn.commit()
-        print("Database initialized and meals table ensured.")
 
     async def food_scheduler_task(self):
         """Task to send food messages at scheduled times."""
         now = datetime.now(self.california_tz)  # Use California timezone
-        print(f"Scheduler triggered at {now}.")
         for meal, scheduled_time in zip(["breakfast", "lunch", "dinner"], self.scheduled_times):
             if now.time() >= scheduled_time:
                 await self.send_food_message(meal)

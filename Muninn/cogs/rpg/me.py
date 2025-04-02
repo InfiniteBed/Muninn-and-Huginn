@@ -153,8 +153,9 @@ class Status(commands.Cog):
                 for index, item in enumerate(page_items, start=1):
                     item_data = await self.list_manager.get_item_data(item['name'])
                     description = item_data['description']
+                    prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""
-                    inventory_list.append(f"**{index + start_index}. {item['name']}** - {description}{heal_info}")
+                    inventory_list.append(f"**{index + start_index}. *{prefix}* {item['name']}** - {description}{heal_info}".strip())
                 inventory_embed.description = "\n".join(inventory_list)
             else:
                 inventory_embed.description = "Your inventory is empty."
@@ -264,30 +265,64 @@ class Status(commands.Cog):
                 """Handle item usage."""
                 if not await self.ensure_correct_user(interaction):
                     return
+
+                # Acknowledge the interaction to prevent "This interaction failed" errors
+                await interaction.response.defer()
+
                 if item.get("slot") == "consumable":
+                    # Fetch the user's current stats
+                    user_stats = await self.navigation_view.parent_cog.stats_manager.fetch_user_stats(self.profile_user)
+                    current_health = user_stats['health']
+                    max_health = user_stats['health_max']
+
+                    # Check if the user's health is already at maximum
+                    if current_health >= max_health:
+                        # Send a red embed indicating the user cannot heal
+                        max_health_embed = discord.Embed(
+                            title="Cannot Use Item",
+                            description=f"Your health is already at maximum (**{current_health}/{max_health}**).",
+                            color=discord.Color.red()
+                        )
+                        await interaction.followup.send(embed=max_health_embed, ephemeral=True)
+                        return
+
+                    # Apply the healing effect
                     heal_amount = item.get("base_heal", 0)
                     await self.navigation_view.parent_cog.stats_manager.modify_user_stat(self.profile_user, "health", heal_amount)
-                    
+
+                    # Reload the user's stats to get the updated health
+                    updated_stats = await self.navigation_view.parent_cog.stats_manager.fetch_user_stats(self.profile_user)
+                    updated_health = updated_stats['health_display']
+
+                    # Send a green embed with healing information
+                    heal_embed = discord.Embed(
+                        title="Item Used",
+                        description=f"You used **{item['name']}** and healed for **{heal_amount} HP**.\nYour current health is now **{updated_health}**.",
+                        color=discord.Color.green()
+                    )
+                    await interaction.followup.send(embed=heal_embed, ephemeral=True)
+
                     # Remove the used item from the inventory
                     self.current_items.remove(item)
                     updated_inventory = json.dumps(self.current_items)  # Serialize the updated inventory
-                    
+
                     # Update the inventory in the database
                     await self.navigation_view.parent_cog.update_inventory_in_database(self.profile_user.id, updated_inventory)
-                    
-                    # Refresh the inventory page after using the item
-                    self.current_embed, self.current_items = await get_inventory_page(self.current_page)
-                    self.refresh_inventory_buttons()
-                    await interaction.message.edit(embed=self.current_embed, view=self)
-                else:
-                    # Refresh the inventory page for non-consumable items
-                    self.current_embed, self.current_items = await get_inventory_page(self.current_page)
-                    self.refresh_inventory_buttons()
-                    await interaction.message.edit(embed=self.current_embed, view=self)
 
-            async def interaction_check(self, interaction: discord.Interaction):
-                print(f"[DEBUG] Interaction received. Custom ID: {getattr(interaction, 'custom_id', None)}")
-                return True
+                    # Reload the inventory data
+                    user_inventory = updated_stats['inventory']
+                    if isinstance(user_inventory, str):
+                        try:
+                            self.current_items = json.loads(user_inventory)  # Deserialize if it's a JSON string
+                        except json.JSONDecodeError:
+                            self.current_items = []  # Default to an empty list if JSON parsing fails
+                    elif isinstance(user_inventory, list):
+                        self.current_items = user_inventory
+                    else:
+                        self.current_items = []
+
+                # Redirect to the main page after using the item
+                await interaction.message.edit(embed=self.navigation_view.main_embed, view=self.navigation_view)
 
         # Button view for top-level navigation
         class NavigationView(View):
@@ -409,6 +444,13 @@ class Status(commands.Cog):
 
                     # Delete the expedition from the database
                     await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
+
+            async def interaction_check(self, interaction: discord.Interaction):
+                """Ensure only the requested user can interact with the buttons."""
+                if interaction.user.id != self.profile_user.id:
+                    await interaction.response.send_message("You cannot interact with this profile!", ephemeral=True)
+                    return False
+                return True
 
         navigation_view = NavigationView(user, expedition_completed, expedition_name=expedition_name, parent_cog=self, main_embed=main_embed)
         await ctx.send(file=file, embed=main_embed, view=navigation_view)
