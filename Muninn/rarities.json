@@ -7,7 +7,9 @@
         "rarities": [
             "Horrible",
             "Awful",
-            "Disgusting"
+            "Disgusting",
+            "Despicable",
+            "Terrible"
         ]
     },
     {
@@ -44,7 +46,13 @@
             "Well Made",
             "Well Cooked",
             "Medium-Rare",
-            "Great"
+            "Great",
+            "Well-Crafted",
+            "Decent",
+            "Nice",
+            "Good",
+            "Satisfactory",
+            "Impressive"
         ]
     },
     {
@@ -55,7 +63,14 @@
         "rarities":[
             "Awesome",
             "There's-Nothing-Like-It",
-            "Expertly Crafted"
+            "Expertly Crafted",
+            "Wonderful",
+            "Perfectly Cooked",
+            "Masterpiece",
+            "Exquisite",
+            "Incredible",
+            "Amazing",
+            "Fantastic"
         ]
     }
 ]

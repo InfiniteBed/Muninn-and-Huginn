@@ -71,19 +71,6 @@ async def on_message(message):
     c.execute("REPLACE INTO guild_last_messages (guild_id, last_message_time) VALUES (?, ?)",
               (message.guild.id, current_time))
     conn.commit()
-    
-    c.execute("SELECT user_id FROM opt_in_users WHERE user_id = ?", (message.author.id,))
-    if c.fetchone() and random.random() < CHANCE_TO_RESPOND:
-        part1 = random.choice(bot.data["part1"])
-        part2 = random.choice(bot.data["part2"])
-        part3 = random.choice(bot.data["part3"])
-        part4 = random.choice(bot.data["part4"])
-        response = f"{message.author.mention} {part1} {part2}, {part3} {part4}"
-        
-        async with message.channel.typing():
-            await asyncio.sleep(3)
-        
-        await message.channel.send(response)
 
     await bot.process_commands(message)
     if message.content.startswith(bot.command_prefix):

@@ -1,5 +1,5 @@
 {
-    "part1": [
+    "intro": [
         "um actually",
         "but uhh",
         "bro", 
@@ -14,9 +14,11 @@
         "AAAAAAAAAAAAH",
         "woooooow",
         "no joke",
-        "my guy"
+        "my guy",
+        "thats it",
+        "no"
     ],
-    "part2": [
+    "command": [
         "shut up",
         "sit down",
         "chill out",
@@ -26,9 +28,10 @@
         "you've got no authority",
         "its all downhill",
         "stay in school",
-        "focus up"
+        "focus up",
+        "youre making me old"
     ],
-    "part3": [
+    "comparison": [
         "youre built like",
         "you actually smell like",
         "you remind me of",
@@ -42,9 +45,14 @@
         "you're actually like",
         "you sound like",
         "this sounds like",
-        "i could use you as"
+        "i could use you as",
+        "im telling",
+        "its time to Ctrl-Alt-Delete",
+        "youre actually uglier than",
+        "youre worse than",
+        "youre way worse than"
     ],
-    "part4": [
+    "target": [
         "infinite_bed",
         "luci",
         "sammy",
@@ -64,7 +72,19 @@
         "joseph",
         "tooth fairy",
         "trash",
-        "floss"
+        "floss",
+        "miles",
+        "shrek",
+        "carl from jimmy newtron",
+        "unseasoned chicken"
+    ],
+    "unique": [
+        "no one in the audience laughed… get off the stage bro",
+        "did i ask???",
+        "you really thought you ate with that… huh",
+        "shut up, you’re actually just as boring as a class in home ec about napkins",
+        "wait, hold on, i think i heard something… did anyone say anything?",
+        "just do better."
     ],
     "prompts": [
         {
@@ -354,6 +374,106 @@
         {
             "text": "Worst color combination hands down?",
             "contributor": "Joriel"
+        },
+        {
+            "text": "Have you ever planned/hosted any parties?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever considered getting an/another ear piercing?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "When is ostracization acceptable?",
+            "contributor": "Ben"
+        },
+        {
+            "text": "what is your best unecessary/irrelevant piece of knowledge that no one cares about, but we’ll all pretend we do bc it’s courteous or whatever",
+            "contributor": "Joriel"
+        },
+        {
+            "text": "if we all went on a trip together, where would we go?",
+            "contributor": "Joriel"
+        },
+        {
+            "text": "How would you feel about getting a giftcard for the place you work?",
+            "contributor": "Ben"
+        },
+        {
+            "text": "Have you ever missed a flight?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever made up a secret language or code?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever fallen out of your bed in the middle of the night?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever seen a shooting star?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever broken a bone?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Ever been zip lining?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Thoughts on owning a pet ferret?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "How often do you rewatch shows/movies you've watched before?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "What is your favorite movie to rewatch?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "What is your favorite series to binge?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "What is the furthest you've ever traveled?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Would you drive a jet ski?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Have you ever successfully pulled an all-nighter?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Do you think you'll ever get to ride a helicopter?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Do you want to go scuba diving some day?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Ever consider going vegan?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Ever eaten squid?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Ever eaten a bug?",
+            "contributor": "Luci"
+        },
+        {
+            "text": "Do you follow the 5-second rule?",
+            "contributor": "Luci"
         }
     ]
 }

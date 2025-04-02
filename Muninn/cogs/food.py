@@ -31,11 +31,12 @@ class FoodCog(commands.Cog):
         self.food_scheduler = tasks.loop(time=self.scheduled_times)(self.food_scheduler_task)
         self.food_scheduler.start()
         self.db_path = "discord.db"
+        self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
         self._initialize_database()
         self.reaction_timeout = 300  # Timeout for reactions in seconds
         print("FoodCog initialized with scheduled meal times and reaction detection.")
 
-    def cog_unload(self):
+    def cog_unload(self):   
         self.food_scheduler.cancel()
         print("FoodCog unloaded and scheduler stopped.")
 
@@ -57,7 +58,7 @@ class FoodCog(commands.Cog):
 
     async def food_scheduler_task(self):
         """Task to send food messages at scheduled times."""
-        now = datetime.now(pytz.utc)
+        now = datetime.now(self.california_tz)  # Use California timezone
         print(f"Scheduler triggered at {now}.")
         for meal, scheduled_time in zip(["breakfast", "lunch", "dinner"], self.scheduled_times):
             if now.time() >= scheduled_time:
@@ -116,8 +117,8 @@ class FoodCog(commands.Cog):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO meals (meal, status, emoji) VALUES (?, ?, ?)", 
-                (meal, status, emoji)
+                "INSERT INTO meals (meal, status, emoji, timestamp) VALUES (?, ?, ?, ?)", 
+                (meal, status, emoji, datetime.now(self.california_tz).strftime("%Y-%m-%d %H:%M:%S"))  # Log with California time
             )
             conn.commit()
         print(f"Logged meal: {meal}, status: {status}, emoji: {emoji}.")

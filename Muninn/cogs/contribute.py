@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import json
+from discord.ui import View, Button
+import asyncio
 
 class Contribution(commands.Cog):
     def __init__(self, bot):
@@ -20,55 +22,81 @@ class Contribution(commands.Cog):
             json.dump(self.data, f, indent=4)
 
     @commands.command()
-    async def contribute(self, ctx, *, content: str = None):
-        if not content:
-            embed = discord.Embed(
-                title="Contribute Data",
-                description=(
-                    "Contributions will earn you ⭐️ stars! Here’s what you can help with:\n"
-                    "- Randomized Insults\n"
-                    "- Prompts, theological discussions, or brain teasers\n"
-                    "- Message rewards for every 100, 200 messages sent\n"
-                    "- Custom graphs for `!graphs`\n"
-                    "- Items, weapons, and armor\n"
-                    "- Expeditions\n"
-                    "- Suggest improvements or new commands\n\n"
-                    "Simply type your contribution after the command!\n"
-						"`!contribute Is time relative?`"
-                ),
-                color=discord.Color.purple()
-            )
-            await ctx.send(embed=embed)
+    async def contribute(self, ctx, *, initial_response: str = None):
+        if not initial_response:
+            await ctx.send("Please provide an initial response. Usage: `!contribute <your response>`")
             return
-        
-        self.data.setdefault("submissions", []).append({
-            "user": ctx.author.name,
-            "guild": ctx.guild.name if ctx.guild else "DMs",
-            "channel": ctx.channel.name if ctx.guild else "Private Message",
-            "content": content
-        })
-        self.save_data()
-        
+
         embed = discord.Embed(
-            title=content, 
-            color=discord.Color.green(),
-            description="Thank you for your response! It's been sent straight to the bot owner!"
+            title="Contribute Data",
+            description=(
+                f"Your initial response: **{initial_response}**\n"
+                "Now, choose the type of contribution you'd like to make by clicking one of the buttons below!"
+            ),
+            color=discord.Color.purple()
         )
-        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
+        view = ContributionTypeView(self.bot, ctx.author, initial_response)
+        await ctx.send(embed=embed, view=view)
 
-        await ctx.author.send(embed=embed)
+class ContributionTypeView(View):
+    def __init__(self, bot, author, initial_response):
+        super().__init__()
+        self.bot = bot
+        self.author = author
+        self.initial_response = initial_response
 
-        # Send the embed to the bot owner
+        # Add buttons with unique callbacks
+        self.add_item(ContributionButton("Randomized Insults", "Randomized Insults", bot, author, initial_response))
+        self.add_item(ContributionButton("Randomized Prompts", "Randomized Prompts", bot, author, initial_response))
+        self.add_item(ContributionButton("Message Rewards", "Message Rewards", bot, author, initial_response))
+        self.add_item(ContributionButton("Custom Graphs", "Custom Graphs", bot, author, initial_response))
+        self.add_item(ContributionButton("Items/Weapons/Armor", "Items/Weapons/Armor", bot, author, initial_response))
+        self.add_item(ContributionButton("Expeditions", "Expeditions", bot, author, initial_response))
+        self.add_item(ContributionButton("Commands", "Commands", bot, author, initial_response))
+
+class ContributionButton(Button):
+    def __init__(self, label, contribution_type, bot, author, initial_response):
+        super().__init__(label=label, style=discord.ButtonStyle.primary)
+        self.contribution_type = contribution_type
+        self.bot = bot
+        self.author = author
+        self.initial_response = initial_response
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user != self.author:
+            await interaction.response.send_message("This button is not for you.", ephemeral=True)
+            return
+
+        # Disable all buttons immediately after a valid interaction
+        for item in self.view.children:
+            if isinstance(item, Button):
+                item.disabled = True
+        await interaction.message.edit(view=self.view)
+
+        await interaction.response.send_message(
+            f"You selected **{self.contribution_type}**. Your contribution has been sent to the bot owner.",
+            ephemeral=True
+        )
+
+        cog = self.bot.get_cog("Contribution")
+        cog.data.setdefault("submissions", []).append({
+            "user": self.author.name,
+            "type": self.contribution_type,
+            "initial_response": self.initial_response
+        })
+        cog.save_data()
+
         bot_owner = self.bot.get_user(self.bot.owner_id)
         embed_to_author = discord.Embed(
-            title=content, 
+            title="New Contribution Received",
             color=discord.Color.green(),
-            description=ctx.channel.mention if ctx.guild else "Private Message"
+            description=(
+                f"Type: {self.contribution_type}\n"
+                f"Initial Response: {self.initial_response}"
+            )
         )
-        embed_to_author.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
+        embed_to_author.set_author(name=self.author.name, icon_url=self.author.avatar.url if self.author.avatar else self.author.default_avatar.url)
         await bot_owner.send(embed=embed_to_author)
-
-        await ctx.send("Contribution recorded and sent to the bot owner's DMs!")
 
 async def setup(bot):
     await bot.add_cog(Contribution(bot))

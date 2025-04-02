@@ -5,6 +5,7 @@ import sqlite3
 from datetime import datetime, timedelta
 import json
 import random
+from dateutil import parser  # Add this import
 
 class Status(commands.Cog):
     def __init__(self, bot):
@@ -57,8 +58,8 @@ class Status(commands.Cog):
             start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()
             california_time = await self.timezone_converter.convert_time(start_time_str)
-            # Adjust parsing to match the format returned by convert_time
-            california_time = datetime.strptime(california_time, "%A, %B %d, %Y at %I:%M %p")  # Example: "Monday, March 31, 2025 at 10:16 AM"
+            # Adjust parsing to handle timezone abbreviations
+            california_time = parser.parse(california_time)  # Use dateutil.parser to parse the time
             formatted_start_time = california_time.strftime("%b. %d at %I:%M %p")
             time_remaining = start_time - current_time
             rounded_time_remaining = timedelta(seconds=round(time_remaining.total_seconds()))

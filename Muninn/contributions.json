@@ -239,6 +239,224 @@
             "guild": "BLiPS Club",
             "channel": "Contribution",
             "content": "worst color combination hands down?"
+        },
+        {
+            "user": "frostbite08491",
+            "guild": "BLiPS Club",
+            "channel": "Contribution",
+            "content": "\"That's it, I'm telling Miles\""
+        },
+        {
+            "user": "kevin158787",
+            "guild": "BLiPS Club",
+            "channel": "Contribution",
+            "content": "\u201cyour messages are making me old\u201d"
+        },
+        {
+            "user": "kevin158787",
+            "guild": "BLiPS Club",
+            "channel": "Contribution",
+            "content": "\u201cCrtl-Alt-del that message\u201d"
+        },
+        {
+            "user": "infinite_bed",
+            "type": "Expeditions",
+            "content": "AAAH"
+        },
+        {
+            "user": "infinite_bed",
+            "type": "Commands",
+            "content": "test"
+        },
+        {
+            "user": "kevin158787",
+            "type": "Randomized Insults",
+            "content": "your messages are making me old"
+        },
+        {
+            "user": "kevin158787",
+            "type": "Commands",
+            "content": "Crtl-Alt-Del that message"
+        },
+        {
+            "user": "infinite_bed",
+            "type": "Commands",
+            "initial_response": "test"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever planned/hosted any parties?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever considered getting an/another ear piercing?"
+        },
+        {
+            "user": "infinite_bed",
+            "type": "Randomized Prompts",
+            "initial_response": "When is ostracization acceptable?"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Prompts",
+            "initial_response": "your best unecessary/irrelevant piece of knowledge that no one cares about, but we\u2019ll all pretend we do bc it\u2019s courteous or whatever"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "shut up, you\u2019re actually uglier than shrek"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "no one in the audience laughed\u2026 get off the stage bro"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "did i ask???"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "no because why do you smell like spongebob\u2019s splintet"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "you really thought you ate with that\u2026 huh"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "shut up, you\u2019re actually just as boring as a class in home ec about napkins"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "wait, hold on, i think i heard something\u2026 did anyone say anything?"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "you\u2019re worse than carl from jimmy newtron"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Insults",
+            "initial_response": "shut up, you\u2019re way worse than unseasoned chicken"
+        },
+        {
+            "user": "itz_yce_06",
+            "type": "Randomized Prompts",
+            "initial_response": "if we all went on a trip together, where would we go?"
+        },
+        {
+            "user": "infinite_bed",
+            "type": "Randomized Prompts",
+            "initial_response": "How would you feel about getting a giftcard for the place you work?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever missed a flight?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever made up a secret language or code?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever fallen out of your bed in the middle of the night?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever seen a shooting star?"
+        },
+        {
+            "user": "kevin158787",
+            "type": "Randomized Insults",
+            "initial_response": "\u201cjust do better\u201d"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever broken a bone?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Ever been zip lining?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Thoughts on owning a pet ferret?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "How often do you rewatch shows/movies you've watched before?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "What is your favorite movie to rewatch?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "What is your favorite series to binge?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "What is the furthest you've ever traveled?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Would you drive a jet ski?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Have you ever successfully pulled an all-nighter?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Do you think you'll ever get to ride a helicopter?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Do you want to go scuba diving some day?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Ever consider going vegan?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Ever eaten squid?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Ever eaten a bug?"
+        },
+        {
+            "user": "bunbun312",
+            "type": "Randomized Prompts",
+            "initial_response": "Do you follow the 5-second rule?"
         }
     ]
 }

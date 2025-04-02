@@ -18,11 +18,11 @@ class TimezoneConverter(commands.Cog):
             utc_time = pytz.utc.localize(utc_time)
 
             # Convert the time to California (PST/PDT)
-            california_tz = pytz.timezone('US/Pacific')
+            california_tz = pytz.timezone('US/Pacific')  # Explicitly define California timezone
             california_time = utc_time.astimezone(california_tz)
 
             # Format the time to display
-            formatted_time = california_time.strftime("%A, %B %d, %Y at %I:%M %p")
+            formatted_time = california_time.strftime("%A, %B %d, %Y at %I:%M %p %Z")
             return formatted_time
         
         except ValueError:

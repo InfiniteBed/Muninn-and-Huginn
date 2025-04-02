@@ -31,56 +31,38 @@ class GraphMessageRankingsTotal(commands.Cog):
     async def generate_graph(self, ctx):
         self.apply_discord_theme()  # Apply global styling
         """Generate a bar chart of user rankings based on all-time messages sent."""
-        
-        conn = None
-        cursor = None
+
         try:
             print(f"Rankusers command triggered for guild {ctx.guild.id}")  # Debugging line to check guild ID
 
-            # Connect to the database with WAL mode enabled
-            conn = sqlite3.connect("discord.db")
-            cursor = conn.cursor()
-
-            # Debugging: Confirm the guild_id data type in the database (checking for proper formatting)
-            cursor.execute("PRAGMA table_info(user_activity);")
-            columns = cursor.fetchall()
-            print(f"Table columns: {columns}")  # Check column names and types
-
-            # Get all user activity data
-            cursor.execute("""
-                SELECT user_id, guild_id, COUNT(*)
-                FROM user_activity
-                GROUP BY user_id, guild_id
-            """)
-            all_data = cursor.fetchall()
-
-            if not all_data:
-                await ctx.send("No message data found.")
+            # Fetch rankings data from the Rankings cog
+            rankings_cog = self.bot.get_cog("Rankings")
+            if not rankings_cog:
+                await ctx.send("Rankings cog is not loaded.")
                 return
 
-            # Filter data for the specific guild
-            filtered_data = [row for row in all_data if row[1] == ctx.guild.id]
+            guild_id = ctx.guild.id
+            rankings_cog.cur.execute(f'''
+                SELECT friendly_name, message_count 
+                FROM discord_{guild_id} 
+                ORDER BY message_count DESC
+            ''')
+            rankings = rankings_cog.cur.fetchall()
 
-            if not filtered_data:
-                await ctx.send("No data found for this guild.")
+            if not rankings:
+                await ctx.send("No ranking data found.")
                 return
 
-            # Extract user_ids and message counts
-            user_ids = [row[0] for row in filtered_data]
-            message_counts = [row[2] for row in filtered_data]
-
-            # Get user names for display
-            user_names = []
-            for user_id in user_ids:
-                user = await self.bot.fetch_user(user_id)
-                user_names.append(user.display_name if user else str(user_id))
+            # Extract user names and message counts
+            user_names = [row[0] for row in rankings]
+            message_counts = [row[1] for row in rankings]
 
             # Generate the ranking graph
             plt.figure(figsize=(10, 6))
             plt.barh(user_names, message_counts, color='skyblue')
-            plt.xlabel("Messages Sent", fontproperties=prop)
-            plt.ylabel("User", fontproperties=prop)
-            plt.title("User Ranking Based on Messages Sent (All Time)", fontproperties=prop)
+            plt.xlabel("Messages Sent")
+            plt.ylabel("User")
+            plt.title("User Ranking Based on Messages Sent (All Time)")
 
             # Check if the graph file exists, and remove it if it does
             file_path = "cogs/graphs/user_ranking_all_time.png"
@@ -101,10 +83,7 @@ class GraphMessageRankingsTotal(commands.Cog):
         
         finally:
             # Ensure that resources are released, even if an error occurs
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+            pass  # No database connection to close here
 
 # Setup function to add the cog to the bot
 async def setup(bot):

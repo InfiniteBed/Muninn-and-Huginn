@@ -35,10 +35,10 @@ class ExpeditionBoard(commands.Cog):
 
         for filename in os.listdir(expeditions_folder):
             if filename.endswith(".json"):
-                expedition_name = filename[:-5]  # Do not replace spaces or underscores
+                expedition_name = filename[:-5]  # File name without extension
                 expedition = await self.list_manager.get_expedition(expedition_name)
                 if location == "all" or location == expedition.get("location"):
-                    expeditions_data.append(expedition_name)  # Use the exact file name
+                    expeditions_data.append(expedition_name)  # Add file name (not pretty name)
                     print("Expedition added:", expedition_name)
 
         return expeditions_data
@@ -167,7 +167,8 @@ class ExpeditionBoard(commands.Cog):
                             await interaction.response.send_message("You already have an active expedition!")
                             return
 
-                        expedition_details = await self.list_manager.get_expedition(self.expedition_name)
+                        expedition_id = self.expedition_name  # Use file name (not pretty name)
+                        expedition_details = await self.list_manager.get_expedition(expedition_id)
                         cost = expedition_details.get('cost')
 
                         if user_stats['coins'] < cost:
@@ -185,7 +186,7 @@ class ExpeditionBoard(commands.Cog):
 
                         # Save the updated activity to the user
                         updated_activity = {
-                            'expedition_name': expedition_details.get('name'),
+                            'expedition_name': expedition_id,  # Use file name (not pretty name)
                             'start_time': end_time_str,
                         }
 
@@ -197,7 +198,7 @@ class ExpeditionBoard(commands.Cog):
                         # Remove the taken expedition from the board
                         cursor.execute("SELECT items FROM vendors WHERE vendor = ?", ("Item Board", ))
                         data = json.loads(cursor.fetchone()[0])
-                        data.remove(self.expedition_name)
+                        data.remove(expedition_id)
                         cursor.execute("UPDATE vendors SET items = ? WHERE vendor = ?", (json.dumps(data), 'Item Board'))
                         conn.commit()
                         conn.close()
@@ -205,7 +206,7 @@ class ExpeditionBoard(commands.Cog):
                         # Send confirmation as an embed
                         embed = discord.Embed(
                             title="Expedition Started!",
-                            description=f"You've successfully started the expedition: **{updated_activity['expedition_name']}**",
+                            description=f"You've successfully started the expedition: **{expedition_id}**",
                             color=discord.Color.gold()
                         )
                         embed.set_footer(text="Good luck on your journey!")
@@ -256,10 +257,9 @@ class ExpeditionBoard(commands.Cog):
             await ctx.send("Invalid expedition ID!")
             return
     
-        expedition_details = await self.list_manager.get_expedition(data[expedition_id-1])
+        expedition_id = data[expedition_id-1]  # Use file name (minus extension)
+        expedition_details = await self.list_manager.get_expedition(expedition_id)
         cost = expedition_details.get('cost')
-
-        user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
 
         if user_stats['coins'] < cost:
             await ctx.send(f"You do not have enough coins to take this expedition! You need {cost} coins.")
@@ -270,32 +270,22 @@ class ExpeditionBoard(commands.Cog):
 
         # Calculate the end time based on the expedition's duration
         duration_hours = expedition_details.get('hours', 0)  # Assuming duration is in hours
-        if duration_hours:
-            end_time = datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
-        else:
-            # Default to 1 hour if no duration is provided
-            end_time = datetime.datetime.now() + datetime.timedelta(hours=1)
-
-        # Convert the datetime object to a string before storing it
+        end_time = datetime.datetime.now() + datetime.timedelta(hours=duration_hours or 1)
         end_time_str = end_time.strftime('%Y-%m-%d %H:%M:%S')
 
         # Save the updated activity to the user
         updated_activity = {
-            'expedition_name': expedition_details.get('name'),
-            'start_time': end_time_str,  # Store as string
+            'expedition_name': expedition_id,  # Use file name (not pretty name)
+            'start_time': end_time_str,
         }
 
-        if user_stats['activity']:
-            await ctx.send("You've already taken an expedition!")
-            return
-        
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute('UPDATE stats SET activity = ? WHERE user_id = ?', 
                     (json.dumps(updated_activity), ctx.author.id))
 
         # Remove the taken expedition from the board
-        data.remove(data[expedition_id-1])
+        data.remove(expedition_id)
         cursor.execute("UPDATE vendors SET items = ? WHERE vendor = ?", (json.dumps(data), 'Item Board'))
         conn.commit()
         conn.close()
@@ -307,7 +297,7 @@ class ExpeditionBoard(commands.Cog):
         # Send confirmation as an embed
         embed = discord.Embed(
             title="Expedition Started!",
-            description=f"You've successfully started the expedition: **{updated_activity['expedition_name']}**",
+            description=f"You've successfully started the expedition: **{expedition_id}**",
             color=discord.Color.gold()
         )
         embed.set_footer(text="Good luck on your journey!")

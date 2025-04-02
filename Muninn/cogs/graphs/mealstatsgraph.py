@@ -5,11 +5,14 @@ import sqlite3
 import os
 from pathlib import Path
 from cogs.graphs.discord_theme import DiscordTheme  # Import the Discord theme cog
+import pytz
+from datetime import datetime
 
 class MealStatsGraph(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db_path = "discord.db"
+        self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
 
     @commands.command(name="meal_graph")
     async def generate_meal_graph(self, ctx):
@@ -58,6 +61,10 @@ class MealStatsGraph(commands.Cog):
             plt.ylabel("Count", fontproperties=prop)
             plt.title("Meal Statistics (with Emoji Choices)", fontproperties=prop)
             plt.legend(prop=prop)
+
+            # Add California time to the graph title
+            california_time = datetime.now(self.california_tz).strftime("%Y-%m-%d %I:%M %p %Z")
+            plt.suptitle(f"Generated on {california_time}", fontproperties=prop)
 
             # Save the graph to a file
             file_path = "cogs/graphs/meal_stats.png"

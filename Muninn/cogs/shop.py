@@ -36,10 +36,10 @@ class Shop(commands.Cog):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT time_loaded FROM vendors ORDER BY time_loaded DESC LIMIT 1")
+        cursor.execute("SELECT time_loaded FROM vendors WHERE vendor = ?", ("Shop",))
         timestamp = cursor.fetchone()
-
         conn.close()
+
         return timestamp[0] if timestamp else None
 
     def is_shop_empty(self):
@@ -48,27 +48,19 @@ class Shop(commands.Cog):
         cursor = conn.cursor()
 
         cursor.execute("SELECT items FROM vendors WHERE vendor = ?", ("Shop",))
-        if not cursor.fetchone():
-            conn.close()
-            return True
-        elif cursor.fetchone() is []:
-            conn.close()
-            return True
-        else: 
-            conn.close()
-            return False
+        result = cursor.fetchone()
+        conn.close()
+
+        return not result or not json.loads(result[0])
 
     async def regenerate_shop(self, ctx):
         """Regenerate the shop's content and store it in the database."""
-        if self.is_shop_empty():
-            await ctx.send("The shop is empty and will be regenerated with new stock!")
-        else:
-            last_timestamp = self.get_last_timestamp()
-            current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        last_timestamp = self.get_last_timestamp()
+        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
-            if last_timestamp and last_timestamp.split('T')[0] == current_date:
-                await ctx.send("The shop has already been regenerated today.")
-                return
+        if last_timestamp and last_timestamp.split('T')[0] == current_date:
+            await ctx.send("The shop has already been regenerated today.")
+            return
 
         stock = 10
         shop_data = []
@@ -80,9 +72,12 @@ class Shop(commands.Cog):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("INSERT OR REPLACE INTO vendors (vendor, items, time_loaded) VALUES (?, ?, ?)", ("Shop", json.dumps(shop_data), datetime.datetime.now().isoformat(),))
+        cursor.execute("INSERT OR REPLACE INTO vendors (vendor, items, time_loaded) VALUES (?, ?, ?)", 
+                       ("Shop", json.dumps(shop_data), datetime.datetime.now().isoformat()))
         conn.commit()
         conn.close()
+
+        await ctx.send("The shop has been restocked with new items!")
 
     async def check_and_regenerate(self, ctx):
         """Check if the shop needs to be regenerated, or force regeneration if empty."""
@@ -205,8 +200,8 @@ class Shop(commands.Cog):
             description = ""
             for index, item_data in enumerate(data[start_index:end_index], start=start_index + 1):
                 combined_name = f"{item_data.get('prefix', '')} {item_data['name']}".strip()
-                name = f"{combined_name}"
-                description += f"**{index}.** {name}\n"
+                price = item_data['base_price']
+                description += f"**{index}.** {combined_name} - **{price} coins**\n"
 
             embed.description = description
             embed.set_footer(text=f"{user_stats['coins']} Coins in {user_stats['profile_name']}'s Coin Purse")

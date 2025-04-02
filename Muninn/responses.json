@@ -17,19 +17,20 @@
         "2000": "# 2,000 messages!?!?\nWow {nick}!!!!\n\"*{message}*\"",
         "2200": "Hey, {nick}, 2,200 messages! You're making @Infinite_Bed run out of reward messages!   Don't stop, of course\n\"*{message}*\"",
         "2400": "Thanks for keeping me employed with your 2,400 messages, {nick}!\n\"*{message}*\"",
-        "2600": "{nick} ur fingers wont grow biceps so why try???\n\"*{message}*\"",
-        "2800": "{nick} yap much?\n\"*{message}*\"",
-        "3000": "{nick} give up.\n\"*{message}*\"",
+        "2600": "{nick} ur fingers wont grow biceps so why try??? 2,600 messages???\n\"*{message}*\"",
+        "2800": "{nick} yap much?\n\"*{message}*\"\n2,800 messages.",
+        "3000": "{nick} give up.\n\"*{message}*\"\n3,000 messages.",
         "3200": "{nick} you should spend time talking to the Lord instead of this...\n\"*{message}*\"",
         "3400": "{nick} five big booms for 3,400 messages!\nBOOM\nBOOM\nBOOM\nBOOM\nBOOM.\n\"*{message}*\"",
-        "3600": "{nick} BOOMBASTIC!”\n\"*{message}*\"",
-        "3800": "{nick} u have a lot of opinions”\n\"*{message}*\"",
-        "4000": "{nick} do you… have any hobbies?”\n\"*{message}*\"",
+        "3600": "{nick} BOOMBASTIC for 3,600 messages!”\n\"*{message}*\"",
+        "3800": "{nick} u have a lot of opinions... 3,800 messages.”\n\"*{message}*\"",
+        "4000": "{nick} do you… have any hobbies? 4,000 messages!?”\n\"*{message}*\"",
         "4200": "{nick} whether you spammed or are chronically on your phone, you get a reward for 4,200 messages:”\n\"*{message}*\"",
         "4400": "{nick} SHUT UP! no one in the chat cares that you said”\n\"*{message}*\"",
         "4600": "{nick} i hope both sides of your pillow are cold because you deserve it for reaching 4,600 messages”\n\"*{message}*\"",
         "4800": "{nick} Hey, it could be worse! You could be at 4,800 messages! Oh wait... you are...\n\"*{message}*\"",
-        "5200": "5200 messages, {nick}? Aren't you, like, in class or something?\n\"*{message}*\""
+        "5000": "{nick} 5,000 messages!!!!! Amazing!!!\n\nPlease go outside.\n\"*{message}*\"",
+        "5200": "5,200 messages, {nick}? Aren't you, like, in class or something?\n\"*{message}*\""
     },
     "thank_you_responses": {
         "normal": [
@@ -46,7 +47,10 @@
             "please stop",
             "k",
             "please stop thanking me {user}",
-            "stop"
+            "stop",
+            "stop thanking me",
+            "stop it",
+            "stop it {user}"
         ]
     }
 }
