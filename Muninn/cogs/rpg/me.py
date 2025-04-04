@@ -27,6 +27,7 @@ class Status(commands.Cog):
                 return
 
         user_stats = await self.stats_manager.fetch_user_stats(user)
+        
         if not user_stats:
             error_embed = discord.Embed(
                 title="Error",

@@ -7,6 +7,7 @@ import os
 class ListManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.data_manager = self.bot.get_cog("DataManager")
 
     async def get_expedition(self, expedition: str):
         expeditions_dir = '/usr/src/bot/expeditions/'
@@ -27,12 +28,11 @@ class ListManager(commands.Cog):
         expedition_data["id"] = expedition  # Add the trimmed file name as the expedition ID
         return expedition_data
     
-    async def get_item_data(self, item: str):
-        with open('items.json', 'r') as file:
-            item_data = json.load(file)
+    async def find_data(self, data: str, item: str):
+        item_data = await self.data_manager.get_all_data_type('items')
 
         for got_item in item_data:
-            if got_item["name"] == item:
+            if got_item["name"].lower() == item:
                 return {
                     "name": got_item["name"],
                     "description": got_item["description"],
@@ -42,8 +42,9 @@ class ListManager(commands.Cog):
                     "base_defense": got_item.get("base_defense", 0),  # Add defense value for equippable items
                     "actions": got_item.get("actions", [])  # Add actions for equippable items
                 }
-        return {"error": "Item not found"}
+        return None
 
+    
 # Setup the cog
 async def setup(bot):
     await bot.add_cog(ListManager(bot))
