@@ -2,3 +2,4 @@ config.ini
 *.db*
 *.pyc
 __pycache__/
+.DS_STORE
