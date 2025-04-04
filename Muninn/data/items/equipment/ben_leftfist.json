@@ -1,0 +1,14 @@
+{
+    "name": "Left Fist",
+    "description": "Your left fist.",
+    "dev": true,
+    "slot": "hand",
+    "actions": [
+        {
+        "name": "Punch",
+        "description": "Take a swing at your enemy, gangsta style.",
+        "damage": 8,
+        "defense": -2
+        }
+    ]
+}

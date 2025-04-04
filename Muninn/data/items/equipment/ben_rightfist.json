@@ -1,0 +1,15 @@
+{
+    "name": "Right Fist",
+    "description": "Your right fist.",
+    "shop": false,
+    "slot": "hand",
+    "dev": true,
+    "actions": [
+      {
+        "name": "Hook",
+        "description": "LEFT HOOK! RIGHT HOOK!!!",
+        "damage": 8,
+        "defense": -2
+      }
+    ]
+}
