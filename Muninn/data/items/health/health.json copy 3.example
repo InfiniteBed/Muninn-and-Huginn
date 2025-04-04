@@ -1,7 +1,0 @@
-{
-    "name": "Health Tub",
-    "description": "NEEDS DESCRIPTION",
-    "slot": "consumable",
-    "base_heal": 10,
-    "base_price": 80
-}

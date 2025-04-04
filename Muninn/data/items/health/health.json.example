@@ -1,6 +1,0 @@
-{
-    "name": "Health Elixir",
-    "description": "Looks like a communion cup, with a plastic seal over the top. It glows a soft red.",
-    "slot": "consumable",
-    "base_heal": 5
-}
