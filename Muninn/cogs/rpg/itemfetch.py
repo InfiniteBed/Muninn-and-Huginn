@@ -10,12 +10,7 @@ class ItemFetch(commands.Cog):
 
     def load_data(self):
         """Load item and rarity data from JSON files."""
-        with open("items.json", "r") as f:
-            self.data = json.load(f)
-
-        with open("rarities.json", "r") as f:
-            self.rarities = json.load(f)
-            
+        
     async def random_item_or_equip(self, category: str = 'any', from_shop: bool = False):
         """Return a random item or equip with a weighted chance based on price and a random rarity."""
         

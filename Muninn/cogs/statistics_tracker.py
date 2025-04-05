@@ -3,10 +3,8 @@ from discord.ext import commands
 import sqlite3
 import time
 from datetime import datetime, timedelta
-import random
 import matplotlib.pyplot as plt
 import pytz
-import emoji
 import numpy as np
 import regex as re
 

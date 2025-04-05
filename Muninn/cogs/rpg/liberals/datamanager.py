@@ -25,15 +25,18 @@ class DataManager(commands.Cog):
 
         await ctx.send(f"Data validated..")
 
-    async def get_all_data_type(self, data_type: str = None):
+    ## Returns all data of a certain type
+    async def get_data_of_type(self, data_type: str = None):
         if data_type is None:
             return None
 
         unifieddata = []
 
         if data_type == 'items':
-            datapath = f'./data/{data_type}'
-        if data_type == 'shops' or data_type == 'item_gathering':
+            datapath = f'./data/items'
+        if data_type in ('crafting', 'equipment', 'single_use'):
+            datapath = f'./data/items/{data_type}'
+        if data_type in ('shops', 'item_gathering'):
             datapath = f'./data/locations/{data_type}'
 
         for dirpath, _, filenames in os.walk(datapath):
@@ -49,6 +52,16 @@ class DataManager(commands.Cog):
 
         return unifieddata
     
+    ## Finds One Item within One Dataset
+    async def find_data(self, type: str, item: str):
+        item_data = await self.get_data_of_type(type)
+        try:
+            for got_item in item_data:
+                if got_item["name"].lower() == item:
+                    return got_item
+        except Exception as e:
+            print(f'ERROR - Could not find item in database: {e}')  
+            return None
 
     @commands.command()
     @commands.is_owner()

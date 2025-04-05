@@ -8,7 +8,8 @@ class ModTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.search = bot.get_cog('Search')
-        self.list_manager = self.bot.get_cog("ListManager") # For Item and Expedition Info
+        self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
+        self.item_randomizer = self.bot.get_cog("ItemRandomizer") # For Item and Expedition Info
 
     @commands.command()
     async def give_item(self, ctx, type: str, item: str, user: str):
@@ -20,13 +21,38 @@ class ModTools(commands.Cog):
                 await ctx.send("No profile found.")
                 return
             
-        item = await self.list_manager.find_item(type, item)
+        item = await self.item_randomizer.generate_item(type, item)
 
-        # Query StatsManager to add the item to the inventory
+        # Query InventoryManager to add the item to the inventory
     
     @commands.command()
     async def find_data(self, ctx, type: str, item: str):
-        item = await self.list_manager.find_data(type, item)
+        item = await self.data_manager.find_data(type, item)
+        await ctx.send(item)
+    
+    @commands.command()
+    async def gen_item(self, ctx, type: str, item: str):
+        item = await self.item_randomizer.generate_item(type, item)
+        await ctx.send(item)
+
+    @commands.command()
+    async def gen_items_HC(self, ctx):
+        hardcoded_list = [
+            {
+                "name": "katana",
+                "weight": 10
+            },
+            {
+                "name": "steel boots",
+                "weight": 1
+            },
+            {
+                "name": "steel sword",
+                "weight": 1
+            },
+        ]
+
+        item = await self.item_randomizer.weighted_random_items('equipment', hardcoded_list)
         await ctx.send(item)
 
 async def setup(bot):

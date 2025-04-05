@@ -28,22 +28,6 @@ class ListManager(commands.Cog):
         expedition_data["id"] = expedition  # Add the trimmed file name as the expedition ID
         return expedition_data
     
-    async def find_data(self, data: str, item: str):
-        item_data = await self.data_manager.get_all_data_type('items')
-
-        for got_item in item_data:
-            if got_item["name"].lower() == item:
-                return {
-                    "name": got_item["name"],
-                    "description": got_item["description"],
-                    "type": got_item.get("type"),  # Add type (e.g., consumable, equippable)
-                    "slot": got_item.get("slot"),  # Add slot for equippable items
-                    "base_heal": got_item.get("base_heal", 0),  # Add healing value for consumables
-                    "base_defense": got_item.get("base_defense", 0),  # Add defense value for equippable items
-                    "actions": got_item.get("actions", [])  # Add actions for equippable items
-                }
-        return None
-
     
 # Setup the cog
 async def setup(bot):

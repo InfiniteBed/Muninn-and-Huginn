@@ -58,9 +58,11 @@ class Setup(commands.Cog):
                     user_id INTEGER PRIMARY KEY,
                     class TEXT,
                     alignment TEXT,
+                    gender TEXT,
                     race TEXT,
                     name TEXT,
-                    ability_scores TEXT
+                    ability_scores TEXT,
+                    bio TEXT
                 )
             ''')
 
@@ -74,6 +76,7 @@ class Setup(commands.Cog):
                     defense_boost INTEGER,
                     attack INTEGER,
                     attack_boost INTEGER,
+                    activity TEXT,
                     level INTEGER,
                     coins INTEGER
                 )
@@ -312,7 +315,6 @@ class Setup(commands.Cog):
                 choices
             )
         else:
-            await thread.send(question)
             response = await self.ask_question(thread, ctx, question)
 
         if not response:
@@ -512,7 +514,7 @@ class Setup(commands.Cog):
         finally:
             conn.close()
 
-        await thread.send(f"Your ability scores have been set. You can proceed with the next steps using `!profile_setup_image`.")
+        await thread.send(f"Your ability scores have been set. You can proceed to the next step.")
         await asyncio.sleep(10)  # Wait for 5 seconds before deleting the thread
         await thread.delete()
 
@@ -529,7 +531,7 @@ class Setup(commands.Cog):
         )
         await thread.add_user(ctx.author)
 
-        await thread.send("**Question 7:**\nPlease upload a profile image (this will be saved as your character's image). If you'd like to skip, type 'skip'.")
+        await thread.send("**Question 7:**\nPlease upload a profile image (this will be saved as your character's image).\nIf you'd like to skip, type `skip`.")
         
         def check_image(message):
             return message.author == ctx.author and message.channel == thread
