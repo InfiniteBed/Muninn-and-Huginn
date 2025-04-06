@@ -12,7 +12,7 @@ import os  # Import os for file handling
 class FoodCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.target_channel_id = 1337136026895782049  # Replace with the target channel's ID
+        self.target_channel_id = 1298762960184934432  # Replace with the target channel's ID
         self.food_emojis = [
                 "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭",
                 "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯", "🫔", "🥙", "🧆", "🥚", "🍳",
@@ -24,7 +24,7 @@ class FoodCog(commands.Cog):
 
         self.scheduled_times = [
             time(8, 0),  # 8:00 AM
-            time(12, 45),  # 12:45 PM
+            time(12, 53),  # 12:45 PM
             time(18, 0),  # 6:00 PM
         ]
         self.food_scheduler = tasks.loop(time=self.scheduled_times)(self.food_scheduler_task)
@@ -57,9 +57,12 @@ class FoodCog(commands.Cog):
         """Task to send food messages at scheduled times."""
         now = datetime.now(self.california_tz)  # Use California timezone
         for meal, scheduled_time in zip(["breakfast", "lunch", "dinner"], self.scheduled_times):
-            if now.time() >= scheduled_time:
+            # Check if the current time matches the scheduled time
+            if now.time().hour == scheduled_time.hour and now.time().minute == scheduled_time.minute:
                 await self.send_food_message(meal)
-                print(f"Sent {meal} message.")
+                print(f"Sent {meal} message at {scheduled_time}.")
+            else:
+                print(f"Skipping {meal}. Current time: {now.time()}, Scheduled time: {scheduled_time}")
 
     async def send_food_message(self, meal):
         if self.target_channel_id is None:
@@ -99,11 +102,12 @@ class FoodCog(commands.Cog):
 
     def _log_meal_status(self, meal, status, emoji=None, user_id=None):
         """Log the meal status (e.g., 'sent', 'chosen: 🍕', 'skipped') in the database."""
+        user_id = user_id or 0  # Default to 0 if user_id is None
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO meals (user_id, meal, status, emoji, timestamp) VALUES (?, ?, ?, ?, ?)", 
-                (user_id, meal, status, emoji, datetime.now(self.california_tz).strftime("%Y-%m-%d %H:%M:%S"))  # Log with user ID
+                (user_id, meal, status, emoji, datetime.now(self.california_tz).strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         print(f"Logged meal: {meal}, status: {status}, emoji: {emoji}, user_id: {user_id}.")
