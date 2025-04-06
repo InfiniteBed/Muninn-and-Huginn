@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+from icecream import ic
 import os
 
 class DataManager(commands.Cog):
@@ -23,10 +24,11 @@ class DataManager(commands.Cog):
                         except json.JSONDecodeError:
                             await ctx.send(f"Skipping invalid JSON: {file_path}")
 
-        await ctx.send(f"Data validated..")
+        await ctx.send(f"Data validated!")
 
     ## Returns all data of a certain type
-    async def get_data_of_type(self, data_type: str = None):
+    async def get_data_of_type(self, ctx, data_type: str = None):
+
         if data_type is None:
             return None
 
@@ -34,10 +36,13 @@ class DataManager(commands.Cog):
 
         if data_type == 'items':
             datapath = f'./data/items'
-        if data_type in ('crafting', 'equipment', 'single_use'):
+        elif data_type in ('crafting', 'equipment', 'single_use'):
             datapath = f'./data/items/{data_type}'
-        if data_type in ('shops', 'item_gathering'):
+        elif data_type in ('shops', 'item_gathering'):
             datapath = f'./data/locations/{data_type}'
+        else: 
+            await ctx.send(f"ERROR: Data type {data_type} not found")
+            return
 
         for dirpath, _, filenames in os.walk(datapath):
             for file in filenames:
@@ -50,18 +55,22 @@ class DataManager(commands.Cog):
                         except json.JSONDecodeError:
                             await print(f"Skipping invalid JSON: {file_path}")
 
+        ic(unifieddata)
         return unifieddata
     
     ## Finds One Item within One Dataset
-    async def find_data(self, type: str, item: str):
-        item_data = await self.get_data_of_type(type)
+    async def find_data(self, ctx, type: str, item: str):
+        item_data = await self.get_data_of_type(ctx, type)
         try:
             for got_item in item_data:
-                if got_item["name"].lower() == item:
+                if got_item["name"].lower() == item.lower():
                     return got_item
+                
         except Exception as e:
-            print(f'ERROR - Could not find item in database: {e}')  
+            await ctx.send(f'ERROR - Could not find item in database: {e}')  
             return None
+        
+        await ctx.send(f"Unable to find item {item}")
 
     @commands.command()
     @commands.is_owner()

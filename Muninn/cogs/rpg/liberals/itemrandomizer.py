@@ -11,8 +11,8 @@ class ItemRandomizer(commands.Cog):
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
 
     ## Modifies Item's Values by Rarity if Needed
-    async def generate_item(self, type, item):
-        item = await self.data_manager.find_data(type, item)
+    async def generate_item(self, ctx, type: str, item_name: str):
+        item = await self.data_manager.find_data(ctx, type, item_name)
 
         if item is None:
             print('Could not find item to generate!')
@@ -29,6 +29,9 @@ class ItemRandomizer(commands.Cog):
             item['prefix'] = rarity_prefix  # Prefix assigned directly to 'prefix'
             item['quality'] = rarity_quality  # Quality assigned directly
             item['base_price'] = max(1, int(item['base_price'] * (1 + rarity['price_mod'] / 100)))
+            item['type'] = type
+
+            ic(item)
             
             if type == 'equipment' or type == 'single_use':
                 if 'base_heal' in item:
@@ -39,10 +42,11 @@ class ItemRandomizer(commands.Cog):
                     item['attack'] = max(1, int(item['attack'] * (1 + rarity['modifier'] / 100)))
 
             return item
-
+        
+        item['type'] = type
         return item
     
-    async def weighted_random_items(self, type: str, pool: list, item_count: int = 1):
+    async def weighted_random_items(self, ctx, type: str, pool: list, item_count: int = 1):
         ic("Started randomized item generation")
         items_result = []
         weights = []
@@ -50,7 +54,7 @@ class ItemRandomizer(commands.Cog):
         for item in pool:
             print (item) 
 
-            if await self.data_manager.find_data(type, item['name']) == None:
+            if await self.data_manager.find_data(ctx, type, item['name']) == None:
                 print(f"Item '{item['name']}' in selected pool not found")
                 return
             
@@ -60,12 +64,12 @@ class ItemRandomizer(commands.Cog):
             random_item = random.choices(pool, weights=weights)
             item_name = random_item[0]['name']
             ic(item_name)
-            generated_item = await self.generate_item(type, item_name)
+            generated_item = await self.generate_item(ctx, type, item_name)
             return generated_item
         
         for i in range(item_count):
             random_item = random.choices(pool, weights=weights)['name']
-            generated_item = await self.generate_item(type, random_item['name'])
+            generated_item = await self.generate_item(ctx, type, random_item['name'])
             items_result.append(generated_item)
             return items_result
 

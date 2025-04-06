@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import json
 import random
 from dateutil import parser  # Add this import
+from icecream import ic
 
 class Status(commands.Cog):
     def __init__(self, bot):
@@ -14,7 +15,7 @@ class Status(commands.Cog):
         self.utils = bot.get_cog('Utils')
         self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = bot.get_cog("StatsManager")
-        self.list_manager = bot.get_cog("ListManager")  # Add direct reference to ListManager
+        self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
 
     @commands.command(name="status", aliases=["me"])
     async def status(self, ctx, user: str = None):
@@ -152,7 +153,8 @@ class Status(commands.Cog):
             if page_items:
                 inventory_list = []
                 for index, item in enumerate(page_items, start=1):
-                    item_data = await self.list_manager.get_item_data(item['name'])
+                    item_data = await self.data_manager.find_data(ctx, item['type'], item['name'])
+                    ic(item_data)
                     description = item_data['description']
                     prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""

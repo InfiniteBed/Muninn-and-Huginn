@@ -2,6 +2,7 @@ import sqlite3
 import discord
 from discord.ext import commands
 import json
+from icecream import ic
 
 class StatsManager(commands.Cog):
     def __init__(self, bot):
@@ -255,6 +256,37 @@ class StatsManager(commands.Cog):
 
         await ctx.send(f"Unequipped {equipped_item} from {slot.title()}.")
 
+    def add_to_user_inventory(self, user_id, item):
+        ic(item['name'], user_id)
+
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+
+        #Check if inventotry is empty, then skip if empty. theres definitely a waaaaay better way to do this
+        cursor.execute("SELECT user_id FROM inventory WHERE inventory IS NULL")
+        data = cursor.fetchall()
+
+        if len(data) < 1:
+            cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+            result = cursor.fetchone()
+            ic(result)
+            user_inventory = json.loads(result[0])
+
+        for id in data:
+            if id[0] == user_id:
+                user_inventory = []
+                break
+            else:
+                cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+                result = cursor.fetchone()
+                ic(result)
+                user_inventory = json.loads(result[0])
+
+        user_inventory.append(item)
+
+        cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
+        conn.commit()
+        conn.close()
 
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))

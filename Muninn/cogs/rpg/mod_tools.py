@@ -10,9 +10,10 @@ class ModTools(commands.Cog):
         self.search = bot.get_cog('Search')
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
         self.item_randomizer = self.bot.get_cog("ItemRandomizer") # For Item and Expedition Info
+        self.user_manager = self.bot.get_cog("StatsManager") # For Item and Expedition Info
 
     @commands.command()
-    async def give_item(self, ctx, type: str, item: str, user: str):
+    async def give_item(self, ctx, type: str, item: str, user: str = None):
         if user is None:
             user = ctx.author
         else:
@@ -21,9 +22,11 @@ class ModTools(commands.Cog):
                 await ctx.send("No profile found.")
                 return
             
-        item = await self.item_randomizer.generate_item(type, item)
+        item = await self.item_randomizer.generate_item(ctx, type, item)
 
-        # Query InventoryManager to add the item to the inventory
+        self.user_manager.add_to_user_inventory(user.id, item)
+
+        await ctx.send(f"Added {item['name']} to inventory.")
     
     @commands.command()
     async def find_data(self, ctx, type: str, item: str):
@@ -52,7 +55,7 @@ class ModTools(commands.Cog):
             },
         ]
 
-        item = await self.item_randomizer.weighted_random_items('equipment', hardcoded_list)
+        item = await self.item_randomizer.weighted_random_items(ctx, 'equipment', hardcoded_list)
         await ctx.send(item)
 
 async def setup(bot):
