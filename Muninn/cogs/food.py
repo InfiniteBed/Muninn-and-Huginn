@@ -12,7 +12,6 @@ import os  # Import os for file handling
 class FoodCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.target_user_id = 738065718909862049  # Replace with the target user's Discord ID
         self.target_channel_id = 1337136026895782049  # Replace with the target channel's ID
         self.food_emojis = [
                 "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭",
@@ -45,6 +44,7 @@ class FoodCog(commands.Cog):
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS meals (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
                     meal TEXT NOT NULL,
                     status TEXT NOT NULL,
                     emoji TEXT,
@@ -77,78 +77,36 @@ class FoodCog(commands.Cog):
         for emoji in food_options:
             await message.add_reaction(emoji)
 
-        # Wait for a reaction
+        reacted_users = set()  # Track users who have already reacted
         try:
             while True:
                 reaction, user = await self.bot.wait_for(
                     "reaction_add",
                     timeout=self.reaction_timeout,
-                    check=lambda r, u: r.message.id == message.id and str(r.emoji) in food_options
+                    check=lambda r, u: r.message.id == message.id and str(r.emoji) in food_options and u.id not in reacted_users
                 )
                 if user.bot:
                     continue  # Ignore bot reactions
-                if user.id != self.target_user_id:
-                    await message.remove_reaction(reaction.emoji, user)
-                    await channel.send(f"Hey {user.mention}, this isn't your meal! Let the right person choose.")
-                    print(f"Removed reaction from {user} for {meal}.")
-                else:
-                    chosen_food = str(reaction.emoji)
-                    self._log_meal_status(meal, f"chosen", chosen_food)  # Log the chosen emoji
-                    print(f"User {user} chose {chosen_food} for {meal}.")
-                    break
 
+                chosen_food = str(reaction.emoji)
+                reacted_users.add(user.id)  # Add user to the set of reacted users
+                self._log_meal_status(meal, f"chosen", chosen_food, user.id)  # Log with user ID
+                await channel.send(f"{user.mention} chose {chosen_food} for {meal}.")
+                print(f"User {user} chose {chosen_food} for {meal}.")
         except asyncio.TimeoutError:
-            self._log_meal_status(meal, "skipped")
-            funny_responses = [
-                f"No response for {meal}? The guards took your tray away.",
-                f"{meal.capitalize()} skipped! Hope you enjoy the stale bread and water instead. 🥖💧",
-                f"Looks like you missed {meal}.",
-                f"Skipping {meal}? The warden won't be happy about this.",
-            ]
-            await channel.send(random.choice(funny_responses))
-            print(f"No reaction received for {meal} within the timeout period.")
+            await channel.send(f"Time's up! Thanks for participating in {meal}.")
+            print(f"Reaction timeout reached for {meal}.")
 
-    def _log_meal_status(self, meal, status, emoji=None):
+    def _log_meal_status(self, meal, status, emoji=None, user_id=None):
         """Log the meal status (e.g., 'sent', 'chosen: 🍕', 'skipped') in the database."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO meals (meal, status, emoji, timestamp) VALUES (?, ?, ?, ?)", 
-                (meal, status, emoji, datetime.now(self.california_tz).strftime("%Y-%m-%d %H:%M:%S"))  # Log with California time
+                "INSERT INTO meals (user_id, meal, status, emoji, timestamp) VALUES (?, ?, ?, ?, ?)", 
+                (user_id, meal, status, emoji, datetime.now(self.california_tz).strftime("%Y-%m-%d %H:%M:%S"))  # Log with user ID
             )
             conn.commit()
-        print(f"Logged meal: {meal}, status: {status}, emoji: {emoji}.")
-
-    @commands.command(name="setuser")
-    async def set_user(self, ctx, user: discord.User):
-        """Set the target user to receive food messages."""
-        self.target_user_id = user.id
-        await ctx.send(f"Target user set to {user.name}.")
-        print(f"Target user set to {user.id} ({user.name}).")
-
-    @commands.command(name="setchannel")
-    async def set_channel(self, ctx, channel: discord.TextChannel):
-        """Set the target channel to receive food messages."""
-        self.target_channel_id = channel.id
-        await ctx.send(f"Target channel set to {channel.name}.")
-        print(f"Target channel set to {channel.id} ({channel.name}).")
-
-    @commands.command(name="settimes")
-    async def set_times(self, ctx, breakfast: str, lunch: str, dinner: str):
-        """Set custom times for breakfast, lunch, and dinner (HH:MM format)."""
-        try:
-            self.scheduled_times = [
-                datetime.strptime(breakfast, "%H:%M").time(),
-                datetime.strptime(lunch, "%H:%M").time(),
-                datetime.strptime(dinner, "%H:%M").time(),
-            ]
-            self.food_scheduler.cancel()  # Stop the current loop
-            self.food_scheduler = tasks.loop(time=self.scheduled_times)(self.food_scheduler_task)
-            self.food_scheduler.start()  # Restart the loop with updated times
-            await ctx.send("Meal times updated successfully.")
-            print(f"Meal times updated: Breakfast at {breakfast}, Lunch at {lunch}, Dinner at {dinner}.")
-        except ValueError:
-            await ctx.send("Invalid time format. Use HH:MM.")
+        print(f"Logged meal: {meal}, status: {status}, emoji: {emoji}, user_id: {user_id}.")
 
     @commands.command(name="sendfood")
     async def send_food(self, ctx, meal: str):
@@ -161,30 +119,6 @@ class FoodCog(commands.Cog):
         await ctx.send(f"Food message for {meal} sent to channel.")
         self._log_meal_status(meal.lower(), "manual")
         print(f"Manual food message for {meal} logged as 'manual'.")
-
-    @commands.command(name="mealstats")
-    async def meal_stats(self, ctx):
-        """Retrieve and display meal statistics."""
-        with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT meal, status, COUNT(*) as count
-                FROM meals
-                GROUP BY meal, status
-            """)
-            stats = cursor.fetchall()
-
-        if not stats:
-            await ctx.send("No meal data available.")
-            print("No meal data to display.")
-            return
-
-        stats_message = "Meal Statistics:\n"
-        for meal, status, count in stats:
-            stats_message += f"{meal.capitalize()} ({status}): {count}\n"
-
-        await ctx.send(stats_message)
-        print("Displayed meal statistics.")
 
 async def setup(bot):
     await bot.add_cog(FoodCog(bot))

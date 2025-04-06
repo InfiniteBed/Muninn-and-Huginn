@@ -15,8 +15,8 @@ class MealStatsGraph(commands.Cog):
         self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
 
     @commands.command(name="meal_graph")
-    async def generate_meal_graph(self, ctx):
-        """Generate a bar chart for meal statistics."""
+    async def generate_meal_graph(self, ctx, user: discord.User = None):
+        """Generate a bar chart for meal statistics, optionally filtered by a specific user."""
         prop = DiscordTheme.apply_discord_theme()  # Apply global Discord theme and capture prop
         conn = None
         cursor = None
@@ -25,12 +25,20 @@ class MealStatsGraph(commands.Cog):
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            # Fetch meal statistics
-            cursor.execute("""
-                SELECT meal, status, emoji, COUNT(*) as count
-                FROM meals
-                GROUP BY meal, status, emoji
-            """)
+            # Fetch meal statistics, optionally filtered by user
+            if user:
+                cursor.execute("""
+                    SELECT meal, status, emoji, COUNT(*) as count
+                    FROM meals
+                    WHERE user_id = ?
+                    GROUP BY meal, status, emoji
+                """, (user.id,))
+            else:
+                cursor.execute("""
+                    SELECT meal, status, emoji, COUNT(*) as count
+                    FROM meals
+                    GROUP BY meal, status, emoji
+                """)
             stats = cursor.fetchall()
 
             if not stats:
@@ -59,7 +67,8 @@ class MealStatsGraph(commands.Cog):
             plt.xticks([p + 0.25 for p in x], meals, fontproperties=prop)
             plt.xlabel("Meals", fontproperties=prop)
             plt.ylabel("Count", fontproperties=prop)
-            plt.title("Meal Statistics (with Emoji Choices)", fontproperties=prop)
+            title = f"Meal Statistics for {user.name}" if user else "Meal Statistics (All Users)"
+            plt.title(title, fontproperties=prop)
             plt.legend(prop=prop)
 
             # Add California time to the graph title
