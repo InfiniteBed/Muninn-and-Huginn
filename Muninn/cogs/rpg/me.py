@@ -49,7 +49,7 @@ class Status(commands.Cog):
         main_embed.add_field(name="Expedition", value="Active" if user_stats['activity'] else "Idle", inline=True)
 
         # Expedition page embed
-        expedition_embed = discord.Embed(title="Expedition Details", color=embed_color)
+        expedition_embed = discord.Embed(title="Activity Details", color=embed_color)
         expedition_completed = False
         expedition_name = None
         if user_stats['activity'] and user_stats['activity'] != "{}":
@@ -67,7 +67,7 @@ class Status(commands.Cog):
             rounded_time_remaining = timedelta(seconds=round(time_remaining.total_seconds()))
             formatted_time_remaining = str(rounded_time_remaining).split(".")[0]
 
-            expedition_embed.add_field(name="Expedition Name", value=expedition_name, inline=True)
+            expedition_embed.add_field(name="Activity Name", value=expedition_name, inline=True)
             expedition_embed.add_field(name="End Time", value=formatted_start_time, inline=False)
             expedition_embed.add_field(name="Time Remaining", value=formatted_time_remaining if start_time > current_time else "Complete!", inline=True)
             expedition_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
@@ -75,7 +75,7 @@ class Status(commands.Cog):
             if start_time <= current_time:
                 expedition_completed = True
         else:
-            expedition_embed.add_field(name="Expedition", value="No active expedition.", inline=False)
+            expedition_embed.add_field(name="Activity", value="The world awaits your next actions...", inline=False)
             expedition_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
 
         # Info page embed
@@ -269,9 +269,6 @@ class Status(commands.Cog):
                 if not await self.ensure_correct_user(interaction):
                     return
 
-                # Acknowledge the interaction to prevent "This interaction failed" errors
-                await interaction.response.defer()
-
                 if item.get("slot") == "consumable":
                     # Fetch the user's current stats
                     user_stats = await self.navigation_view.parent_cog.stats_manager.fetch_user_stats(self.profile_user)
@@ -324,6 +321,12 @@ class Status(commands.Cog):
                     else:
                         self.current_items = []
 
+                if item.get("type") == "equipment":
+                    if item.get("slot") == "hand":
+                        return
+
+                    await self.navigation_view.parent_cog.stats_manager.equip_from_inventory(ctx, ctx.author, item['slot'], item)
+
                 # Redirect to the main page after using the item
                 await interaction.message.edit(embed=self.navigation_view.main_embed, view=self.navigation_view)
 
@@ -353,9 +356,9 @@ class Status(commands.Cog):
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=self.main_embed, view=self)
 
-            @discord.ui.button(label="Expedition", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Activity", style=discord.ButtonStyle.secondary)
             async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Expedition"
+                self.current_menu = "Activity"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=expedition_embed, view=self)
 
@@ -365,15 +368,15 @@ class Status(commands.Cog):
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=info_embed, view=self)
 
-            @discord.ui.button(label="Equipped Items", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Gear", style=discord.ButtonStyle.secondary)
             async def equipped_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Equipped Items"
+                self.current_menu = "Gear"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=equipped_embed, view=self)
 
-            @discord.ui.button(label="Inventory", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Pack", style=discord.ButtonStyle.secondary)
             async def inventory_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Inventory"
+                self.current_menu = "Pack"
                 self.update_button_styles()
                 inventory_view = InventoryView(self.profile_user, self)
                 await inventory_view.initialize_inventory()

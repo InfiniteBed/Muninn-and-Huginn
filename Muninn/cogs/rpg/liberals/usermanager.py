@@ -155,8 +155,7 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()
     
-    async def equip(self, ctx, slot: str, item: dict):
-        user = ctx.author
+    async def equip_from_inventory(self, ctx, user, slot: str, item_data: dict):
         user_data = await self.fetch_user_stats(user)
         inventory = user_data['inventory']
 
@@ -164,7 +163,7 @@ class StatsManager(commands.Cog):
             await ctx.send("User data not found.")
             return
 
-        if item not in inventory:
+        if item_data not in inventory:
             await ctx.send("Item not in inventory.")
             return
 
@@ -179,10 +178,10 @@ class StatsManager(commands.Cog):
         c = conn.cursor()
 
         # Remove item from inventory
-        inventory.remove(item)
+        inventory.remove(item_data)
 
         # Equip new item
-        c.execute(f'UPDATE equipped_items SET {slot} = ? WHERE user_id = ?', (json.dumps(item), user.id))
+        c.execute(f'UPDATE equipped_items SET {slot} = ? WHERE user_id = ?', (json.dumps(item_data), user.id))
 
         # Return old item to inventory if applicable
         if current_equipped:
@@ -193,11 +192,10 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()
 
-        await ctx.send(f"Equipped {item['name']} in {slot}.")
+        print(f"Equipped {item_data['name']} in {slot}.")
 
     @commands.command()
-    async def unequip(self, ctx, slot: str):
-        user = ctx.author
+    async def unequip_from_inventory(self, ctx, user, slot: str):
         user_data = await self.fetch_user_stats(user)
 
         if user_data is None:
@@ -254,10 +252,10 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()
 
-        await ctx.send(f"Unequipped {equipped_item} from {slot.title()}.")
+        print(f"Unequipped {equipped_item} from {slot.title()}.")
 
-    def add_to_user_inventory(self, user_id, item):
-        ic(item['name'], user_id)
+    def add_to_user_inventory(self, user_id, item_data):
+        ic(item_data['name'], user_id)
 
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
@@ -282,11 +280,47 @@ class StatsManager(commands.Cog):
                 ic(result)
                 user_inventory = json.loads(result[0])
 
-        user_inventory.append(item)
+        user_inventory.append(item_data)
 
         cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
         conn.commit()
         conn.close()
 
+    def remove_from_user_inventory(self, user_id, item_data):
+        ic(item_data[0]['name'], user_id)
+
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+
+        #Check if inventotry is empty, then skip if empty.
+        cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+
+        if len(result) < 1:
+            print("Nothing to remove from user's inventory!")
+            return
+        
+        user_inventory = json.loads(result[0])
+
+        #Remove item from inventory
+        user_inventory.remove(item_data[0])
+
+        ic(user_inventory)
+
+        #Plant back into database
+        cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
+        conn.commit()
+        conn.close()
+
+    def get_item_in_inventory(self, user_id, index):
+
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+
+        #Check if inventotry is empty, then skip if empty.
+        cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+
+        return json.loads(result[index])
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))

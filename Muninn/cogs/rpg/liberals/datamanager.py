@@ -55,7 +55,6 @@ class DataManager(commands.Cog):
                         except json.JSONDecodeError:
                             await print(f"Skipping invalid JSON: {file_path}")
 
-        ic(unifieddata)
         return unifieddata
     
     ## Finds One Item within One Dataset
@@ -64,6 +63,7 @@ class DataManager(commands.Cog):
         try:
             for got_item in item_data:
                 if got_item["name"].lower() == item.lower():
+                    ic("find_data result", type, got_item['name'])
                     return got_item
                 
         except Exception as e:

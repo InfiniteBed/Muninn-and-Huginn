@@ -27,6 +27,22 @@ class ModTools(commands.Cog):
         self.user_manager.add_to_user_inventory(user.id, item)
 
         await ctx.send(f"Added {item['name']} to inventory.")
+
+    @commands.command()
+    async def remove_item_index(self, ctx, index: int, user: str = None):
+        if user is None:
+            user = ctx.author
+        else:
+            user = await self.search.find_user(user, ctx.guild)
+            if not user:
+                await ctx.send("No profile found.")
+                return
+            
+        item = self.user_manager.get_item_in_inventory(user.id, index)
+
+        self.user_manager.remove_from_user_inventory(user.id, item)
+
+        await ctx.send(f"Removed {item[0]['name']} from inventory.")
     
     @commands.command()
     async def find_data(self, ctx, type: str, item: str):
