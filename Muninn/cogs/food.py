@@ -9,30 +9,39 @@ import sqlite3  # Import sqlite3 for database handling
 import matplotlib.pyplot as plt  # Import matplotlib for graph generation
 import os  # Import os for file handling
 
+def get_time(hour, minute=0):
+    """Helper function to generate localized time."""
+    now = datetime.now(pytz.timezone("US/Pacific"))
+    return now.replace(hour=hour, minute=minute, second=0, microsecond=0).timetz()
+
 class FoodCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.target_channel_id = 1298762960184934432  # Replace with the target channel's ID
         self.food_emojis = [
-                "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭",
-                "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯", "🫔", "🥙", "🧆", "🥚", "🍳",
-                "🥘", "🍲", "🫕", "🥣", "🥗", "🍿", "🧈", "🫘", "🍚", "🍘", "🍙", "🍛", "🍜", "🍝",
-                "🍠", "🥠", "🍢", "🍡", "🥮", "🍧", "🍨", "🍦", "🥧", "🍰", "🎂", "🧁", "🍮", "🍭",
-                "🍬", "🍫", "🍩", "🍪", "🍼", "🥛", "☕", "🫖", "🍵", "🍶", "🍾", "🍷", "🍸", "🍹",
-                "🍺", "🍻", "🥂", "🥃"
-            ]
+            "🍓", "🍈", "🍉", "🍊", "🍋", "🍌", "🍍", "🥭", "🍎", "🍏", "🍐", "🍑", "🍒", "🍓", "🥝", 
+            "🥥", "🥑", "🍆", "🥔", "🥕", "🌽", "🌶️", "🥒", "🥬", "🥦", "🧄", "🧅", "🍄", "🥜", "🌰",  
+            "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧇", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕",  
+            "🌭", "🥪", "🌮", "🌯", "🥙", "🧆", "🥚", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🧈", "🧂",  
+            "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤", "🍥", "🥮", "🍡",  
+            "🥟", "🥠", "🥡", "🦪", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫", "🍬",  
+            "🍭", "🍮", "🍯", "🍼", "🥛", "☕", "🍵", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻", "🥂",  
+            "🥃", "🥤", "🧃", "🧉", "🧊", "🍅"
+        ]
 
+
+        # Define scheduled times using the helper function
         self.scheduled_times = [
-            time(8, 0),  # 8:00 AM
-            time(12, 53),  # 12:45 PM
-            time(18, 0),  # 6:00 PM
+            get_time(8),  # 8:00 AM
+            get_time(12),  # 12:00 PM
+            get_time(19),  # 7:00 PM
         ]
         self.food_scheduler = tasks.loop(time=self.scheduled_times)(self.food_scheduler_task)
         self.food_scheduler.start()
         self.db_path = "discord.db"
         self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
         self._initialize_database()
-        self.reaction_timeout = 300  # Timeout for reactions in seconds
+        self.reaction_timeout = 1800  # Timeout for reactions in seconds
 
     def cog_unload(self):   
         self.food_scheduler.cancel()
@@ -57,7 +66,7 @@ class FoodCog(commands.Cog):
         """Task to send food messages at scheduled times."""
         now = datetime.now(self.california_tz)  # Use California timezone
         for meal, scheduled_time in zip(["breakfast", "lunch", "dinner"], self.scheduled_times):
-            # Check if the current time matches the scheduled time
+            # Check if the current time matches the scheduled time (ignoring seconds and microseconds)
             if now.time().hour == scheduled_time.hour and now.time().minute == scheduled_time.minute:
                 await self.send_food_message(meal)
                 print(f"Sent {meal} message at {scheduled_time}.")
