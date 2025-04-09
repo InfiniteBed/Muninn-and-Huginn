@@ -78,7 +78,8 @@ class Setup(commands.Cog):
                     attack_boost INTEGER,
                     activity TEXT,
                     level INTEGER,
-                    coins INTEGER
+                    coins INTEGER,
+                    found_jobs TEXT
                 )
             ''')
 

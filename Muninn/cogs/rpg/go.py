@@ -68,9 +68,6 @@ class Go(commands.Cog):
             def __init__(self, nav_buttons, parent_cog):
                 super().__init__(timeout=None)
 
-            
-                
-
         class ExploreDetailView(View):
             def __init__(self, ctx, location, hours, parent_cog):
                 self.main_embed = main_embed
