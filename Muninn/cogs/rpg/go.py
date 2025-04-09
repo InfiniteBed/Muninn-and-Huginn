@@ -28,6 +28,9 @@ class Go(commands.Cog):
     async def go(self, ctx):
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
 
+        ## Construct Job Search Embed
+        
+
         ## Construct Item Gathering Embed
         gather_embed = discord.Embed(title="Explore", color=0x00DD77, description=f"Where will **{user_stats['profile_name']}** explore?")
 
@@ -61,6 +64,12 @@ class Go(commands.Cog):
 
             return embed
         
+        class JobView(View):
+            def __init__(self, nav_buttons, parent_cog):
+                super().__init__(timeout=None)
+
+            
+                
 
         class ExploreDetailView(View):
             def __init__(self, ctx, location, hours, parent_cog):
@@ -138,17 +147,24 @@ class Go(commands.Cog):
                 ## Navigate to the Main Menu
 
         class NavigationButtons(View):
-            def __init__(self, ctx, gather_embed, parent_cog):
+            def __init__(self, ctx, job_embed, gather_embed, parent_cog):
+                self.job_embed = job_embed
                 self.gather_embed = gather_embed
                 self.parent_cog = parent_cog
                 super().__init__(timeout=None)
+
+            @discord.ui.button(label="Professions", style=discord.ButtonStyle.blurple)
+            async def explore_button(self, interaction: discord.Interaction, button: Button):
+                home_button = ExploreView(ctx, nav_buttons, gather_locations, self.parent_cog)
+                await interaction.response.edit_message(embed=self.job_embed, view=home_button)
 
             @discord.ui.button(label="Explore", style=discord.ButtonStyle.blurple)
             async def explore_button(self, interaction: discord.Interaction, button: Button):
                 home_button = ExploreView(ctx, nav_buttons, gather_locations, self.parent_cog)
                 await interaction.response.edit_message(embed=self.gather_embed, view=home_button)
 
-        nav_buttons = NavigationButtons(ctx, gather_embed, self)
+
+        nav_buttons = NavigationButtons(ctx, job_embed, gather_embed, self)
         await ctx.send(embed=main_embed, view=nav_buttons)
 
 async def setup(bot):

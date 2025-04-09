@@ -25,6 +25,9 @@ class StatsManager(commands.Cog):
         c.execute('SELECT user_id, head, upper, lower, feet, hand_left, hand_right FROM equipped_items WHERE user_id = ?', (user.id,))
         equipped_armor = c.fetchone()
 
+        c.execute("SELECT * FROM proficiencies WHERE user_id = ?", (user.id,))
+        raw_inventory = (c.fetchone())[0]
+
         c.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user.id,))
         raw_inventory = (c.fetchone())[0]
 
@@ -389,5 +392,20 @@ class StatsManager(commands.Cog):
         # Save the updated activity to the user
         return end_time_str
     
+
+    @commands.command()
+    @commands.is_owner()
+    async def migrate(self, ctx):
+        for member in ctx.guild.members:
+            conn = sqlite3.connect('discord.db')
+            c = conn.cursor()
+            c.execute('''
+                INSERT OR REPLACE INTO proficiencies (
+                    user_id, author, baking, brewer, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (member.id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+            conn.commit()
+            conn.close()
+
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))
