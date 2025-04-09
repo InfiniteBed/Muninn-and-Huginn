@@ -1,7 +1,7 @@
 {
     "name": "Health Gallon",
     "description": "NEEDS DESCRIPTION",
-    "slot": "consumable",
+    "type": "consumable",
     "base_heal": 10,
     "base_price": 40
 }

@@ -3,10 +3,14 @@ import discord
 from discord.ext import commands
 import json
 from icecream import ic
+from datetime import datetime, timedelta, timezone
+import random
+import math
 
 class StatsManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.item_randomizer = self.bot.get_cog("ItemRandomizer") # For Item and Expedition Info
 
     async def fetch_user_stats(self, user):
         conn = sqlite3.connect('discord.db')
@@ -322,5 +326,68 @@ class StatsManager(commands.Cog):
         result = cursor.fetchone()
 
         return json.loads(result[index])
+    
+    async def calculate_activity_results(self, user_stats, activity):
+        if not activity['item_bonus']: 
+            activity['item_bonus'] = 1
+
+        item_bonus = activity['item_bonus']
+        item_results = []
+
+        if activity['skill_test'] is False:
+            for item in activity['item_pool']:
+                if random.random() < item['chance_to_appear']:
+                    std_deviation = item['std_deviation']
+
+                    item_data = await self.item_randomizer.generate_item(item['type'], item['name'])
+
+                    deviation = random.randint(-std_deviation, std_deviation)
+                    item_count = math.ceil(float(item['std_amount'] + deviation) * item_bonus)
+
+                    for i in range(item_count):
+                        item_results.append(item_data)
+                    
+                    print("Generated activity :)")
+        else:
+            pass
+            ## IMPLEMENT OR DIE
+            ## (based off job skills)
+
+        activity['item_results'] = item_results
+        return activity
+    
+    async def update_activity(self, interaction, activity, duration_hours, cost):
+        # The reward pool will consist of high, medium, and low luck results. This  will predetermine the results, and then store them
+        user_stats = await self.fetch_user_stats(interaction.user)
+
+        # Check if the user already has an activity
+        if user_stats['activity']:
+            await interaction.response.send_message(f"{user_stats['profile_name']} is already busy doing something else!")
+            return
+
+        if user_stats['coins'] < cost:
+            await interaction.response.send_message(f"You do not have enough coins to do this! You need {cost} coins.")
+            return
+
+        # Deduct the cost
+        await self.modify_user_stat(interaction.user, 'coins', -cost)
+
+        resulting_activity = await self.calculate_activity_results(user_stats, activity)
+
+        # Calculate the end time based on the expedition's duration
+        end_time = datetime.now(timezone.utc)  # Use timezone-aware datetime
+        end_time += timedelta(hours=duration_hours)
+        end_time_str = end_time.strftime('%Y-%m-%d %H:%M:%S')
+        activity['end_time'] = end_time_str
+
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+        cursor.execute('UPDATE stats SET activity = ? WHERE user_id = ?', (json.dumps(resulting_activity), interaction.user.id))
+        conn.commit()
+        conn.close()        
+    
+        # Save the updated activity to the user
+        return end_time_str
+    
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))

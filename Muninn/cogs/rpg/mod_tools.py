@@ -74,5 +74,27 @@ class ModTools(commands.Cog):
         item = await self.item_randomizer.weighted_random_items(ctx, 'equipment', hardcoded_list)
         await ctx.send(item)
 
+    @commands.command()
+    async def remove_activity(self, ctx, user: str = None):
+        if user is None:
+            user = ctx.author
+        else:
+            user = await self.search.find_user(user, ctx.guild)
+            if not user:
+                await ctx.send("No profile found.")
+                return
+            
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+        try:
+            cursor.execute("UPDATE stats SET activity = NULL WHERE user_id = ?", (user.id,))
+            conn.commit()
+            print(f"[DEBUG] Deleted expedition for user {user.id}")
+        except sqlite3.Error as e:
+            print(f"[ERROR] Failed to delete expedition from database: {e}")
+        finally:
+            conn.close()
+
+
 async def setup(bot):
     await bot.add_cog(ModTools(bot))

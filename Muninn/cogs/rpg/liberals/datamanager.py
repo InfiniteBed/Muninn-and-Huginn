@@ -22,12 +22,12 @@ class DataManager(commands.Cog):
                             data = json.load(f)
                             unifieddata.append(data)
                         except json.JSONDecodeError:
-                            await ctx.send(f"Skipping invalid JSON: {file_path}")
+                            print(f"Skipping invalid JSON: {file_path}")
 
-        await ctx.send(f"Data validated!")
+        print(f"Data validated!")
 
     ## Returns all data of a certain type
-    async def get_data_of_type(self, ctx, data_type: str = None):
+    async def get_data_of_type(self, data_type: str = None):
 
         if data_type is None:
             return None
@@ -40,8 +40,10 @@ class DataManager(commands.Cog):
             datapath = f'./data/items/{data_type}'
         elif data_type in ('shops', 'item_gathering'):
             datapath = f'./data/locations/{data_type}'
+        elif data_type in ('recipes'):
+            datapath = f'./data/{data_type}'
         else: 
-            await ctx.send(f"ERROR: Data type {data_type} not found")
+            print(f"ERROR: Data type {data_type} not found")
             return
 
         for dirpath, _, filenames in os.walk(datapath):
@@ -52,14 +54,14 @@ class DataManager(commands.Cog):
                         try:
                             data = json.load(f)
                             unifieddata.append(data)
-                        except json.JSONDecodeError:
-                            await print(f"Skipping invalid JSON: {file_path}")
+                        except json.JSONDecodeError as e:
+                            print(f"Skipping invalid JSON: {file_path}, {e}")
 
         return unifieddata
     
     ## Finds One Item within One Dataset
-    async def find_data(self, ctx, type: str, item: str):
-        item_data = await self.get_data_of_type(ctx, type)
+    async def find_data(self, type: str, item: str):
+        item_data = await self.get_data_of_type(type)
         try:
             for got_item in item_data:
                 if got_item["name"].lower() == item.lower():
@@ -67,15 +69,15 @@ class DataManager(commands.Cog):
                     return got_item
                 
         except Exception as e:
-            await ctx.send(f'ERROR - Could not find item in database: {e}')  
+            await print(f'ERROR - Could not find item in database: {e}')  
             return None
         
-        await ctx.send(f"Unable to find item {item}")
+        await print(f"Unable to find item {item}")
 
     @commands.command()
     @commands.is_owner()
-    async def debug_data(self, ctx, data_type):
-        data = await self.get_data(ctx, data_type)
+    async def debug_data(self, data_type):
+        data = await self.get_data(data_type)
         print(data)
     
     

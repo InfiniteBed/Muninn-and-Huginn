@@ -11,8 +11,8 @@ class ItemRandomizer(commands.Cog):
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
 
     ## Modifies Item's Values by Rarity if Needed
-    async def generate_item(self, ctx, type: str, item_name: str):
-        item = await self.data_manager.find_data(ctx, type, item_name)
+    async def generate_item(self, type: str, item_name: str):
+        item = await self.data_manager.find_data(type, item_name)
 
         if item is None:
             print('Could not find item to generate!')

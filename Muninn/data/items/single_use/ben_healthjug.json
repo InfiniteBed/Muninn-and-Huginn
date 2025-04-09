@@ -1,8 +1,7 @@
 {
     "name": "Health Jug",
     "description": "NEEDS DESCRIPTION",
-    "slot": "consumable",
-    "shop": true,
+    "type": "consumable",
     "base_heal": 10,
     "base_price": 20
 }
