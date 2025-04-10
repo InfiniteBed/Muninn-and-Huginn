@@ -79,6 +79,7 @@ class Setup(commands.Cog):
                     activity TEXT,
                     level INTEGER,
                     coins INTEGER,
+                    job TEXT,
                     found_jobs TEXT
                 )
             ''')

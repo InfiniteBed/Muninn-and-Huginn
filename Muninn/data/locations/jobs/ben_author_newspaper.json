@@ -1,0 +1,33 @@
+{
+    "name": "Mardo Stack",
+    "introduction": "The Mardo Stack is looking for new papermakers to join their team.You'll be turning wood pulp into new stacks of paper, ready to be written on.",
+    "proficiency": "author",
+    "results": [
+        {
+            "stage": 1,
+            "job_title": "Papermaker",
+            "hourly_wage": 2,
+            "hourly_xp": 1,
+            "range": {
+                "min": 0,
+                "max": 100
+            },
+            "results": [
+                "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace."
+            ]
+        },
+        {
+            "stage": 2,
+            "job_title": "Junior Editor",
+            "hourly_wage": 3,
+            "hourly_xp": 2,
+            "range": {
+                "min": 100,
+                "max": 200
+            },
+            "results": [
+                "{name} was given a few simple editing tasks to do. {pronoun} was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work."
+            ]
+        }
+    ]
+}

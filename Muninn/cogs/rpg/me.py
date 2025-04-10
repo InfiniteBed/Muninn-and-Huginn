@@ -52,9 +52,11 @@ class Status(commands.Cog):
         # Expedition page embed
         expedition_embed = discord.Embed(title="Activity Details", color=embed_color)
         expedition_completed = False
+        activity_data = False
         expedition_name = None
         if user_stats['activity'] and user_stats['activity'] != "{}":
             activity_data = json.loads(user_stats['activity'])
+            expedition_name = activity_data['name']
             end_time = datetime.strptime(str(activity_data['end_time']), "%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()
             california_time = await self.timezone_converter.convert_time(str(end_time))
@@ -333,10 +335,11 @@ class Status(commands.Cog):
 
         # Button view for top-level navigation
         class NavigationView(View):
-            def __init__(self, profile_user, expedition_completed, parent_cog=None, main_embed=None):
+            def __init__(self, profile_user, expedition_completed, activity_data, parent_cog=None, main_embed=None):
                 super().__init__(timeout=180)
                 self.profile_user = profile_user
                 self.activity_data = activity_data
+                self.expedition_completed = expedition_completed
                 self.expedition_name = expedition_name
                 self.parent_cog = parent_cog  # Reference to the parent cog
                 self.main_embed = main_embed  # Store the main embed
@@ -388,8 +391,8 @@ class Status(commands.Cog):
                 @discord.ui.button(label="Activity Results", style=discord.ButtonStyle.success)
                 async def expedition_results_button(self, interaction: discord.Interaction, button: Button):
                 
-                    await self.parent_cog.process_activity(user, activity_data)
-                    
+                    # await self.parent_cog.process_activity(ctx, user, activity_data)
+                        
                     if activity_data['type'] == 'expedition':
                         # Determine embed color based on result type
                         color_map = {
@@ -455,8 +458,42 @@ class Status(commands.Cog):
 
                         await interaction.response.send_message(embed=embed)
 
-
-
+                    if activity_data.get('type') == 'job_search':
+                        if activity_data['got_job']:
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} found a job!", color=discord.Color.green())
+                            embed.add_field(name=activity_data['job_name'], value=activity_data['introduction'])
+                            await interaction.response.send_message(embed=embed)
+                        else:
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} wasn't able to find a job!", description=f"{user_stats['profile_name']} searched far and wide, but was unable to find a job.", color=discord.Color.red())
+                            await interaction.response.send_message(embed=embed)
+                    
+                    if activity_data.get('type') == 'job':
+                        description = ""
+                        proficiency = activity_data.get('proficiency')
+                        current_xp = await self.parent_cog.stats_manager.get_proficiency(interaction.user, proficiency)
+                        
+                        new_xp = activity_data.get('xp_change') + current_xp
+                        
+                        for index, stage in enumerate(activity_data['results']):
+                            if stage['range']['min'] <= current_xp < stage['range']['max']:
+                                current_stage = index
+                            if stage['range']['min'] <= new_xp < stage['range']['max']:
+                                new_stage = index
+                                new_index = index
+                                                                                        
+                        if new_stage > current_stage:
+                            description += f"**{user_stats['profile_name']} got a raise to {activity_data['results'][new_index]['job_title']} (Level {activity_data['results'][new_index]}!**\n\n"
+                        if activity_data.get('xp_change'):
+                            description += f"Increased **{activity_data['proficiency'].title()}** proficiency by `{activity_data['xp_change']}`.\n\n"
+                        if activity_data.get('result'):
+                            description += str.format(activity_data.get('result'), name=f"**{user_stats['profile_name']}**")
+                        
+                        embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
+                                              description=description, 
+                                              color=discord.Color.green())
+                        
+                        await interaction.response.send_message(embed=embed)
+                        
                     # Delete the expedition from the database
                     # await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
 
@@ -467,7 +504,7 @@ class Status(commands.Cog):
                     return False
                 return True
 
-        navigation_view = NavigationView(user, expedition_completed, parent_cog=self, main_embed=main_embed)
+        navigation_view = NavigationView(user, expedition_completed, activity_data, parent_cog=self, main_embed=main_embed)
         await ctx.send(file=file, embed=main_embed, view=navigation_view)
 
     async def update_inventory_in_database(self, user_id, updated_inventory):
@@ -497,9 +534,12 @@ class Status(commands.Cog):
         finally:
             conn.close()
         
-    async def process_activity(self, user, activity_data):
+    async def process_activity(self, ctx, user, activity_data):
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
+        
+        if activity_data.get('xp_change'):
+            await self.stats_manager.proficency_increase(user, activity_data.get('proficiency'), activity_data.get('xp_change'))
 
         if activity_data.get('item_results'):
             for item in activity_data['item_results']:

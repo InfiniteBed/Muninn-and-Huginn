@@ -16,7 +16,7 @@ class StatsManager(commands.Cog):
         conn = sqlite3.connect('discord.db')
         c = conn.cursor()
 
-        c.execute('SELECT health, health_max, defense, attack, level, activity, coins FROM stats WHERE user_id = ?', (user.id,))
+        c.execute('SELECT health, health_max, defense, attack, level, activity, coins, job1, job2, job3, found_jobs FROM stats WHERE user_id = ?', (user.id,))
         stats_data = c.fetchone()
 
         c.execute('SELECT class, gender, alignment, race, name, bio, ability_scores FROM profiles WHERE user_id = ?', (user.id,))
@@ -27,6 +27,9 @@ class StatsManager(commands.Cog):
 
         c.execute("SELECT * FROM proficiencies WHERE user_id = ?", (user.id,))
         raw_inventory = (c.fetchone())[0]
+
+        c.execute("SELECT author, baking, brewer, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance FROM proficiencies WHERE user_id = ?", (user.id,))
+        proficiencies = (c.fetchone())[0]
 
         c.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user.id,))
         raw_inventory = (c.fetchone())[0]
@@ -43,7 +46,7 @@ class StatsManager(commands.Cog):
         
         #Retrieve Variables from Dictionaries
         profile_class, profile_gender, profile_alignment, profile_race, profile_name, profile_bio, ability_scores_str = profile_data
-        health, health_max, defense, attack, level, activity, coins = stats_data
+        health, health_max, defense, attack, level, activity, coins, job1, job2, job3, available_jobs = stats_data
         _, head, upper, lower, feet, hand_left, hand_right = equipped_armor
 
         #Process Bio
@@ -78,6 +81,11 @@ class StatsManager(commands.Cog):
             'pronoun_possessive': pronoun_possessive,
             'ability_scores': ability_scores,
             'scores_display': scores_display,
+            "job1": job1,
+            "job2": job2,
+            "job3": job3,
+            'available_jobs': available_jobs,
+            'proficiencies': proficiencies,
             'health': health,
             'health_max': health_max,
             'health_display': health_display,
@@ -330,14 +338,32 @@ class StatsManager(commands.Cog):
 
         return json.loads(result[index])
     
-    async def calculate_activity_results(self, user_stats, activity):
-        if not activity['item_bonus']: 
-            activity['item_bonus'] = 1
-
-        item_bonus = activity['item_bonus']
+    async def calculate_activity_results(self, interaction, activity):
+        item_bonus = activity.get('item_bonus', 1)
         item_results = []
+        
+        if activity.get('type') == 'job':
+            proficiency = await self.get_proficiency(interaction.user, activity['proficiency'])
+            for stage in activity['results']:
+                if stage['range']['min'] <= proficiency < stage['range']['max']:
+                    activity['result'] = random.choice(stage['results'])
+                    activity['coins_change'] = activity['hours'] * stage['hourly_wage']
+                    activity['xp_change'] = activity['hours'] * stage['hourly_xp']
+                    ic(activity['result'])
+                    
+            return activity
+        
+        if activity.get('type') == 'job_search':
+            if random.random() < activity['chance']:  
+                print('AAAAAH')        
+                activity['got_job'] = True
+            else:          
+                activity['got_job'] = False
+                print('NOOOOO')
+                
+            return activity
 
-        if activity['skill_test'] is False:
+        if 'skill_test' not in activity:
             for item in activity['item_pool']:
                 if random.random() < item['chance_to_appear']:
                     std_deviation = item['std_deviation']
@@ -375,7 +401,7 @@ class StatsManager(commands.Cog):
         # Deduct the cost
         await self.modify_user_stat(interaction.user, 'coins', -cost)
 
-        resulting_activity = await self.calculate_activity_results(user_stats, activity)
+        resulting_activity = await self.calculate_activity_results(interaction, activity)
 
         # Calculate the end time based on the expedition's duration
         end_time = datetime.now(timezone.utc)  # Use timezone-aware datetime
@@ -392,6 +418,61 @@ class StatsManager(commands.Cog):
         # Save the updated activity to the user
         return end_time_str
     
+    async def get_proficiency(self, user, proficiency):
+        query = f"SELECT {proficiency} FROM proficiencies WHERE user_id = ?"
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        result = c.execute(query, (user.id,)).fetchone()[0]
+        conn.close()
+        return result
+    
+    async def proficency_increase(self, user, proficiency, amount: int):
+        query = f"SELECT {proficiency} FROM proficiencies WHERE user_id = ?"
+        execute = f"UPDATE proficiencies SET {proficiency} = ? WHERE user_id = ?"
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute(query, (user.id,))
+
+        proficiency_value = float((c.fetchone())[0])
+        proficiency_value = max(0, proficiency_value + float(amount))
+        
+        c.execute(execute, (proficiency_value, user.id,))
+        conn.commit()
+        conn.close()        
+
+    @commands.command()
+    @commands.is_owner()
+    async def prof_inc(self, ctx, proficiency, amount):
+        await self.proficency_increase(ctx.author, proficiency, amount)
+        
+    async def add_available_job(self, ctx, user, activity_name):
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute("SELECT found_jobs FROM stats WHERE user_id = ?", (user.id,))
+        result = c.fetchone()
+        
+        if not result or result[0] == None:
+            found_jobs = []
+        else:
+           found_jobs = json.loads(result[0])  # c
+            
+        found_jobs.append(activity_name)
+            
+        c.execute("UPDATE stats SET found_jobs = ? WHERE user_id = ?", (json.dumps(found_jobs), user.id,))
+        conn.commit()
+        conn.close()
+
+    def apply_job(self, slot, user, job_name):
+        query = f"SELECT job{slot} FROM stats WHERE user_id = ?"
+        execute = f"UPDATE stats SET job{slot} = ? WHERE user_id = ?"
+        
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute(query, (user.id,))
+            
+        c.execute(execute, (job_name, user.id,))
+        conn.commit()
+        conn.close()        
 
     @commands.command()
     @commands.is_owner()
@@ -406,6 +487,7 @@ class StatsManager(commands.Cog):
             ''', (member.id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
             conn.commit()
             conn.close()
+
 
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))

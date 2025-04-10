@@ -28,7 +28,7 @@ class DataManager(commands.Cog):
 
     ## Returns all data of a certain type
     async def get_data_of_type(self, data_type: str = None):
-
+        print('Getting data of type...')
         if data_type is None:
             return None
 
@@ -38,7 +38,7 @@ class DataManager(commands.Cog):
             datapath = f'./data/items'
         elif data_type in ('crafting', 'equipment', 'single_use'):
             datapath = f'./data/items/{data_type}'
-        elif data_type in ('shops', 'item_gathering'):
+        elif data_type in ('jobs', 'item_gathering'):
             datapath = f'./data/locations/{data_type}'
         elif data_type in ('recipes'):
             datapath = f'./data/{data_type}'
@@ -61,6 +61,7 @@ class DataManager(commands.Cog):
     
     ## Finds One Item within One Dataset
     async def find_data(self, type: str, item: str):
+        print('Finding item in data...')
         item_data = await self.get_data_of_type(type)
         try:
             for got_item in item_data:
@@ -69,10 +70,10 @@ class DataManager(commands.Cog):
                     return got_item
                 
         except Exception as e:
-            await print(f'ERROR - Could not find item in database: {e}')  
+            print(f'ERROR - Could not find item in database: {e}')  
             return None
         
-        await print(f"Unable to find item {item}")
+        print(f"Unable to find item {item}")
 
     @commands.command()
     @commands.is_owner()
