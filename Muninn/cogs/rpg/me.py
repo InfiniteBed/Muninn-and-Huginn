@@ -87,6 +87,21 @@ class Status(commands.Cog):
         info_embed.add_field(name="Ability Scores", value=user_stats['scores_display'], inline=True)
         info_embed.add_field(name="Bio", value=user_stats['bio'], inline=True)
 
+        # Profession page embed
+        professions_clean = ["📚 Author", "🥖 Baking", "🍺 Brewer", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
+
+        professions_str = ""
+        query = f"SELECT * FROM proficiencies WHERE user_id = ?"
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        result = c.execute(query, (user.id,)).fetchall()[0]
+        conn.close()
+        
+        for index, profession_name in enumerate(professions_clean):
+            professions_str += f"{profession_name}: `{result[index+1]}`\n"
+            
+        professions_embed = discord.Embed(title="Character Professions", color=embed_color, description=professions_str)
+        professions_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
         # Helper function to format equipped items
         def format_item(item):
             """Format an item with its prefix, name, and actions."""
@@ -354,31 +369,25 @@ class Status(commands.Cog):
                         else:
                             child.style = discord.ButtonStyle.secondary  # Reset other buttons
 
-            @discord.ui.button(label="Main", style=discord.ButtonStyle.primary)
+            @discord.ui.button(label="Main", style=discord.ButtonStyle.primary, row=0)
             async def main_button(self, interaction: discord.Interaction, button: Button):
                 self.current_menu = "Main"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=self.main_embed, view=self)
 
-            @discord.ui.button(label="Activity", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Activity", style=discord.ButtonStyle.secondary, row=0)
             async def expedition_button(self, interaction: discord.Interaction, button: Button):
                 self.current_menu = "Activity"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=expedition_embed, view=self)
 
-            @discord.ui.button(label="Info", style=discord.ButtonStyle.secondary)
-            async def info_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Info"
-                self.update_button_styles()
-                await interaction.response.edit_message(embed=info_embed, view=self)
-
-            @discord.ui.button(label="Gear", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Gear", style=discord.ButtonStyle.secondary, row=0)
             async def equipped_button(self, interaction: discord.Interaction, button: Button):
                 self.current_menu = "Gear"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=equipped_embed, view=self)
 
-            @discord.ui.button(label="Pack", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Pack", style=discord.ButtonStyle.secondary, row=0)
             async def inventory_button(self, interaction: discord.Interaction, button: Button):
                 self.current_menu = "Pack"
                 self.update_button_styles()
@@ -386,12 +395,24 @@ class Status(commands.Cog):
                 await inventory_view.initialize_inventory()
                 await interaction.response.edit_message(embed=inventory_view.current_embed, view=inventory_view)
 
+            @discord.ui.button(label="Character Info", style=discord.ButtonStyle.secondary, row=1)
+            async def info_button(self, interaction: discord.Interaction, button: Button):
+                self.current_menu = "Character Info"
+                self.update_button_styles()
+                await interaction.response.edit_message(embed=info_embed, view=self)
+
+            @discord.ui.button(label="Professions", style=discord.ButtonStyle.secondary, row=1)
+            async def professions_button(self, interaction: discord.Interaction, button: Button):
+                self.current_menu = "Professions"
+                self.update_button_styles()
+                await interaction.response.edit_message(embed=professions_embed, view=self)
+
             # Add a button for expedition results if the expedition is completed
             if expedition_completed:
                 @discord.ui.button(label="Activity Results", style=discord.ButtonStyle.success)
                 async def expedition_results_button(self, interaction: discord.Interaction, button: Button):
                 
-                    # await self.parent_cog.process_activity(ctx, user, activity_data)
+                    await self.parent_cog.process_activity(ctx, user, activity_data)
                         
                     if activity_data['type'] == 'expedition':
                         # Determine embed color based on result type
@@ -495,7 +516,7 @@ class Status(commands.Cog):
                         await interaction.response.send_message(embed=embed)
                         
                     # Delete the expedition from the database
-                    # await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
+                    await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
 
             async def interaction_check(self, interaction: discord.Interaction):
                 """Ensure only the requested user can interact with the buttons."""

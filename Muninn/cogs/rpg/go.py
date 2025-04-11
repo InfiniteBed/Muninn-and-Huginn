@@ -107,10 +107,12 @@ class Go(commands.Cog):
         main_embed = discord.Embed(title="Go", 
                                    color=0x00DD77, 
                                    description=f"**{user_stats['profile_name']}** stands just outside {user_stats['pronoun_possessive']} home.\n\n"
-                                               f"{user_stats['pronoun'].title()} could **go to work** or **find a job**, **visit the expedition board** and help people in need, or **shop** at the user-led market.")
+                                               f"{user_stats['pronoun'].title()} could go to work or find a job, explore for items or shop at the user-led market.")
 
         def location_details_embed(location, time_gathering = 1):
-            embed = discord.Embed(title=f"{location['name']}", color=0x89CFF0, description=f"Select how long **{user_stats['profile_name']}** will explore for.")
+            embed = discord.Embed(title=f"{location['name']}", 
+                                  color=0x89CFF0, 
+                                  description=f"Select how long **{user_stats['profile_name']}** will explore for.")
 
             item_bonus = time_gathering/2
 
@@ -178,7 +180,7 @@ class Go(commands.Cog):
                     self.decrease_button.disabled = False
 
                 if hours >= 8:
-                    self.increase_button.disabled = True
+                     self.increase_button.disabled = True
                 else:
                     self.increase_button.disabled = False
 
@@ -188,7 +190,7 @@ class Go(commands.Cog):
                 user_stats = await self.parent_cog.stats_manager.fetch_user_stats(interaction.user)
 
                 random_job['type'] = 'job_search'
-                random_job['chance'] = (15 * hours) / 100
+                random_job['chance'] = (15 * hours)
                 random_job['job_name'] = random_job['name']
                 random_job['name'] = 'Searching for a Job'
 
@@ -225,11 +227,11 @@ class Go(commands.Cog):
                 job_data['name'] = f'Working at {job_data['job_name']}'
                 job_data['hours'] = hours
 
-                eta = await self.parent_cog.stats_manager.update_activity(interaction, job_data, hours/100, cost=0)
+                eta = await self.parent_cog.stats_manager.update_activity(interaction, job_data, hours, cost=0)
 
                 embed = discord.Embed(
                     title=f"{user_stats['profile_name']} went to work at {job}!",
-                    description=f"Rest assured, {user_stats['profile_name']} is hard at work.",
+                    description=f"Rest assured, **{user_stats['profile_name']}** is hard at work.",
                     color=discord.Color.gold()
                 )
                 embed.add_field(name="ETA", value=eta)
@@ -416,7 +418,7 @@ class Go(commands.Cog):
 
             @discord.ui.button(label="Market", style=discord.ButtonStyle.grey)
             async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                market_view = self.parent_cog.go_market.ShopOverView()
+                market_view = self.parent_cog.go_market.ShopOverView(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats)
                 market_overview_embed = await self.parent_cog.go_market.market_overview_embed(ctx)
                 await interaction.response.edit_message(embed=market_overview_embed, view=market_view)
 
