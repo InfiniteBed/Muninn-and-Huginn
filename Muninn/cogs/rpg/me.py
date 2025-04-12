@@ -1,4 +1,5 @@
 import discord  # type: ignore
+from discord import app_commands
 from discord.ext import commands  # type: ignore
 from discord.ui import View, Button
 import sqlite3
@@ -17,16 +18,16 @@ class Status(commands.Cog):
         self.stats_manager = bot.get_cog("StatsManager")
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
 
-
-    @commands.command(name="status", aliases=["me"])
-    async def status(self, ctx, user: str = None):
+    @commands.hybrid_command(name="me", aliases=["status"], description="View your own or another user's status.")
+    @app_commands.describe(user="The user to check status of")
+    async def status(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
-        else:
-            user = await self.search.find_user(user, ctx.guild)
-            if not user:
-                await ctx.send("No profile found.")
-                return
+        # else:
+        #     user = await self.search.find_user(user, ctx.guild)
+        #     if not user:
+        #         await ctx.send("No profile found.")
+        #         return
 
         user_stats = await self.stats_manager.fetch_user_stats(user)
         
@@ -172,7 +173,6 @@ class Status(commands.Cog):
                 inventory_list = []
                 for index, item in enumerate(page_items, start=1):
                     item_data = await self.data_manager.find_data(item['type'], item['name'])
-                    ic(item_data)
                     description = item_data['description']
                     prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""

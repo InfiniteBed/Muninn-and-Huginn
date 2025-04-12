@@ -2,12 +2,13 @@ import sqlite3
 import json
 import datetime
 import discord
+from discord import app_commands, SelectOption
 from discord.ext import commands
 import asyncio
 import math
 import ast
 from icecream import ic
-from discord.ui import View, Button
+from discord.ui import View, Button, Select
 import random
 
 class Go(commands.Cog):
@@ -19,7 +20,7 @@ class Go(commands.Cog):
         self.data_manager = self.bot.get_cog("DataManager")
         self.go_market = self.bot.get_cog("GoMarket")
     
-    @commands.command()
+    @commands.hybrid_command(name="go", description="Go work, find a job, shop around, or gather items.")
     async def go(self, ctx):
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
         
@@ -104,10 +105,9 @@ class Go(commands.Cog):
             gather_embed.add_field(name=location['name'], value=location['description'])
             
         ## Construct Main Menu Embed
-        main_embed = discord.Embed(title="Go", 
+        main_embed = discord.Embed(title=f"**{user_stats['profile_name']}** stands just outside {user_stats['pronoun_possessive']} home.", 
                                    color=0x00DD77, 
-                                   description=f"**{user_stats['profile_name']}** stands just outside {user_stats['pronoun_possessive']} home.\n\n"
-                                               f"{user_stats['pronoun'].title()} could go to work or find a job, explore for items or shop at the user-led market.")
+                                   description=f"{user_stats['pronoun'].title()} could go to work or find a job, explore for items or shop at the user-led market.")
 
         def location_details_embed(location, time_gathering = 1):
             embed = discord.Embed(title=f"{location['name']}", 
@@ -160,14 +160,14 @@ class Go(commands.Cog):
                 self.hours = self.hours/2
                 embed = await self.build_details_embed(location, self.hours)
                 self.disable_buttons(self.hours)
-                await interaction.response.edit_message(embed=await embed, view=self)
+                await interaction.response.edit_message(embed=embed, view=self)
 
             @discord.ui.button(label="x2 hrs", style=discord.ButtonStyle.grey)
             async def increase_button(self, interaction: discord.Interaction, button: Button):
                 self.hours = self.hours*2
                 embed = await self.build_details_embed(location, self.hours)
                 self.disable_buttons(self.hours)
-                await interaction.response.edit_message(embed=await embed, view=self)
+                await interaction.response.edit_message(embed=embed, view=self)
 
             @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
             async def home_button(self, interaction: discord.Interaction, button: Button):
@@ -377,28 +377,32 @@ class Go(commands.Cog):
             async def build_details_embed(self, location, time_gathering = 1):
                 return location_details_embed(location, time_gathering)
             
-        class ExploreView(View):
-            def __init__(self, ctx, nav_buttons, gather_locations, parent_cog):
-                self.main_embed = main_embed
-                self.nav_buttons = nav_buttons
-                self.gather_locations = gather_locations
+        class ExploreDropdown(Select):
+            def __init__(self, parent_cog):
                 self.parent_cog = parent_cog
-                super().__init__(timeout=None)
+                options = []
+                for index, location in enumerate(gather_locations):
+                    ic(location)
+                    options.append(SelectOption(label=location['name'], description=location['description'][:100], value=str(index)))
 
-            for location in gather_locations:
-                @discord.ui.button(label=location["name"], style=discord.ButtonStyle.grey)
-                async def gather_button(self, interaction: discord.Interaction, button: Button):
-                    location_name = button.label
+                super().__init__(placeholder="Select a location to explore...", options=options, min_values=1, max_values=1)
 
-                    embed = location_details_embed(location)
+            async def callback(self, interaction: discord.Interaction):
+                if interaction.user.id != ctx.author.id:
+                    await interaction.response.send_message("Sorry, this menu isn't for you.", ephemeral=True)
+                    return
+                
+                index = int(self.values[0])
 
-                    detail_view = ExploreDetailView(ctx, location, 1, self.parent_cog, job=None)
-                    await interaction.response.edit_message(embed=embed, view=detail_view)
+                embed = location_details_embed(gather_locations[index])
 
-            @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
-            async def home_button(self, interaction: discord.Interaction, button: Button):
-                await interaction.response.edit_message(embed=self.main_embed, view=nav_buttons)
-                ## Navigate to the Main Menu
+                detail_view = ExploreDetailView(ctx, location, 1, self.parent_cog, job=None)
+                await interaction.response.edit_message(embed=embed, view=detail_view)
+
+        class VendorDropdownView(View):
+            def __init__(self, parent_cog):
+                super().__init__(timeout=60)
+                self.add_item(ExploreDropdown(parent_cog))
 
         class NavigationButtons(View):
             def __init__(self, ctx, gather_embed, parent_cog):
@@ -406,21 +410,20 @@ class Go(commands.Cog):
                 self.parent_cog = parent_cog
                 super().__init__(timeout=None)
 
-            @discord.ui.button(label="Jobs", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label="Explore", style=discord.ButtonStyle.grey, emoji="🌲")
+            async def explore_button(self, interaction: discord.Interaction, button: Button):
+                explore_view = VendorDropdownView(self.parent_cog)
+                await interaction.response.edit_message(embed=self.gather_embed, view=explore_view)
+
+            @discord.ui.button(label="Market", style=discord.ButtonStyle.grey, emoji="🛍️")
+            async def expedition_button(self, interaction: discord.Interaction, button: Button):
+                market_overview_embed, view = await self.parent_cog.go_market.market_overview_embed(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats)
+                await interaction.response.edit_message(embed=market_overview_embed, view=view)
+
+            @discord.ui.button(label="Jobs", style=discord.ButtonStyle.grey, emoji="🛠️")
             async def job_button(self, interaction: discord.Interaction, button: Button):
                 job_view = JobView(ctx, nav_buttons, self.parent_cog)
                 await interaction.response.edit_message(embed=job_overview_embed, view=job_view)
-
-            @discord.ui.button(label="Explore", style=discord.ButtonStyle.grey)
-            async def explore_button(self, interaction: discord.Interaction, button: Button):
-                explore_view = ExploreView(ctx, nav_buttons, gather_locations, self.parent_cog)
-                await interaction.response.edit_message(embed=self.gather_embed, view=explore_view)
-
-            @discord.ui.button(label="Market", style=discord.ButtonStyle.grey)
-            async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                market_view = self.parent_cog.go_market.ShopOverView(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats)
-                market_overview_embed = await self.parent_cog.go_market.market_overview_embed(ctx)
-                await interaction.response.edit_message(embed=market_overview_embed, view=market_view)
 
         nav_buttons = NavigationButtons(ctx, gather_embed, self)
         await ctx.send(embed=main_embed, view=nav_buttons)

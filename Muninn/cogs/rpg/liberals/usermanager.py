@@ -302,7 +302,7 @@ class StatsManager(commands.Cog):
         conn.close()
 
     def remove_from_user_inventory(self, user_id, item_data):
-        ic(item_data[0]['name'], user_id)
+        ic(item_data['name'], user_id)
 
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
@@ -318,7 +318,7 @@ class StatsManager(commands.Cog):
         user_inventory = json.loads(result[0])
 
         #Remove item from inventory
-        user_inventory.remove(item_data[0])
+        user_inventory.remove(item_data)
 
         ic(user_inventory)
 
@@ -328,7 +328,6 @@ class StatsManager(commands.Cog):
         conn.close()
 
     def get_item_in_inventory(self, user_id, index):
-
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
 
@@ -473,21 +472,6 @@ class StatsManager(commands.Cog):
         c.execute(execute, (job_name, user.id,))
         conn.commit()
         conn.close()        
-
-    @commands.command()
-    @commands.is_owner()
-    async def migrate(self, ctx):
-        for member in ctx.guild.members:
-            conn = sqlite3.connect('discord.db')
-            c = conn.cursor()
-            c.execute('''
-                INSERT OR REPLACE INTO proficiencies (
-                    user_id, author, baking, brewer, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (member.id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-            conn.commit()
-            conn.close()
-
 
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))

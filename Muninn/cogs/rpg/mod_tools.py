@@ -22,7 +22,7 @@ class ModTools(commands.Cog):
                 await ctx.send("No profile found.")
                 return
             
-        item = await self.item_randomizer.generate_item(ctx, type, item)
+        item = await self.item_randomizer.generate_item(type, item)
 
         self.user_manager.add_to_user_inventory(user.id, item)
 
