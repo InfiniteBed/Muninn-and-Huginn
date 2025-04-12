@@ -2,7 +2,10 @@
     "name": "Whittled Knife",
     "type": "equipment",
     "skill": "woodworking",
-    "recipe": {
-        "Branch": 1
-    }
+    "recipe": [
+        {
+            "name": "Branch",
+            "amount": 1
+        }
+    ]
 }

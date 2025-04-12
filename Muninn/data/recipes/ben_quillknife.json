@@ -1,0 +1,12 @@
+{
+    "name": "Quill Knife",
+    "type": "equipment",
+    "required_skill": "author",
+    "skill_level": 5,
+    "recipe": [
+        {
+            "name": "Feather",
+            "amount": 1
+        }
+    ]
+}

@@ -513,7 +513,7 @@ class Status(commands.Cog):
                                               description=description, 
                                               color=discord.Color.green())
                         
-                        await interaction.response.send_message(embed=embed)
+                        await interaction.response.edit_message(embed=embed, view=None)
                         
                     # Delete the expedition from the database
                     await self.parent_cog.delete_expedition_from_database(self.profile_user.id)

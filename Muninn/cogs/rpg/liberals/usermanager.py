@@ -209,7 +209,32 @@ class StatsManager(commands.Cog):
 
         print(f"Equipped {item_data['name']} in {slot}.")
 
-    @commands.command()
+    def remove_from_user_inventory(self, user_id, item_data):
+        ic(item_data['name'], user_id)
+
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+
+        #Check if inventotry is empty, then skip if empty.
+        cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+
+        if len(result) < 1:
+            print("Nothing to remove from user's inventory!")
+            return
+        
+        user_inventory = json.loads(result[0])
+
+        #Remove item from inventory
+        user_inventory.remove(item_data)
+
+        ic(user_inventory)
+
+        #Plant back into database
+        cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
+        conn.commit()
+        conn.close()
+
     async def unequip_from_inventory(self, ctx, user, slot: str):
         user_data = await self.fetch_user_stats(user)
 
@@ -297,32 +322,6 @@ class StatsManager(commands.Cog):
 
         user_inventory.append(item_data)
 
-        cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
-        conn.commit()
-        conn.close()
-
-    def remove_from_user_inventory(self, user_id, item_data):
-        ic(item_data['name'], user_id)
-
-        conn = sqlite3.connect('discord.db')
-        cursor = conn.cursor()
-
-        #Check if inventotry is empty, then skip if empty.
-        cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
-        result = cursor.fetchone()
-
-        if len(result) < 1:
-            print("Nothing to remove from user's inventory!")
-            return
-        
-        user_inventory = json.loads(result[0])
-
-        #Remove item from inventory
-        user_inventory.remove(item_data)
-
-        ic(user_inventory)
-
-        #Plant back into database
         cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
         conn.commit()
         conn.close()
@@ -416,6 +415,14 @@ class StatsManager(commands.Cog):
     
         # Save the updated activity to the user
         return end_time_str
+    
+    async def get_users_proficiency_by_id(self, user_id, proficiency):
+        query = f"SELECT {proficiency} FROM proficiencies WHERE user_id = ?"
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        result = c.execute(query, (user_id,)).fetchone()[0]
+        conn.close()
+        return result
     
     async def get_proficiency(self, user, proficiency):
         query = f"SELECT {proficiency} FROM proficiencies WHERE user_id = ?"

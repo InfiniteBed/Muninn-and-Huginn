@@ -69,6 +69,7 @@ class DataManager(commands.Cog):
                     ic("find_data result", type, got_item['name'])
                     return got_item
                 
+            
         except Exception as e:
             print(f'ERROR - Could not find item in database: {e}')  
             return None

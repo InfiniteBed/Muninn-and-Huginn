@@ -1,0 +1,20 @@
+{
+    "name": "Katana",
+    "description": "A weapon originating from Japan that takes skill to strike effectively.",
+    "slot": "hand",
+    "base_price": 29,
+    "actions": [
+      {
+        "name": "Scribe",
+        "description": "\"Write\" a cut into your enemy with the sharp pen tip.",
+        "damage": 5,
+        "defense": 8
+      },
+      {
+        "name": "Zero Stars",
+        "description": "Write a scathing review on your enemy, and deal major ego damage.",
+        "damage": 4,
+        "defense": 9
+      }
+    ]
+}
