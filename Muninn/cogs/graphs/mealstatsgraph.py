@@ -7,12 +7,16 @@ from pathlib import Path
 from cogs.graphs.discord_theme import DiscordTheme  # Import the Discord theme cog
 import pytz
 from datetime import datetime
+import matplotlib.font_manager  # Import font manager for adding custom fonts
 
 class MealStatsGraph(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db_path = "discord.db"
         self.california_tz = pytz.timezone('US/Pacific')  # Add California timezone
+
+        # Add NotoColorEmoji font for emoji rendering
+        matplotlib.font_manager.fontManager.addfont("/usr/src/bot/fonts/NotoColorEmoji-Regular.ttf")
 
     @commands.command(name="meal_graph")
     async def generate_meal_graph(self, ctx, user: discord.User = None):
@@ -58,18 +62,24 @@ class MealStatsGraph(commands.Cog):
             statuses = sorted({key for meal in meal_status.values() for key in meal.keys()})
             data = {status: [meal_status.get(meal, {}).get(status, 0) for meal in meals] for status in statuses}
 
+            # Include emojis in meal labels
+            meal_labels = [
+                f"{meal} ({', '.join(set(key.split(' ')[-1] for key in meal_status[meal].keys() if '(' in key))})"
+                for meal in meals
+            ]
+
             # Generate the bar chart
             x = range(len(meals))
             plt.figure(figsize=(12, 8))
             for i, status in enumerate(statuses):
                 plt.bar([p + i * 0.25 for p in x], data[status], width=0.25, label=status)
 
-            plt.xticks([p + 0.25 for p in x], meals, fontproperties=prop)
+            plt.xticks([p + 0.25 for p in x], meal_labels, fontproperties=prop, rotation=45, ha="right")
             plt.xlabel("Meals", fontproperties=prop)
             plt.ylabel("Count", fontproperties=prop)
             title = f"Meal Statistics for {user.name}" if user else "Meal Statistics (All Users)"
             plt.title(title, fontproperties=prop)
-            plt.legend(prop=prop)
+            plt.legend()  # Use default font for the legend
 
             # Add California time to the graph title
             california_time = datetime.now(self.california_tz).strftime("%Y-%m-%d %I:%M %p %Z")

@@ -110,8 +110,9 @@ class StatsTracker(commands.Cog):
                     continue
                 if message.content.startswith("!"):
                     continue
-
-                print(f"Processing message {message.id} from {message.author}: {message.content}")
+                
+                message_content = re.sub(r'https?://\S+', '', message.content)
+                print(f"Processing message {message.id} from {message.author}: {message_content}")
                 total_messages_in_channel += 1
                 processed_messages += 1
 
@@ -120,24 +121,44 @@ class StatsTracker(commands.Cog):
 
                 self.cursor.execute("SELECT COUNT(*) FROM user_activity WHERE message_id = ?", (message.id,))
                 if self.cursor.fetchone()[0] > 0:
+                    self.cursor.execute("""
+                        UPDATE user_activity SET
+                            guild_id = ?,
+                            user_id = ?,
+                            channel_id = ?,
+                            timestamp = ?,
+                            message_length = ?,
+                            emoji_count = ?,
+                            word_count = ?,
+                            has_media = ?,
+                            attachment_count = ?,
+                            mentioned_users = ?,
+                            mentioned_roles = ?
+                        WHERE message_id = ?
+                    """, (
+                        message.guild.id, message.author.id, message.channel.id, timestamp, message_length,
+                        emoji_count, word_count, has_media, attachment_count, mentioned_users,
+                        mentioned_roles, message.id
+                    ))
+                    self.conn.commit()
                     continue
 
                 timestamp = message.created_at
                 # Convert to California time
                 timestamp = convert_to_california_time(timestamp)
 
-                message_length = len(message.content) if message.content else 0
+                message_length = len(message_content) if message_content else 0
 
                 # Updated emoji count using regex
                 unicode_emoji_pattern = re.compile(r"[\U0001F300-\U0001F6FF\U0001F900-\U0001F9FF\U0001F1E0-\U0001F1FF]+", flags=re.UNICODE)
                 custom_emoji_pattern = re.compile(r"<a?:\w+:\d+>")
                 
-                unicode_emojis = unicode_emoji_pattern.findall(message.content)
-                custom_emojis = custom_emoji_pattern.findall(message.content)
+                unicode_emojis = unicode_emoji_pattern.findall(message_content)
+                custom_emojis = custom_emoji_pattern.findall(message_content)
                 
                 emoji_count = len(unicode_emojis) + len(custom_emojis)
 
-                word_count = len(message.content.split()) if message.content else 0
+                word_count = len(message_content.split()) if message_content else 0
                 has_media = bool(message.attachments)
                 attachment_count = len(message.attachments)
                 mentioned_users = ', '.join(str(user.id) for user in message.mentions) if message.mentions else ''
@@ -214,6 +235,8 @@ class StatsTracker(commands.Cog):
 
         if message.author.bot:
             return
+        
+        message_content = re.sub(r'https?://\S+', '', message.content)
 
         user_id = message.author.id
         message_id = message.id
@@ -223,18 +246,18 @@ class StatsTracker(commands.Cog):
         # Convert timestamp to UTC and then to California time
         timestamp = convert_to_california_time(timestamp)
 
-        message_length = len(message.content) if message.content else 0
+        message_length = len(message_content) if message_content else 0
 
         # Updated emoji count using regex
         unicode_emoji_pattern = re.compile(r"[\U0001F300-\U0001F6FF\U0001F900-\U0001F9FF\U0001F1E0-\U0001F1FF]+", flags=re.UNICODE)
         custom_emoji_pattern = re.compile(r"<a?:\w+:\d+>")
         
-        unicode_emojis = unicode_emoji_pattern.findall(message.content)
-        custom_emojis = custom_emoji_pattern.findall(message.content)
+        unicode_emojis = unicode_emoji_pattern.findall(message_content)
+        custom_emojis = custom_emoji_pattern.findall(message_content)
         
         emoji_count = len(unicode_emojis) + len(custom_emojis)
         
-        word_count = len(message.content.split()) if message.content else 0
+        word_count = len(message_content.split()) if message_content else 0
         has_media = bool(message.attachments)
         attachment_count = len(message.attachments)
         mentioned_users = ', '.join(str(user.id) for user in message.mentions) if message.mentions else ''
