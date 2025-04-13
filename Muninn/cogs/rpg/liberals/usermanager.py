@@ -67,9 +67,9 @@ class StatsManager(commands.Cog):
 
         # Ensure users can Still fight without weapons
         if not hand_right:
-            hand_left = "{\"name\": \"Left Fist\"}"
+            hand_right = "{\"name\": \"Right Fist\"}"
         if not hand_left:
-            hand_left = "{\"name\": \"Right Fist\"}"
+            hand_left = "{\"name\": \"Left Fist\"}"
 
         return {
             'profile_name': profile_name,
@@ -170,8 +170,7 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()
     
-    async def equip_from_inventory(self, ctx, user, slot: str, item_data: dict):
-        user_data = await self.fetch_user_stats(user)
+    async def equip_from_inventory(self, ctx, user_id, user_data, slot: str, item_data: dict):
         inventory = user_data['inventory']
 
         if user_data is None:
@@ -196,13 +195,13 @@ class StatsManager(commands.Cog):
         inventory.remove(item_data)
 
         # Equip new item
-        c.execute(f'UPDATE equipped_items SET {slot} = ? WHERE user_id = ?', (json.dumps(item_data), user.id))
+        c.execute(f'UPDATE equipped_items SET {slot} = ? WHERE user_id = ?', (json.dumps(item_data), user_id))
 
         # Return old item to inventory if applicable
-        if current_equipped:
+        if current_equipped and 'Fist' not in current_equipped:
             inventory.append(json.loads(current_equipped))
 
-        c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user.id))
+        c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user_id))
 
         conn.commit()
         conn.close()

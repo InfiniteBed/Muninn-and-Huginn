@@ -178,6 +178,7 @@ class Status(commands.Cog):
                     heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""
                     inventory_list.append(f"**{index + start_index}. *{prefix}* {item['name']}** - {description}{heal_info}".strip())
                 inventory_embed.description = "\n".join(inventory_list)
+                inventory_embed.set_footer(text="Use !equip to outfit your character")
             else:
                 inventory_embed.description = "Your inventory is empty."
             return inventory_embed, page_items
@@ -260,12 +261,14 @@ class Status(commands.Cog):
                         self.remove_item(child)
 
                 for index, item in enumerate(self.current_items):
+                    if item['type'] == 'equipment':
+                        continue
                     row = index // 5
                     if row >= 4:
                         break
                     custom_id = f"use_item_{index}"
                     button = CustomButton(label=f"Use {item['name']}", style=discord.ButtonStyle.success, row=row, custom_id=custom_id)
-                    button.callback = self.create_button_callback(index)
+                    button.callback = self.create_button_callback(index) 
                     self.add_item(button)
 
                 self.previous_page_button.disabled = self.current_page == 1
@@ -295,7 +298,6 @@ class Status(commands.Cog):
 
                     # Check if the user's health is already at maximum
                     if current_health >= max_health:
-                        # Send a red embed indicating the user cannot heal
                         max_health_embed = discord.Embed(
                             title="Cannot Use Item",
                             description=f"Your health is already at maximum (**{current_health}/{max_health}**).",
@@ -414,57 +416,6 @@ class Status(commands.Cog):
                 
                     await self.parent_cog.process_activity(ctx, user, activity_data)
                         
-                    if activity_data['type'] == 'expedition':
-                        # Determine embed color based on result type
-                        color_map = {
-                            "major success": discord.Color.green(),
-                            "success": discord.Color.dark_green(),
-                            "fail": discord.Color.dark_red(),
-                            "major fail": discord.Color.red()
-                        }
-                        embed_color = color_map.get(activity_data['roll_for_result'], discord.Color.blue())
-
-                        # Prepare the results embeds
-                        embeds = []
-                        current_description = ""
-                        for paragraph in activity_data['result_text']:
-                            if len(current_description) + len(paragraph) + 2 > 4096:  # Split if adding the paragraph exceeds 4096 characters
-                                embed = discord.Embed(
-                                    title="Expedition Results",
-                                    description=current_description,
-                                    color=embed_color
-                                )
-                                embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
-                                embeds.append(embed)
-                                current_description = paragraph
-                            else:
-                                current_description += f"\n\n{paragraph}"
-
-                        # Add the last embed if there's remaining content
-                        if current_description:
-                            embed = discord.Embed(
-                                title="Expedition Results",
-                                description=current_description,
-                                color=embed_color
-                            )
-                            embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
-                            embeds.append(embed)
-
-                        # Add outcome, coins, and damage to the first embed
-                        if embeds:
-                            embeds[0].add_field(name="Outcome", value=roll_for_result.replace("_", " ").title(), inline=False)
-                            embeds[0].add_field(name="Coins Earned", value=f"{result.get('coins', 0)} coins", inline=True)
-                            embeds[0].add_field(name="Damage Taken", value=f"{result.get('health', 0)} health", inline=True)
-
-                        # Remove all buttons after showing results
-                        self.clear_items()
-
-                        for embed in embeds:
-                            if interaction.response.is_done():
-                                await interaction.followup.send(embed=embed)
-                            else:
-                                await interaction.response.send_message(embed=embed)
-
                     if activity_data['type'] == 'gathering':
                         embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!")
                         considered_items = []

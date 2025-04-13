@@ -3,3 +3,4 @@ config.ini
 *.pyc
 __pycache__/
 .DS_STORE
+profile_images

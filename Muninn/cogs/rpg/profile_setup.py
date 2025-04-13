@@ -79,55 +79,13 @@ class Setup(commands.Cog):
                     activity TEXT,
                     level INTEGER,
                     coins INTEGER,
-                    job TEXT,
+                    job1 TEXT,
+                    job2 TEXT,
+                    job3 TEXT,
                     found_jobs TEXT
                 )
             ''')
-
-            c.execute('''
-                CREATE TABLE IF NOT EXISTS proficiencies (
-                    user_id INTEGER PRIMARY KEY,
-                    author NUMERIC,
-                    baking NUMERIC,
-                    brewer NUMERIC,
-                    carpentry NUMERIC,
-                    cleaning NUMERIC,
-                    coachman NUMERIC,
-                    cooking NUMERIC,
-                    cupbearing NUMERIC,
-                    farming NUMERIC,
-                    fishing NUMERIC,
-                    floristry NUMERIC,
-                    gardening NUMERIC,
-                    guarding NUMERIC,
-                    glassblowing NUMERIC,
-                    healing NUMERIC,
-                    husbandry NUMERIC,
-                    innkeeping NUMERIC,
-                    knighthood NUMERIC,
-                    leadership NUMERIC,
-                    masonry NUMERIC,
-                    metalworking NUMERIC,
-                    painting NUMERIC,
-                    pottery NUMERIC,
-                    royalty NUMERIC,
-                    sculpting NUMERIC,
-                    smithing NUMERIC,
-                    spinning NUMERIC,
-                    stablekeeping NUMERIC,
-                    tailoring NUMERIC,
-                    teaching NUMERIC,
-                    vigilance NUMERIC
-                )
-            ''')
-            
-            c.execute('''
-                INSERT OR REPLACE INTO proficiencies (
-                    user_id, author, baking, brewer, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (ctx.author.id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-            conn.commit()
-
+  
             c.execute('''
                 CREATE TABLE IF NOT EXISTS equipped_items (
                     user_id INTEGER PRIMARY KEY,
