@@ -417,9 +417,13 @@ class Status(commands.Cog):
                     await self.parent_cog.process_activity(ctx, user, activity_data)
                         
                     if activity_data['type'] == 'gathering':
-                        embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!")
+                        embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!", color=discord.color.Orange())
                         considered_items = []
                         got_items_str = ""
+                        
+                        if not activity_data['item_results']:
+                            embed.add_field(name=f"{activity_data['profile_name']} did not find any items!")
+                            embed.set_footer(text=f"Maybe {activity_data['profile_name']} should try exploring for longer...")
 
                         for item in activity_data['item_results']:
                             if item not in considered_items:
