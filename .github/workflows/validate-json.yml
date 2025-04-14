@@ -3,7 +3,7 @@ name: Validate JSON files
 on:
   pull_request:
     paths:
-      - 'data/*.json'  # Adjust this to your folder
+      - 'Muninn/data/*.json'  # Adjust this to your folder
 
 jobs:
   validate:
