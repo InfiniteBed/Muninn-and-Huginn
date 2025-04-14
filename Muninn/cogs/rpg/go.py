@@ -382,7 +382,6 @@ class Go(commands.Cog):
                 self.parent_cog = parent_cog
                 options = []
                 for index, location in enumerate(gather_locations):
-                    ic(location)
                     options.append(SelectOption(label=location['name'], description=location['description'][:100], value=str(index)))
 
                 super().__init__(placeholder="Select a location to explore...", options=options, min_values=1, max_values=1)

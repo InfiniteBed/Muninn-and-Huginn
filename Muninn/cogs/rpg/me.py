@@ -420,17 +420,19 @@ class Status(commands.Cog):
                         embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!", color=discord.Color.orange())
                         considered_items = []
                         got_items_str = ""
+                        got_item = False
                         
-                        if not activity_data['item_results']:
-                            embed.add_field(name=f"{activity_data['profile_name']} did not find any items!")
-                            embed.set_footer(text=f"Maybe {activity_data['profile_name']} should try exploring for longer...")
-
                         for item in activity_data['item_results']:
+                            got_item = True
                             if item not in considered_items:
                                 got_items_str += f"**`{activity_data['item_results'].count(item)}`** {item['name']}\n" 
                                 considered_items.append(item)
 
-                        embed.add_field(name="Got Items:", value=got_items_str)
+                        if not got_item:
+                            embed.add_field(name=f"{user_stats['profile_name']} did not find any items!", value="Better luck next time...")
+                            embed.set_footer(text=f"Maybe {user_stats['profile_name']} should try exploring for longer...")
+                        else:
+                            embed.add_field(name="Got Items:", value=got_items_str)
 
                         await interaction.response.send_message(embed=embed)
 
