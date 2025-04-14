@@ -46,4 +46,4 @@ async def setup(bot):
     from sqlite3 import connect
     conn = connect("huginn.db")
     c = conn.cursor()
-    bot.add_cog(InsultCog(bot, c, 0.01))  # Pass CHANCE_TO_RESPOND here
+    await bot.add_cog(InsultCog(bot, c, 0.01))  # Pass CHANCE_TO_RESPOND here
