@@ -417,7 +417,7 @@ class Status(commands.Cog):
                     await self.parent_cog.process_activity(ctx, user, activity_data)
                         
                     if activity_data['type'] == 'gathering':
-                        embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!", color=discord.color.Orange())
+                        embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!", color=discord.Color.orange())
                         considered_items = []
                         got_items_str = ""
                         

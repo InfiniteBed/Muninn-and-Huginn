@@ -10,10 +10,11 @@
             "hourly_xp": 1,
             "range": {
                 "min": 0,
-                "max": 100
+                "max": 200
             },
             "results": [
-                "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace."
+                "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.",
+                "An orc coworker fell into the slurry vat while {name} was working. They spent the rest of the day cleaning up after the orc's mishap."
             ]
         },
         {
@@ -22,11 +23,24 @@
             "hourly_wage": 3,
             "hourly_xp": 2,
             "range": {
-                "min": 100,
-                "max": 200
+                "min": 200,
+                "max": 400
             },
             "results": [
                 "{name} was given a few simple editing tasks to do. {pronoun} was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work."
+            ]
+        },
+        {
+            "stage": 2,
+            "job_title": "Senior Editor",
+            "hourly_wage": 3,
+            "hourly_xp": 2,
+            "range": {
+                "min": 400,
+                "max": 800
+            },
+            "results": [
+                "{name} was hard at work editing some key articles, something {pronoun} had long become used to. {pronoun} noted some interesting headlines—missing persons, mysterious deaths, and a few strange occurrences."
             ]
         }
     ]
