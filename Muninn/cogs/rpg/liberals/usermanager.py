@@ -445,11 +445,6 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()        
 
-    @commands.command()
-    @commands.is_owner()
-    async def prof_inc(self, ctx, proficiency, amount):
-        await self.proficency_increase(ctx.author, proficiency, amount)
-        
     async def add_available_job(self, ctx, user, activity_name):
         conn = sqlite3.connect('discord.db')
         c = conn.cursor()
@@ -479,5 +474,10 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()        
 
+    @commands.command()
+    @commands.is_owner()
+    async def prof_inc(self, ctx, proficiency, amount):
+        await self.proficency_increase(ctx.author, proficiency, amount)
+        
 async def setup(bot):
     await bot.add_cog(StatsManager(bot))
