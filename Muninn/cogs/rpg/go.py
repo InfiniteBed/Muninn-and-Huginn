@@ -23,9 +23,17 @@ class Go(commands.Cog):
     @commands.hybrid_command(name="go", description="Go work, find a job, shop around, or gather items.")
     async def go(self, ctx):
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
+        user_jobs = await self.stats_manager.get_available_jobs(ctx.author)
+        random_job = []
         
         ## Construct Job Embeds
-        random_job = random.choice(await self.data_manager.get_data_of_type('jobs'))
+        ### Get random job, return none if all jobs have been gotten
+        if len(await self.data_manager.get_data_of_type('jobs')) == len(user_jobs):
+            random_job = None
+        else:
+            while random_job not in user_jobs:
+                random_job = random.choice(await self.data_manager.get_data_of_type('jobs'))
+                
         available_jobs_data = []
         available_jobs_str = ""
         
@@ -67,14 +75,17 @@ class Go(commands.Cog):
             apply_slot_embed = discord.Embed(title="What slot will the job be applied to?")
             return apply_slot_embed
         def job_applied_embed(slot, job):
-            job_applied_embed = discord.Embed(title=f"You applied {job['name']} to Slot {slot}!", color=discord.Color.green())
+            job_applied_embed = discord.Embed(title=f"You applied {job['name']} to Job Slot `{slot}`!", 
+                                              color=discord.Color.green(),
+                                              description=f"**{user_stats['profile_name']}** can now start working in the `!go` menu!")
             return job_applied_embed
         def job_slot_embed():
-            embed = discord.Embed(title="Which job will you be working?", description=f"**Slot 1: {user_stats['job1']}**\n**Slot 2: {user_stats['job2']}**\n**Slot 3: {user_stats['job3']}**")
+            embed = discord.Embed(title="Which job will you be working?", 
+                                  description=f"**Slot 1: {user_stats['job1']}**\n**Slot 2: {user_stats['job2']}**\n**Slot 3: {user_stats['job3']}**")
             return embed
-        async def job_work_embed(job, work_time = 1):
-            job_data = await self.data_manager.find_data('jobs', job)
-            proficiency = await self.stats_manager.get_proficiency(ctx.author, job_data['proficiency'])
+        async def job_work_embed(self, job, work_time = 1):
+            job_data = await self.parent_cog.data_manager.find_data('jobs', job)
+            proficiency = await self.parent_cog.stats_manager.get_proficiency(ctx.author, job_data['proficiency'])
             
             for stage in job_data['results']:
                 if stage['range']['min'] <= proficiency < stage['range']['max']:
@@ -95,7 +106,7 @@ class Go(commands.Cog):
             
         def apply_job(slot, job):
             self.stats_manager.apply_job(slot, ctx.author, job)
-            
+
         ## Construct Item Gathering Embed
         gather_embed = discord.Embed(title="Explore", color=0x00DD77, description=f"Where will **{user_stats['profile_name']}** explore?")
 
@@ -144,10 +155,10 @@ class Go(commands.Cog):
                 super().__init__(timeout=None)
                 self.disable_buttons(hours)
                 
-            async def build_result_embed() -> discord.Embed:
+            async def build_result_embed(self, interaction, hours) -> discord.Embed:
                 raise NotImplementedError("Subclasses must implement build_result_embed()")
-            
-            async def build_details_embed() -> discord.Embed:
+
+            async def build_details_embed(self, location, hours) -> discord.Embed:
                 raise NotImplementedError("Subclasses must implement build_details_embed()")
                 
             @discord.ui.button(label="Take", style=discord.ButtonStyle.blurple)
@@ -239,7 +250,7 @@ class Go(commands.Cog):
                 return embed
             
             async def build_details_embed(self, location, hours) -> discord.Embed:
-                return job_work_embed(self.job, hours)
+                return await job_work_embed(self, self.job, hours)
               
         class JobWorkSlotView(View):
             def __init__(self, ctx, parent_cog):
@@ -251,21 +262,21 @@ class Go(commands.Cog):
             if user_stats['job1']:
                 @discord.ui.button(label=user_stats['job1'], style=discord.ButtonStyle.grey)
                 async def slot1_button(self, interaction: discord.Interaction, button: Button):
-                    work_embed = await job_work_embed(job=user_stats['job1'], work_time=1)
+                    work_embed = await job_work_embed(self, job=user_stats['job1'], work_time=1)
                     job_work_view = JobWorkView(ctx, None, 1, self.parent_cog, user_stats['job1'])
                     await interaction.response.edit_message(embed=work_embed, view=job_work_view)
                     
             if user_stats['job2']:
                 @discord.ui.button(label=user_stats['job2'], style=discord.ButtonStyle.grey)
                 async def slot2_button(self, interaction: discord.Interaction, button: Button):
-                    work_embed = await job_work_embed(job=user_stats['job2'], work_time=1)
+                    work_embed = await job_work_embed(self, job=user_stats['job2'], work_time=1)
                     job_work_view = JobWorkView(ctx, None, 2, self.parent_cog, user_stats['job2'])
                     await interaction.response.edit_message(embed=work_embed, view=job_work_view)
                     
             if user_stats['job3']:
                 @discord.ui.button(label=user_stats['job3'], style=discord.ButtonStyle.grey)
                 async def slot3_button(self, interaction: discord.Interaction, button: Button): 
-                    work_embed = await job_work_embed(job=user_stats['job3'], work_time=1)
+                    work_embed = await job_work_embed(self, job=user_stats['job3'], work_time=1)
                     job_work_view = JobWorkView(ctx, None, 3, self.parent_cog, user_stats['job3'])
                     await interaction.response.edit_message(embed=work_embed, view=job_work_view)
                 
@@ -344,6 +355,11 @@ class Go(commands.Cog):
 
             @discord.ui.button(label="Search", style=discord.ButtonStyle.grey)
             async def search_button(self, interaction: discord.Interaction, button: Button):
+                if random_job is None:
+                    embed = discord.Embed(title="You've found all the jobs!",
+                                          description="Check back later when new job openings appear!",
+                                          color=discord.Color.orange())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
                 job_search_view = JobSearchView(ctx, location="Job Search", hours=1, parent_cog=self.parent_cog, job=None)
                 search_embed = job_search_embed(1)
                 await interaction.response.edit_message(embed=search_embed, view=job_search_view)

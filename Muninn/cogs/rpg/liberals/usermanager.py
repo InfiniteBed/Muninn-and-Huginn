@@ -445,6 +445,22 @@ class StatsManager(commands.Cog):
         conn.commit()
         conn.close()        
 
+    async def get_available_jobs(self, user):
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute("SELECT found_jobs FROM stats WHERE user_id = ?", (user.id,))
+        result = c.fetchone()
+        
+        if not result or result[0] == None:
+            found_jobs = []
+        else:
+           found_jobs = json.loads(result[0])  # c
+            
+        conn.commit()
+        conn.close()
+        
+        return found_jobs
+            
     async def add_available_job(self, ctx, user, activity_name):
         conn = sqlite3.connect('discord.db')
         c = conn.cursor()
