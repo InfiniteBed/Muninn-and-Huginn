@@ -445,7 +445,9 @@ class Status(commands.Cog):
                             embed.add_field(name="Congratulations, now you can go work a job!", value="You're able to work up to three jobs at once. Open the `!go` menu, and click `Apply` to place a job into your three job slots. Then, begin working with the `Work` button.")
                             await interaction.response.send_message(embed=embed)
                         else:
-                            embed = discord.Embed(title=f"{user_stats['profile_name']} wasn't able to find a job!", description=f"{user_stats['profile_name']} searched far and wide, but was unable to find a job.", color=discord.Color.red())
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} wasn't able to find a job!", 
+                                                  description=f"{user_stats['profile_name']} searched far and wide, but was unable to find a job.\nMaybe {user_stats['pronoun']} should try searching for longer...", 
+                                                  color=discord.Color.red())
                             await interaction.response.send_message(embed=embed)
                     
                     if activity_data.get('type') == 'job':
