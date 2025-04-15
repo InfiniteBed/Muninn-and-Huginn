@@ -438,8 +438,11 @@ class Status(commands.Cog):
 
                     if activity_data.get('type') == 'job_search':
                         if activity_data['got_job']:
-                            embed = discord.Embed(title=f"{user_stats['profile_name']} found a job!", color=discord.Color.green())
+                            await self.parent_cog.stats_manager.add_available_job(ctx, interaction.user, activity_data['job_name'])
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} found a job!", 
+                                                  color=discord.Color.green())
                             embed.add_field(name=activity_data['job_name'], value=activity_data['introduction'])
+                            embed.add_field(name="Congratulations, now you can go work a job!", value="You're able to work up to three jobs at once. Open the `!go` menu, and click `Apply` to place a job into your three job slots. Then, begin working with the `Work` button.")
                             await interaction.response.send_message(embed=embed)
                         else:
                             embed = discord.Embed(title=f"{user_stats['profile_name']} wasn't able to find a job!", description=f"{user_stats['profile_name']} searched far and wide, but was unable to find a job.", color=discord.Color.red())
