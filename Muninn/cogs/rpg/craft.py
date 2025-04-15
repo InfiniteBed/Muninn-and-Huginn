@@ -65,7 +65,11 @@ class Tinker(commands.Cog):
 
             for item in recipe['recipe']:
                 item_data = await self.item_manager.generate_item("crafting", item['name'])
-                inv_count = user_stats['inventory'].count(item_data)
+                if user_stats['inventory'] is []:
+                    inv_count = user_stats['inventory'].count(item_data)
+                else:
+                    inv_count = 0
+               
                 ic(item_data, user_stats['inventory'][0], inv_count)
                 ic(item)
                 got_items_str += f"**`{item['amount']}`** {item['name']} *(Have `{inv_count}`)*\n"
