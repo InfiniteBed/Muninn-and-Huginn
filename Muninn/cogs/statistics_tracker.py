@@ -101,88 +101,92 @@ class StatsTracker(commands.Cog):
         channel_progress = {}
 
         for channel in channels:
-            total_messages_in_channel = 0
-            missing_data_messages = 0
-            processed_messages = 0
+            try:
+                total_messages_in_channel = 0
+                missing_data_messages = 0
+                processed_messages = 0
 
-            async for message in channel.history(limit=None):
-                if message.author.bot:  # Skip bot messages during import
-                    continue
-                if message.content.startswith("!"):
-                    continue
-                
-                message_content = re.sub(r'https?://\S+', '', message.content)
-                print(f"Processing message {message.id} from {message.author}: {message_content}")
-                total_messages_in_channel += 1
-                processed_messages += 1
+                async for message in channel.history(limit=None):
+                    if message.author.bot:  # Skip bot messages during import
+                        continue
+                    if message.content.startswith("!"):
+                        continue
+                    
+                    message_content = re.sub(r'https?://\S+', '', message.content)
+                    print(f"Processing message {message.id} from {message.author}: {message_content}")
+                    total_messages_in_channel += 1
+                    processed_messages += 1
 
-                if processed_messages % 2500 == 0:
-                    await self.send_status_report(ctx, channel.name, total_messages_in_channel, missing_data_messages)
+                    if processed_messages % 2500 == 0:
+                        await self.send_status_report(ctx, channel.name, total_messages_in_channel, missing_data_messages)
 
-                self.cursor.execute("SELECT COUNT(*) FROM user_activity WHERE message_id = ?", (message.id,))
-                if self.cursor.fetchone()[0] > 0:
-                    self.cursor.execute("""
-                        UPDATE user_activity SET
-                            guild_id = ?,
-                            user_id = ?,
-                            channel_id = ?,
-                            timestamp = ?,
-                            message_length = ?,
-                            emoji_count = ?,
-                            word_count = ?,
-                            has_media = ?,
-                            attachment_count = ?,
-                            mentioned_users = ?,
-                            mentioned_roles = ?
-                        WHERE message_id = ?
-                    """, (
-                        message.guild.id, message.author.id, message.channel.id, timestamp, message_length,
-                        emoji_count, word_count, has_media, attachment_count, mentioned_users,
-                        mentioned_roles, message.id
-                    ))
+                    timestamp = message.created_at
+                    # Convert to California time
+                    timestamp = convert_to_california_time(timestamp)
+
+                    message_length = len(message_content) if message_content else 0
+
+                    # Updated emoji count using regex
+                    unicode_emoji_pattern = re.compile(r"[\U0001F300-\U0001F6FF\U0001F900-\U0001F9FF\U0001F1E0-\U0001F1FF]+", flags=re.UNICODE)
+                    custom_emoji_pattern = re.compile(r"<a?:\w+:\d+>")
+                    
+                    unicode_emojis = unicode_emoji_pattern.findall(message_content)
+                    custom_emojis = custom_emoji_pattern.findall(message_content)
+                    
+                    emoji_count = len(unicode_emojis) + len(custom_emojis)
+
+                    word_count = len(message_content.split()) if message_content else 0
+                    has_media = bool(message.attachments)
+                    attachment_count = len(message.attachments)
+                    mentioned_users = ', '.join(str(user.id) for user in message.mentions) if message.mentions else ''
+                    mentioned_roles = ', '.join(str(role.id) for role in message.role_mentions) if message.role_mentions else ''
+
+                    self.cursor.execute("SELECT COUNT(*) FROM user_activity WHERE message_id = ?", (message.id,))
+                    if self.cursor.fetchone()[0] > 0:
+                        self.cursor.execute("""
+                            UPDATE user_activity SET
+                                guild_id = ?,
+                                user_id = ?,
+                                channel_id = ?,
+                                timestamp = ?,
+                                message_length = ?,
+                                emoji_count = ?,
+                                word_count = ?,
+                                has_media = ?,
+                                attachment_count = ?,
+                                mentioned_users = ?,
+                                mentioned_roles = ?
+                            WHERE message_id = ?
+                        """, (
+                            message.guild.id, message.author.id, message.channel.id, timestamp, message_length,
+                            emoji_count, word_count, has_media, attachment_count, mentioned_users,
+                            mentioned_roles, message.id
+                        ))
+                        self.conn.commit()
+                        continue
+
+                    if timestamp and (message_length > 0 or has_media):
+                        missing_data_messages += 1
+                        self.cursor.execute("""
+                            INSERT INTO user_activity (guild_id, user_id, message_id, channel_id, timestamp, message_length, emoji_count,
+                            word_count, has_media, attachment_count, mentioned_users, mentioned_roles)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            message.guild.id, message.author.id, message.id, message.channel.id, timestamp, message_length, emoji_count,
+                            word_count, has_media, attachment_count, mentioned_users, mentioned_roles
+                        ))
                     self.conn.commit()
-                    continue
 
-                timestamp = message.created_at
-                # Convert to California time
-                timestamp = convert_to_california_time(timestamp)
+                await self.send_status_report(ctx, channel.name, total_messages_in_channel, missing_data_messages)
 
-                message_length = len(message_content) if message_content else 0
-
-                # Updated emoji count using regex
-                unicode_emoji_pattern = re.compile(r"[\U0001F300-\U0001F6FF\U0001F900-\U0001F9FF\U0001F1E0-\U0001F1FF]+", flags=re.UNICODE)
-                custom_emoji_pattern = re.compile(r"<a?:\w+:\d+>")
-                
-                unicode_emojis = unicode_emoji_pattern.findall(message_content)
-                custom_emojis = custom_emoji_pattern.findall(message_content)
-                
-                emoji_count = len(unicode_emojis) + len(custom_emojis)
-
-                word_count = len(message_content.split()) if message_content else 0
-                has_media = bool(message.attachments)
-                attachment_count = len(message.attachments)
-                mentioned_users = ', '.join(str(user.id) for user in message.mentions) if message.mentions else ''
-                mentioned_roles = ', '.join(str(role.id) for role in message.role_mentions) if message.role_mentions else ''
-
-                if timestamp and (message_length > 0 or has_media):
-                    missing_data_messages += 1
-                    self.cursor.execute("""
-                        INSERT INTO user_activity (guild_id, user_id, message_id, channel_id, timestamp, message_length, emoji_count,
-                        word_count, has_media, attachment_count, mentioned_users, mentioned_roles)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        message.guild.id, message.author.id, message.id, message.channel.id, timestamp, message_length, emoji_count,
-                        word_count, has_media, attachment_count, mentioned_users, mentioned_roles
-                    ))
-                self.conn.commit()
-
-            await self.send_status_report(ctx, channel.name, total_messages_in_channel, missing_data_messages)
-
-            channel_progress[channel.name] = {
-                "total": total_messages_in_channel,
-                "missing": missing_data_messages,
-                "percentage": (missing_data_messages / total_messages_in_channel) * 100 if total_messages_in_channel else 0
-            }
+                channel_progress[channel.name] = {
+                    "total": total_messages_in_channel,
+                    "missing": missing_data_messages,
+                    "percentage": (missing_data_messages / total_messages_in_channel) * 100 if total_messages_in_channel else 0
+                }
+            except discord.Forbidden:
+                print(f"Skipping {channel.name}: missing access.")
+                continue
 
         elapsed_time = time.time() - start_time
         await self.report_progress(ctx, channel_progress, elapsed_time)
