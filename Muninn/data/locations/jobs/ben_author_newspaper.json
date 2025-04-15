@@ -14,7 +14,9 @@
             },
             "results": [
                 "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.",
-                "An orc coworker fell into the slurry vat while {name} was working. They spent the rest of the day cleaning up after the orc's mishap."
+                "An orc coworker fell into the slurry vat while {name} was working. They spent the rest of the day cleaning up after the orc's mishap.",
+                "Nothing extremely significant happened. In fact, it was quite boring at the paper mill.",
+                "A dwarf lady came into the paper mill—someone quite important, from the looks of everyone's faces—and started bossing people around. Anyone standing around or talking was quickly set back to work, and those already working did so with a bit more urgency. A coworker told {name} after she left, \"That's the boss's lady. Sometimes she just drops by and sets everyone back in line.\"\n\n{name} didn't want to question it too much."
             ]
         },
         {
