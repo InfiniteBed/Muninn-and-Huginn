@@ -23,16 +23,19 @@ class Go(commands.Cog):
     @commands.hybrid_command(name="go", description="Go work, find a job, shop around, or gather items.")
     async def go(self, ctx):
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
+        all_jobs = await self.data_manager.get_data_of_type('jobs')
         user_jobs = await self.stats_manager.get_available_jobs(ctx.author)
         random_job = []
         
+        ic(all_jobs, random_job, user_jobs)
+        
         ## Construct Job Embeds
         ### Get random job, return none if all jobs have been gotten
-        if len(await self.data_manager.get_data_of_type('jobs')) == len(user_jobs):
+        if len(all_jobs) == len(user_jobs):
             random_job = None
         else:
-            while random_job not in user_jobs:
-                random_job = random.choice(await self.data_manager.get_data_of_type('jobs'))
+            available_jobs = [job for job in all_jobs if job not in user_jobs]
+            random_job = random.choice(available_jobs)
                 
         available_jobs_data = []
         available_jobs_str = ""
@@ -83,14 +86,20 @@ class Go(commands.Cog):
             embed = discord.Embed(title="Which job will you be working?", 
                                   description=f"**Slot 1: {user_stats['job1']}**\n**Slot 2: {user_stats['job2']}**\n**Slot 3: {user_stats['job3']}**")
             return embed
+        
         async def job_work_embed(self, job, work_time = 1):
             job_data = await self.parent_cog.data_manager.find_data('jobs', job)
             proficiency = await self.parent_cog.stats_manager.get_proficiency(ctx.author, job_data['proficiency'])
+            story_progress_int = await self.parent_cog.stats_manager.get_job_progress(ctx.author.id, job_data)
             
             for stage in job_data['results']:
                 if stage['range']['min'] <= proficiency < stage['range']['max']:
-                    job_data['result'] = random.choice(stage['results'])
-                    job_data['hourly_wage'] = stage['hourly_wage']
+                    if (story_progress_int+1) > len(stage['results']):
+                        job_data['result'] = "Nothing of note happened... maybe check back later?"
+                    else:
+                        job_data['result'] = stage['results'][story_progress_int]
+                        job_data['hourly_wage'] = stage['hourly_wage']
+                        await self.parent_cog.stats_manager.job_progress_increase(ctx.author.id, job_data)
             
             embed = discord.Embed(title=f"Go work at {job}!") 
             
@@ -432,7 +441,7 @@ class Go(commands.Cog):
 
             @discord.ui.button(label="Market", style=discord.ButtonStyle.grey, emoji="🛍️")
             async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                market_overview_embed, view = await self.parent_cog.go_market.market_overview_embed(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats)
+                market_overview_embed, view = await self.parent_cog.go_market.market_overview_embed(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats, message)
                 await interaction.response.edit_message(embed=market_overview_embed, view=view)
 
             @discord.ui.button(label="Jobs", style=discord.ButtonStyle.grey, emoji="🛠️")
@@ -441,6 +450,6 @@ class Go(commands.Cog):
                 await interaction.response.edit_message(embed=job_overview_embed, view=job_view)
 
         nav_buttons = NavigationButtons(ctx, gather_embed, self)
-        await ctx.send(embed=main_embed, view=nav_buttons)
+        message = await ctx.send(embed=main_embed, view=nav_buttons)
 async def setup(bot):
     await bot.add_cog(Go(bot))

@@ -85,6 +85,13 @@ class Setup(commands.Cog):
                     found_jobs TEXT
                 )
             ''')
+            
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS job_progress (
+                    user_id INTEGER PRIMARY KEY, 
+                    progress TEXT
+                )
+            ''')
   
             c.execute('''
                 CREATE TABLE IF NOT EXISTS equipped_items (
@@ -397,7 +404,13 @@ class Setup(commands.Cog):
                 VALUES (?)
             ''', (ctx.author.id,))
 
+            c.execute('''
+                INSERT INTO job_progress (user_id)
+                VALUES (?)
+            ''', (ctx.author.id,))
+            
             conn.commit()
+            
         except sqlite3.Error as e:
             await ctx.send(f"An error occurred while initializing your profile: {e}")
         finally:

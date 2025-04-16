@@ -300,7 +300,7 @@ class GoMarket(commands.Cog):
         
             @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
             async def back_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = self.market_cog.market_browse_embed_view(ctx, market_cog, user_data)
+                embed, view = await self.market_cog.market_overview_embed(ctx, market_cog, user_data)
                 await interaction.response.edit_message(embed=embed, view=view)
         
         view = MarketView(ctx, market_cog, items, page)
@@ -439,7 +439,7 @@ class GoMarket(commands.Cog):
         else:
             return False
 
-    async def market_overview_embed(self, ctx, market_cog, user_data):
+    async def market_overview_embed(self, ctx, market_cog, user_data, message):
         embed = discord.Embed(title="Market Overview", 
                               description="Coming up over the hill, a quaint market comes into view. The early morning sun reflected off the colorful glass trinkets and cups, giving the area pleasant, ethereal lighting. The morning dew cooled the air, making it a perfect day to browse the wares.\n\nApproaching closer to the market ,it becomes evident that the stalls are handmade by the vendors. The wooden beams are varied in size and distance, and the canopies - though beautifully differed in color - were also varied in quality and type of material. However, whether faded or new, it was clear each canopy was made with love.", 
                               color=0x9ACD32)
@@ -473,6 +473,11 @@ class GoMarket(commands.Cog):
                     else:
                         await interaction.response.edit_message(embed=embed, view=view)
 
+            @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
+            async def back_button(self, interaction: discord.Interaction, button: Button):
+                await message.delete()
+                await market_cog.bot.get_cog("Go").go(ctx)
+        
         view = ShopOverView()
 
         return embed, view

@@ -55,6 +55,18 @@ class ModTools(commands.Cog):
         await ctx.send(item)
 
     @commands.command()
+    async def job_prog(self, ctx, job_name: str):
+        job_data = await self.data_manager.find_data('jobs', job_name)
+        progress = await self.user_manager.get_job_progress(ctx.author.id, job_data)
+        await ctx.send(progress)
+
+    @commands.command()
+    async def prog_inc(self, ctx, job_name: str):
+        job_data = await self.data_manager.find_data('jobs', job_name)
+        progress = await self.user_manager.job_progress_increase(ctx.author.id, job_data)
+        await ctx.send(progress)
+
+    @commands.command()
     async def gen_items_HC(self, ctx):
         hardcoded_list = [
             {

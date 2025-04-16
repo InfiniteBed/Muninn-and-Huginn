@@ -443,7 +443,88 @@ class StatsManager(commands.Cog):
         
         c.execute(execute, (proficiency_value, user.id,))
         conn.commit()
-        conn.close()        
+        conn.close()
+        
+    def init_users_job_progress(self, user_id, job_data):
+        insertion = {job_data['name']: {"name": job_data['name'],"progress": 0}}
+        
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute('''
+            REPLACE INTO job_progress (user_id, progress)
+            VALUES (?, ?)
+        ''', (user_id, json.dumps(insertion)))
+        
+        conn.commit()
+        conn.close()
+    
+    def job_progress_add_job(self, user_id, job_data):
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute("SELECT progress FROM job_progress WHERE user_id = ?", (user_id,))
+        result = c.fetchone()
+        
+        if not result[0]:
+            self.init_users_job_progress(user_id, job_data)
+            return
+        
+        data = json.loads(result[0])
+        
+        data[job_data['name']] = {"name": job_data['name'], "progress": 0}
+        
+        c.execute('''
+            REPLACE INTO job_progress (user_id, progress)
+            VALUES (?, ?)
+        ''', (user_id, json.dumps(data)))
+        
+        conn.commit()
+        conn.close()
+        
+        return data
+    
+    async def job_progress_increase(self, user_id, job_data):
+        progress_int = await self.get_job_progress(user_id, job_data)
+        job_name = job_data['name']
+        
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute("SELECT progress FROM job_progress WHERE user_id = ?", (user_id,))
+        data = json.loads(c.fetchone()[0])
+
+        data[job_name] = {"name": job_name, "progress": progress_int+1}
+        
+        c.execute('''
+            REPLACE INTO job_progress (user_id, progress)
+            VALUES (?, ?)
+        ''', (user_id, json.dumps(data)))
+
+        conn.commit()
+        conn.close()
+        
+        return data
+        
+    async def get_job_progress(self, user_id, job_data):
+        job_name = job_data['name']
+        
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        c.execute("SELECT progress FROM job_progress WHERE user_id = ?", (user_id,))
+        result = c.fetchone()
+        
+        if not result[0]:
+            self.init_users_job_progress(user_id, job_data)
+            return 0
+
+        user_progress_data = json.loads(result[0])
+        job_progress_data = user_progress_data.get(job_name)
+        
+        if not job_progress_data:
+            self.job_progress_add_job(user_id, job_data)
+            return 0
+            
+        progress = job_progress_data['progress']
+    
+        return progress
 
     async def get_available_jobs(self, user):
         conn = sqlite3.connect('discord.db')
