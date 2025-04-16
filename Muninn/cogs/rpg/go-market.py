@@ -358,7 +358,6 @@ class GoMarket(commands.Cog):
 
         return embed, view
 
-    
     async def sell_item_view(self, ctx, market_cog, user_data):
         data_manager = self.bot.get_cog("DataManager")
         user_manager = self.bot.get_cog("StatsManager")
@@ -381,7 +380,7 @@ class GoMarket(commands.Cog):
             @classmethod
             async def create(cls):
                 options = []
-
+            
                 for index, item in enumerate(user_data['inventory'][:25]):
                     item_data = await data_manager.find_data(item['type'], item['name'])
                     prefix = item.get('prefix', '')  # Get the prefix if available
@@ -467,10 +466,10 @@ class GoMarket(commands.Cog):
             if market_cog.if_user_has_stall(ctx):
                 @discord.ui.button(label="Add Items to Stall", style=discord.ButtonStyle.grey)
                 async def manage_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await market_cog.sell_item_view(ctx, market_cog, user_data)
-                    if not user_data['inventory']:
+                    if user_data['inventory'] == 'empty':
                         await interaction.response.send_message(embed=discord.Embed(title=f"{user_data['profile_name']} has no items to put up for sale!", color=discord.Color.red()), ephemeral=True)
                     else:
+                        embed, view = await market_cog.sell_item_view(ctx, market_cog, user_data)
                         await interaction.response.edit_message(embed=embed, view=view)
 
             @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
