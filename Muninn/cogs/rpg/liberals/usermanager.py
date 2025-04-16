@@ -340,23 +340,13 @@ class StatsManager(commands.Cog):
         item_results = []
         
         if activity.get('type') == 'job':
-            proficiency = await self.get_proficiency(interaction.user, activity['proficiency'])
-            for stage in activity['results']:
-                if stage['range']['min'] <= proficiency < stage['range']['max']:
-                    activity['result'] = random.choice(stage['results'])
-                    activity['coins_change'] = activity['hours'] * stage['hourly_wage']
-                    activity['xp_change'] = activity['hours'] * stage['hourly_xp']
-                    ic(activity['result'])
-                    
             return activity
         
         if activity.get('type') == 'job_search':
             if random.random() < activity['chance']:  
-                print('AAAAAH')        
                 activity['got_job'] = True
             else:          
                 activity['got_job'] = False
-                print('NOOOOO')
                 
             return activity
 

@@ -23,11 +23,6 @@ class Status(commands.Cog):
     async def status(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
-        # else:
-        #     user = await self.search.find_user(user, ctx.guild)
-        #     if not user:
-        #         await ctx.send("No profile found.")
-        #         return
 
         user_stats = await self.stats_manager.fetch_user_stats(user)
         
@@ -89,7 +84,7 @@ class Status(commands.Cog):
         info_embed.add_field(name="Bio", value=user_stats['bio'], inline=True)
 
         # Profession page embed
-        professions_clean = ["📚 Author", "🥖 Baking", "🍺 Brewer", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
+        professions_clean = ["📚 Author", "🥖 Baking", "☕️ Brewer", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
 
         professions_str = ""
         query = f"SELECT * FROM proficiencies WHERE user_id = ?"
@@ -451,31 +446,40 @@ class Status(commands.Cog):
                             await interaction.response.send_message(embed=embed)
                     
                     if activity_data.get('type') == 'job':
+                        await self.parent_cog.stats_manager.job_progress_increase(ctx.author.id, activity_data)
                         description = ""
                         proficiency = activity_data.get('proficiency')
                         current_xp = await self.parent_cog.stats_manager.get_proficiency(interaction.user, proficiency)
-                        
+                        story_progress_int = await self.parent_cog.stats_manager.get_job_progress(ctx.author.id, activity_data)
+                        is_promotion = activity_data.get('is_promotion')
                         new_xp = activity_data.get('xp_change') + current_xp
                         
-                        for index, stage in enumerate(activity_data['results']):
-                            if stage['range']['min'] <= current_xp < stage['range']['max']:
-                                current_stage = index
-                            if stage['range']['min'] <= new_xp < stage['range']['max']:
-                                new_stage = index
-                                new_index = index
+                        ic(is_promotion)
                                                                                         
-                        if new_stage > current_stage:
-                            description += f"**{user_stats['profile_name']} got a raise to {activity_data['results'][new_index]['job_title']} (Level {activity_data['results'][new_index]}!**\n\n"
+                        if is_promotion:
+                            description += f"**{user_stats['profile_name']} got a raise to {activity_data['promotion_title']}!**\n\n"
                         if activity_data.get('xp_change'):
                             description += f"Increased **{activity_data['proficiency'].title()}** proficiency by `{activity_data['xp_change']}`.\n\n"
+
                         if activity_data.get('result'):
-                            description += str.format(activity_data.get('result'), name=f"**{user_stats['profile_name']}**")
+                            result = str.format(activity_data.get('result'), name=f"**{user_stats['profile_name']}**")
                         
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
                                               description=description, 
                                               color=discord.Color.green())
                         
-                        await interaction.response.edit_message(embed=embed, view=None)
+                        class SeeExpeditionResults(View):
+                            def __init__(self):
+                                super().__init__(timeout=None)
+                            
+                            @discord.ui.button(label="See Expedition Results", style=discord.ButtonStyle.blurple)
+                            async def accept_button(self, interaction: discord.Interaction, button: Button):
+                                await interaction.response.edit_message(view=None)
+                                await interaction.channel.send(result)
+
+                        view = SeeExpeditionResults()
+                        
+                        await interaction.response.edit_message(embed=embed, view=view)
                         
                     # Delete the expedition from the database
                     await self.parent_cog.delete_expedition_from_database(self.profile_user.id)

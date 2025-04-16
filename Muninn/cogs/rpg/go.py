@@ -25,6 +25,7 @@ class Go(commands.Cog):
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
         all_jobs = await self.data_manager.get_data_of_type('jobs')
         user_jobs = await self.stats_manager.get_available_jobs(ctx.author)
+        stats_manager = self.stats_manager
         random_job = []
         
         ic(all_jobs, random_job, user_jobs)
@@ -87,32 +88,6 @@ class Go(commands.Cog):
                                   description=f"**Slot 1: {user_stats['job1']}**\n**Slot 2: {user_stats['job2']}**\n**Slot 3: {user_stats['job3']}**")
             return embed
         
-        async def job_work_embed(self, job, work_time = 1):
-            job_data = await self.parent_cog.data_manager.find_data('jobs', job)
-            proficiency = await self.parent_cog.stats_manager.get_proficiency(ctx.author, job_data['proficiency'])
-            story_progress_int = await self.parent_cog.stats_manager.get_job_progress(ctx.author.id, job_data)
-            
-            for stage in job_data['results']:
-                if stage['range']['min'] <= proficiency < stage['range']['max']:
-                    if (story_progress_int+1) > len(stage['results']):
-                        job_data['result'] = "Nothing of note happened... maybe check back later?"
-                    else:
-                        job_data['result'] = stage['results'][story_progress_int]
-                        job_data['hourly_wage'] = stage['hourly_wage']
-                        await self.parent_cog.stats_manager.job_progress_increase(ctx.author.id, job_data)
-            
-            embed = discord.Embed(title=f"Go work at {job}!") 
-            
-            if work_time == 1:
-                time_working_str = f"{work_time} hour"
-            else:
-                time_working_str = f"{work_time} hours"
-
-            embed.add_field(name="Time Working:", value=time_working_str)
-            embed.add_field(name="Wage:", value=f"**{round(work_time * job_data['hourly_wage'])}** coins")
-            
-            return embed
-            
         def apply_job(slot, job):
             self.stats_manager.apply_job(slot, ctx.author, job)
 
@@ -227,40 +202,83 @@ class Go(commands.Cog):
             
             async def build_details_embed(self, location, hours) -> discord.Embed:
                 return job_search_embed(hours)
-              
-        class JobWorkView(TimeSelectionView):
-            async def build_result_embed(self, interaction, hours) -> discord.Embed:
-                job = self.job
-                hours = self.hours
-                user_stats = await self.parent_cog.stats_manager.fetch_user_stats(interaction.user)
-                job_data = await self.parent_cog.data_manager.find_data('jobs', job)
-                proficiency = await self.parent_cog.stats_manager.get_proficiency(interaction.user, job_data['proficiency'])
-                
-                for stage in job_data['results']:
-                    if stage['range']['min'] <= proficiency < stage['range']['max']:
-                        job_data['result'] = random.choice(stage['results'])
-                        job_data['hourly_wage'] = stage['hourly_wage']
-                        job_data['user_hourly_xp'] = stage['hourly_xp']
-                
-                job_data['type'] = 'job'
-                job_data['job_name'] = job
-                job_data['name'] = f'Working at {job_data['job_name']}'
-                job_data['hours'] = hours
+        
+        async def working_job(interaction, job_data) -> discord.Embed:
+            user_stats = await stats_manager.fetch_user_stats(interaction.user)
+            
+            ic(job_data)
+            
+            eta = await stats_manager.update_activity(interaction, job_data, job_data['hours'], cost=0)
 
-                eta = await self.parent_cog.stats_manager.update_activity(interaction, job_data, hours, cost=0)
-
-                embed = discord.Embed(
-                    title=f"{user_stats['profile_name']} went to work at {job}!",
-                    description=f"Rest assured, **{user_stats['profile_name']}** is hard at work.",
-                    color=discord.Color.gold()
-                )
-                embed.add_field(name="ETA", value=eta)
-                embed.add_field(name="Wage", value=f"{self.hours * job_data['hourly_wage']} coins")
+            embed = discord.Embed(
+                title=f"{user_stats['profile_name']} went to work at {job_data['name']}!",
+                description=f"Rest assured, **{user_stats['profile_name']}** is hard at work.",
+                color=discord.Color.gold()
+            )
+            
+            embed.add_field(name="ETA", value=eta)
+            embed.add_field(name="Time Working:", value=f"{job_data['hours']} hours")
+            embed.add_field(name="Wage:", value=f"**{job_data['coins_change']}** coins")
+            
+            return embed
+        
+        async def work_confirmation(self, job):
+            job_data = await self.parent_cog.data_manager.find_data('jobs', job)
+            proficiency = await self.parent_cog.stats_manager.get_proficiency(ctx.author, job_data['proficiency'])
+            story_progress_int = await self.parent_cog.stats_manager.get_job_progress(ctx.author.id, job_data)
+            
+            if story_progress_int+1 > len(job_data['results']):
+                embed = discord.Embed(title = f"There's nothing for you here!",
+                                      description = f"{job_data['name']} doesn't need you to work yet!\n\nCome back later...") 
                 return embed
             
-            async def build_details_embed(self, location, hours) -> discord.Embed:
-                return await job_work_embed(self, self.job, hours)
+            result_data = job_data['results'][story_progress_int]
+            
+            result_text = result_data['text']
+            hours = result_data['hours']
+            coins_change = result_data['coins_change']
+            xp_change = result_data['xp_change']
+            is_promotion = result_data.get('is_promotion')
+            promotion_title = result_data.get('promotion_title')
+            
+            job_data['type'] = 'job'
+            
+            job_data['result'] = result_text
+            job_data['coins_change'] = coins_change
+            job_data['xp_change'] = xp_change
+            job_data['hours'] = hours
+            job_data['is_promotion'] = is_promotion
+            job_data['promotion_title'] = promotion_title
+            
+            if hours == 1:
+                time_working_str = f"{hours} hour"
+            else:
+                time_working_str = f"{hours} hours"
+
+            embed = discord.Embed(title=f"Go work at {job}!",
+                                  color=discord.Color.orange())
+            embed.add_field(name="Time Working:", value=time_working_str)
+            embed.add_field(name="Wage:", value=f"**{coins_change}** coins")
+            
+            class WorkConfirmation(View):
+                def __init__(self):
+                    self.main_embed = main_embed
+                    self.nav_buttons = nav_buttons
+                    super().__init__(timeout=None)
+                    
+                @discord.ui.button(label="Work", style=discord.ButtonStyle.green)
+                async def work_button(self, interaction: discord.Interaction, button: Button):
+                    embed = await working_job(interaction, job_data)
+                    await interaction.response.edit_message(embed=embed, view=None)
+    
+                @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
+                async def back_button(self, interaction: discord.Interaction, button: Button):
+                    await interaction.response.edit_message(embed=self.main_embed, view=nav_buttons)
               
+            view = WorkConfirmation()
+                
+            return embed, view
+
         class JobWorkSlotView(View):
             def __init__(self, ctx, parent_cog):
                 self.main_embed = main_embed
@@ -271,23 +289,20 @@ class Go(commands.Cog):
             if user_stats['job1']:
                 @discord.ui.button(label=user_stats['job1'], style=discord.ButtonStyle.grey)
                 async def slot1_button(self, interaction: discord.Interaction, button: Button):
-                    work_embed = await job_work_embed(self, job=user_stats['job1'], work_time=1)
-                    job_work_view = JobWorkView(ctx, None, 1, self.parent_cog, user_stats['job1'])
-                    await interaction.response.edit_message(embed=work_embed, view=job_work_view)
+                    embed, view = await work_confirmation(self, job=user_stats['job1'])
+                    await interaction.response.edit_message(embed=embed, view=view)
                     
             if user_stats['job2']:
                 @discord.ui.button(label=user_stats['job2'], style=discord.ButtonStyle.grey)
                 async def slot2_button(self, interaction: discord.Interaction, button: Button):
-                    work_embed = await job_work_embed(self, job=user_stats['job2'], work_time=1)
-                    job_work_view = JobWorkView(ctx, None, 2, self.parent_cog, user_stats['job2'])
-                    await interaction.response.edit_message(embed=work_embed, view=job_work_view)
+                    embed, view = await work_confirmation(self, job=user_stats['job2'])
+                    await interaction.response.edit_message(embed=embed, view=view)
                     
             if user_stats['job3']:
                 @discord.ui.button(label=user_stats['job3'], style=discord.ButtonStyle.grey)
                 async def slot3_button(self, interaction: discord.Interaction, button: Button): 
-                    work_embed = await job_work_embed(self, job=user_stats['job3'], work_time=1)
-                    job_work_view = JobWorkView(ctx, None, 3, self.parent_cog, user_stats['job3'])
-                    await interaction.response.edit_message(embed=work_embed, view=job_work_view)
+                    embed, view = await work_confirmation(self, job=user_stats['job3'])
+                    await interaction.response.edit_message(embed=embed, view=view)
                 
             @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
             async def home_button(self, interaction: discord.Interaction, button: Button):

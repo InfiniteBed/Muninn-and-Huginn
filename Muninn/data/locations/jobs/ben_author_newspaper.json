@@ -4,46 +4,38 @@
     "proficiency": "author",
     "results": [
         {
-            "stage": 1,
-            "job_title": "Papermaker",
-            "hourly_wage": 2,
-            "hourly_xp": 1,
-            "range": {
-                "min": 0,
-                "max": 200
-            },
-            "results": [
-                "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.",
-                "An orc coworker fell into the slurry vat while {name} was working. They spent the rest of the day cleaning up after the orc's mishap.",
-                "Nothing extremely significant happened. In fact, it was quite boring at the paper mill.",
-                "A dwarf lady came into the paper mill—someone quite important, from the looks of everyone's faces—and started bossing people around. Anyone standing around or talking was quickly set back to work, and those already working did so with a bit more urgency. A coworker told {name} after she left, \"That's the boss's lady. Sometimes she just drops by and sets everyone back in line.\"\n\n{name} didn't want to question it too much."
-            ]
+            "text": "{name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.",
+            "coins_change": 24,
+            "xp_change": 16,
+            "hours": 8
         },
         {
-            "stage": 2,
-            "job_title": "Junior Editor",
-            "hourly_wage": 3,
-            "hourly_xp": 2,
-            "range": {
-                "min": 200,
-                "max": 400
-            },
-            "results": [
-                "{name} was given a few simple editing tasks to do. {pronoun} was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work."
-            ]
+            "text": "An orc coworker fell into the slurry vat while {name} was working. They spent the rest of the day cleaning up after the orc's mishap.",
+            "coins_change": 24,
+            "xp_change": 16,
+            "hours": 8
         },
         {
-            "stage": 2,
-            "job_title": "Senior Editor",
-            "hourly_wage": 3,
-            "hourly_xp": 2,
-            "range": {
-                "min": 400,
-                "max": 800
-            },
-            "results": [
-                "{name} was hard at work editing some key articles, something {pronoun} had long become used to. {pronoun} noted some interesting headlines—missing persons, mysterious deaths, and a few strange occurrences."
-            ]
+            "text": "A dwarf lady came into the paper mill—someone quite important, from the looks of everyone's faces—and started bossing people around. Anyone standing around or talking was quickly set back to work, and those already working did so with a bit more urgency. A coworker told {name} after she left, \"That's the boss's lady. Sometimes she just drops by and sets everyone back in line.\"\n\n{name} didn't want to question it too much.",
+            "coins_change": 24,
+            "xp_change": 16,
+            "hours": 8
+        },
+        {
+            "text": "{name} was given a few simple editing tasks to do. {pronoun} was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work.",
+            "coins_change": 24,
+            "xp_change": 16,
+            "hours": 8,
+            "is_promotion": 1,
+            "promotion_title": "Junior Editor"
+        },
+        {
+            "text": "{name} was hard at work editing some key articles, something {pronoun} had long become used to. {pronoun} noted some interesting headlines—missing persons, mysterious deaths, and a few strange occurrences.",
+            "coins_change": 24,
+            "xp_change": 16,
+            "hours": 8,
+            "is_promotion": 1,
+            "promotion_title": "Senior Editor"
         }
     ]
 }

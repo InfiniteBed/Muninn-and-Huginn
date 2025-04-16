@@ -1,0 +1,13 @@
+{
+    "name": "Ammy's Coffee",
+    "introduction": "Ammy has been looking for another coffee brewer for a while now",
+    "proficiency": "brewing",
+    "results": [
+        {
+            "text": "{name} walked the small distance to the coffee shop, walking under the small awning and entering the quaint shop. Immediately, the strong smell of Montilian coffee is present throughout the shop. A few patrons are here, even so early in the morning. Some are relaxing, enjoying their coffee, and others seem to be scribing papers or making very important meetings. {name} approaches the counter, towards the small blue-plumed Aarakocra placing a steaming mug on the pickup counter.\n\n\"Oh, wonderful, you came!\" She lifted the counter door, and stood aside to let {name} in.\n\nShe showed {name} around behind the counter, explaining the various grinders, presses, and machines. To start, she simply showed how to make a standard coffee; something she called the *Amstein Press.*\n\n\"That's the cup most will order—maybe fifty... sixty percent of your orders. So, you're already halfway there!\"\n\nFor the next few hours, {name} and the blue-jay Aarakocra worked together, with her taking orders. She allowed you to look over her shoulder as she made the more difficult drinks—which wasn't very difficult, considering her height.\n\n{name} learned a lot today.\n\n\"I'll see you tomorrow, {name}!\" She said, as you walked out the door.",
+            "coins_change": 8,
+            "xp_change": 16,
+            "hours": 6
+        }
+    ]
+}
