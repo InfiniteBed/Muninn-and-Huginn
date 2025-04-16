@@ -188,7 +188,7 @@ class GoMarket(commands.Cog):
         
         return final_embed
 
-    async def item_buy(self, ctx, item, market_cog, market, user_data):
+    async def item_buy(self, ctx, item, market_cog, market, user_data, message):
         
         combined_name = f"*{item.get('prefix', '')}* {item['name']}".strip()
         embed = discord.Embed(title=combined_name, color=discord.Color.blue())
@@ -216,7 +216,7 @@ class GoMarket(commands.Cog):
             
             @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
             async def back_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = self.market_cog.market_comb(ctx, market, market_cog, 1, user_data)
+                embed, view = self.market_cog.market_comb(ctx, market, market_cog, 1, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
                 
         view = BuyView(ctx, market_cog, item, market)
@@ -249,7 +249,7 @@ class GoMarket(commands.Cog):
         
         return embed
     
-    def market_comb(self, ctx, market, market_cog, page, user_data):
+    def market_comb(self, ctx, market, market_cog, page, user_data, message):
         user, name, description, items, username = self.market_analyze(market)
         total_pages = math.ceil(len(items)/5)
 
@@ -265,42 +265,42 @@ class GoMarket(commands.Cog):
             
             @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.grey)
             async def first_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+0], market_cog, market, user_data)
+                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+0], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.grey)
             async def second_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+1], market_cog, market, user_data)
+                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+1], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.grey)
             async def third_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+2], market_cog, market, user_data)
+                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+2], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.grey)
             async def fourth_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+3], market_cog, market, user_data)
+                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+3], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.grey)
             async def fifth_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+4], market_cog, market, user_data)
+                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+4], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
             async def prev_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = self.market_cog.market_comb(ctx, market, market_cog, page-1, user_data)
+                embed, view = self.market_cog.market_comb(ctx, market, market_cog, page-1, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"Next", style=discord.ButtonStyle.grey)
             async def next_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = self.market_cog.market_comb(ctx, market, market_cog, page+1, user_data)
+                embed, view = self.market_cog.market_comb(ctx, market, market_cog, page+1, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
             async def back_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.market_overview_embed(ctx, market_cog, user_data)
+                embed, view = await self.market_cog.market_overview_embed(ctx, market_cog, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
         view = MarketView(ctx, market_cog, items, page)
@@ -312,7 +312,7 @@ class GoMarket(commands.Cog):
     
         return embed, view
     
-    async def market_browse_embed_view(self, ctx, market_cog, user_data):
+    async def market_browse_embed_view(self, ctx, market_cog, user_data, message):
         market_data = self.market_serialize()
 
         embed = discord.Embed(
@@ -346,7 +346,7 @@ class GoMarket(commands.Cog):
 
                 index = int(self.values[0])
                 selected_market = self.market_data[index]
-                embed, view = market_cog.market_comb(ctx, selected_market, market_cog, 1, user_data)
+                embed, view = market_cog.market_comb(ctx, selected_market, market_cog, 1, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
 
         class VendorDropdownView(View):
@@ -451,7 +451,7 @@ class GoMarket(commands.Cog):
 
             @discord.ui.button(label="Browse Market", style=discord.ButtonStyle.blurple)
             async def browse_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await market_cog.market_browse_embed_view(ctx, market_cog, user_data)
+                embed, view = await market_cog.market_browse_embed_view(ctx, market_cog, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
                 
             if not market_cog.if_user_has_stall(ctx):
