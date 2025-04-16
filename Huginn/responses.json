@@ -84,7 +84,10 @@
         "you really thought you ate with that… huh",
         "shut up, you’re actually just as boring as a class in home ec about napkins",
         "wait, hold on, i think i heard something… did anyone say anything?",
-        "just do better."
+        "just do better.",
+        "oh please, ur so ugly mirrors shatter",
+        "SHUT UP",
+        "Imagine being too slow to shut me up?"
     ],
     "prompts": [
         {
@@ -514,6 +517,18 @@
         {
             "text": "What movie has the best soundtrack in your opinion?",
             "contributor": "Sammy"
+        },
+        {
+            "text": "thoughts on tattoos? (gasp! so taboo!!)",
+            "contributor": "Joriel"
+        },
+        {
+            "text": "HYPOTHETICALLY! if consuming alcohol wasn’t a sin, would you try it?",
+            "contributor": "Joriel"
+        },
+        {
+            "text": "would you rather be with the one who loves you or the one you love? (meaning you do not love the one who loves you and vice versa)",
+            "contributor": "Joriel"
         }
     ]
 }
