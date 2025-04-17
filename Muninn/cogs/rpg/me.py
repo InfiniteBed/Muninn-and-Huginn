@@ -8,6 +8,7 @@ import json
 import random
 from dateutil import parser  # Add this import
 from icecream import ic
+import re
 
 class Status(commands.Cog):
     def __init__(self, bot):
@@ -17,6 +18,16 @@ class Status(commands.Cog):
         self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = bot.get_cog("StatsManager")
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
+        
+    def format_gendered(text, gender):
+        pattern = re.compile(r'\[([^\[\]]+?)\]')
+        gender_index = 0 if gender.lower() == 'm' else 1
+
+        def replace(match):
+            options = match.group(1).split('|')
+            return options[gender_index]
+
+        return pattern.sub(replace, text)
 
     @commands.hybrid_command(name="me", aliases=["status"], description="View your own or another user's status.")
     @app_commands.describe(user="The user to check status of")
@@ -463,6 +474,7 @@ class Status(commands.Cog):
 
                         if activity_data.get('result'):
                             result = str.format(activity_data.get('result'), name=f"**{user_stats['profile_name']}**")
+                            result = self.format_gendered(result, user_stats['gender_letter'])
                         
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
                                               description=description, 

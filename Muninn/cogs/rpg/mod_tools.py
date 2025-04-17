@@ -2,7 +2,9 @@ import sqlite3
 import discord
 from discord.ext import commands
 from discord.ui import View, Button
+import re
 
+from icecream import ic
 
 class ModTools(commands.Cog):
     def __init__(self, bot):
@@ -65,6 +67,36 @@ class ModTools(commands.Cog):
         job_data = await self.data_manager.find_data('jobs', job_name)
         progress = await self.user_manager.job_progress_increase(ctx.author.id, job_data)
         await ctx.send(progress)
+        
+    @commands.command()
+    async def for_job(self, ctx, job_name: str, progress: int = None):
+        user_stats = await self.user_manager.fetch_user_stats(ctx.author)
+        job_data = await self.data_manager.find_data('jobs', job_name)
+        
+        def format_gendered(text, gender):
+            pattern = re.compile(r'\[([^\[\]]+?)\]')
+            gender_index = 0 if gender.lower() == 'm' else 1
+
+            def replace(match):
+                options = match.group(1).split('|')
+                return options[gender_index]
+
+            return pattern.sub(replace, text)
+        
+        ic(job_data['results'])
+        
+        if progress is None:
+            for result in job_data['results']:
+                result = str.format(result['text'], name=f"**{user_stats['profile_name']}**")
+                result = self.format_gendered(result, user_stats['gender_letter'])
+                await ctx.send(result)
+            return
+                
+        result = job_data['results'][progress]
+        result = str.format(result['text'], name=f"**{user_stats['profile_name']}**")
+        result = format_gendered(result, user_stats['gender_letter'])
+        
+        await ctx.send(result)
 
     @commands.command()
     async def gen_items_HC(self, ctx):
