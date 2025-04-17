@@ -466,7 +466,7 @@ class Status(commands.Cog):
                         new_xp = activity_data.get('xp_change') + current_xp
                         
                         username = user_stats['profile_name']
-                        pclass = user_stats['profile_class']
+                        pclass = user_stats['class']
                         
                         ic(is_promotion)
                                                                                         

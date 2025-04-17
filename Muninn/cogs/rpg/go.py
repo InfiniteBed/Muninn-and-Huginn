@@ -112,6 +112,8 @@ class Go(commands.Cog):
                                   description=f"Select how long **{user_stats['profile_name']}** will explore for.")
 
             item_bonus = time_gathering/2
+            
+            cost = location.get('visit_cost')
 
             if location['base_hrs'] == 1:
                 base_hrs_str = f"{location['base_hrs']} hour"
@@ -128,6 +130,8 @@ class Go(commands.Cog):
             embed.add_field(name="Time to Return:", value=base_hrs_str)
             embed.add_field(name="Total Time:", value=f"*{time_gathering + (location['base_hrs'] * 2)} hours*")
             embed.add_field(name="Time Bonus:", value=f"x{item_bonus}")
+            if cost:
+                embed.add_field(name="Cost to Visit:", value=f"x{cost}")
 
             return embed
 
@@ -399,6 +403,18 @@ class Go(commands.Cog):
             async def build_result_embed(self, interaction, hours) -> discord.Embed:
                 location = self.location
                 user_stats = await self.parent_cog.stats_manager.fetch_user_stats(interaction.user)
+                
+                cost = location.get('visit_cost')
+                
+                if user_stats['coins'] < cost:
+                    embed = discord.Embed(
+                        title=f"You don's have enough coins to go on this expedition!",
+                        color=discord.Color.red()
+                    )
+                    interaction.response.send_message(embed=embed, ephemeral=True)
+
+                if cost:
+                    await self.parent_cog.stats_manager.modify_user_stat(ctx.author, 'coins', (cost * -1))
                 
                 eta = await self.parent_cog.stats_manager.update_activity(
                     interaction,

@@ -73,6 +73,9 @@ class ModTools(commands.Cog):
         user_stats = await self.user_manager.fetch_user_stats(ctx.author)
         job_data = await self.data_manager.find_data('jobs', job_name)
         
+        username = user_stats['profile_name']
+        pclass = user_stats['class']
+        
         def format_gendered(text, gender):
             pattern = re.compile(r'\[([^\[\]]+?)\]')
             gender_index = 0 if gender.lower() == 'm' else 1
@@ -87,13 +90,13 @@ class ModTools(commands.Cog):
         
         if progress is None:
             for result in job_data['results']:
-                result = str.format(result['text'], name=f"**{user_stats['profile_name']}**")
+                result = str.format(result['text'], name=username, pclass=pclass)
                 result = self.format_gendered(result, user_stats['gender_letter'])
                 await ctx.send(result)
             return
                 
         result = job_data['results'][progress]
-        result = str.format(result['text'], name=f"**{user_stats['profile_name']}**")
+        result = str.format(result['text'], name=username, pclass=pclass)
         result = format_gendered(result, user_stats['gender_letter'])
         
         await ctx.send(result)
