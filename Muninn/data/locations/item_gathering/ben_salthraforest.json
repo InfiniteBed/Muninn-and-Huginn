@@ -24,6 +24,20 @@
         {
             "name": "Twine",
             "type": "crafting",
+            "chance_to_appear": 0.2,
+            "std_amount": 2,
+            "std_deviation": 1
+        },
+        {
+            "name": "Raw Chicken Breast",
+            "type": "crafting",
+            "chance_to_appear": 0.1,
+            "std_amount": 2,
+            "std_deviation": 1
+        },
+        {
+            "name": "Raw Chicken Leg",
+            "type": "crafting",
             "chance_to_appear": 0.1,
             "std_amount": 2,
             "std_deviation": 1
