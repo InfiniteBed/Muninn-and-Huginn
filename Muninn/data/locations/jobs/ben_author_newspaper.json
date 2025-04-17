@@ -30,7 +30,7 @@
             "promotion_title": "Junior Editor"
         },
         {
-            "text": "{name} was hard at work editing some key articles, something {pronoun} had long become used to. {pronoun} noted some interesting headlines—missing persons, mysterious deaths, and a few strange occurrences.",
+            "text": "{name} was hard at work editing some key articles, something [he|she] had long become used to. [he|she] noted some interesting headlines—missing persons, mysterious deaths, and a few strange occurrences.",
             "coins_change": 24,
             "xp_change": 16,
             "hours": 8,

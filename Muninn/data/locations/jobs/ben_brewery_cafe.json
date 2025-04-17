@@ -10,7 +10,13 @@
             "hours": 6
         },
         {
-            "text": "The early morning streets carry a busy air. Horse-drawn carriages take the morning stock of herbs and plants to the inner city. And in a thin street, a small coffee shop is just about to open.\n\n\"Oh, awesome! I didn't think you'd be here so early!\"\n\nYou help the avian open up for the day, dusting down wooden tables and setting out signs.\n\n\"Thank you for coming in so early,\" Ammy ",
+            "text": "Like the day before, {name} headed to the coffee shop just a few hours after its open, close to the café's morning rush of business.\n\n\"Morning, {name}",
+            "coins_change": 8,
+            "xp_change": 2,
+            "hours": 6
+        },
+        {
+            "text": "The early morning streets carry a busy air. Horse-drawn carriages take the morning stock of herbs and plants to the inner city. And in a thin street, a small coffee shop is just about to open.\n\n\"Oh, awesome! I didn't think you'd be here so early!\"\n\nYou help the avian open up for the day, dusting down wooden tables and setting out signs.\n\n\"Thank you for coming in so early,\" Ammy",
             "coins_change": 8,
             "xp_change": 2,
             "hours": 6
