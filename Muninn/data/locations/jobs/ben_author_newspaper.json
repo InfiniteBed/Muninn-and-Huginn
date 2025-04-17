@@ -16,13 +16,13 @@
             "hours": 8
         },
         {
-            "text": "A dwarf lady came into the paper mill—someone quite important, from the looks of everyone's faces—and started bossing people around. Anyone standing around or talking was quickly set back to work, and those already working did so with a bit more urgency. A coworker told {name} after she left, \"That's the boss's lady. Sometimes she just drops by and sets everyone back in line.\"\n\n{name} didn't want to question it too much.",
+            "text": "A dwarf lady came into the paper mill—someone quite important, from the looks on everyone's faces—and started bossing people around. Anyone standing around or talking was quickly set back to work, and those already working did so with a bit more urgency. A coworker told [him|her] after she left, \"That's the boss's lady. Sometimes she just drops by and sets everyone back in line.\"\n\n{name} didn't want to question it too much.",
             "coins_change": 24,
             "xp_change": 16,
             "hours": 8
         },
         {
-            "text": "{name} was given a few simple editing tasks to do. {pronoun} was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work.",
+            "text": "{name} was given a few simple editing tasks to do. [He|She] was able to correct a few typos and make some minor changes to the text. The senior editor was pleased with {name}'s work.",
             "coins_change": 24,
             "xp_change": 16,
             "hours": 8,

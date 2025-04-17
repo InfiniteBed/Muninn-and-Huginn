@@ -49,7 +49,8 @@ class Go(commands.Cog):
             for job_data in available_jobs_data:
                 available_jobs_str += (f"{job_data['name']}: *{job_data['introduction']}*")
         
-        job_overview_embed = discord.Embed(title='Job Menu')
+        job_overview_embed = discord.Embed(title='Job Menu',
+                                           color=0x00D9FF)
         job_overview_embed.add_field(name="Search for Jobs", value=f"**{user_stats['profile_name']}** can search for a job.", inline=False)
         
         if user_stats['available_jobs']:
@@ -85,6 +86,7 @@ class Go(commands.Cog):
             return job_applied_embed
         def job_slot_embed():
             embed = discord.Embed(title="Which job will you be working?", 
+                                  color=0x002FFF,
                                   description=f"**Slot 1: {user_stats['job1']}**\n**Slot 2: {user_stats['job2']}**\n**Slot 3: {user_stats['job3']}**")
             return embed
         
@@ -256,7 +258,7 @@ class Go(commands.Cog):
                 time_working_str = f"{hours} hours"
 
             embed = discord.Embed(title=f"Go work at {job}!",
-                                  color=discord.Color.orange())
+                                  color=0x3c00FF)
             embed.add_field(name="Time Working:", value=time_working_str)
             embed.add_field(name="Wage:", value=f"**{coins_change}** coins")
             

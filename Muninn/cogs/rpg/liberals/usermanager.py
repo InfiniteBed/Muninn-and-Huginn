@@ -77,6 +77,7 @@ class StatsManager(commands.Cog):
             'alignment': profile_alignment,
             'race': profile_race,
             'bio': profile_bio,
+            'gender_letter': profile_gender,
             'pronoun': pronoun,
             'pronoun_possessive': pronoun_possessive,
             'ability_scores': ability_scores,
