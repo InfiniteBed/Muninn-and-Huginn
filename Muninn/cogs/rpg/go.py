@@ -107,10 +107,6 @@ class Go(commands.Cog):
                                    description=f"{user_stats['pronoun'].title()} could go to work or find a job, explore for items or shop at the user-led market.")
 
         def location_details_embed(location, time_gathering = 1):
-            embed = discord.Embed(title=f"{location['name']}", 
-                                  color=0x89CFF0, 
-                                  description=f"Select how long **{user_stats['profile_name']}** will explore for.")
-
             item_bonus = time_gathering/2
             
             cost = location.get('visit_cost')
@@ -125,14 +121,19 @@ class Go(commands.Cog):
             else:
                 time_gathering_str = f"{time_gathering} hours"
 
+            description = f"{location['description']}\n\nSelect how long **{user_stats['profile_name']}** will explore for."
+            description += f"\n*It will cost **`{cost}` Coins** to explore this area.*" if cost else ""
+
+            embed = discord.Embed(title=f"{location['name']}", 
+                                  color=0x89CFF0, 
+                                  description=description)
+
             embed.add_field(name="Time to Arrive:", value=base_hrs_str)
             embed.add_field(name="Time Gathering:", value=time_gathering_str)
             embed.add_field(name="Time to Return:", value=base_hrs_str)
             embed.add_field(name="Total Time:", value=f"*{time_gathering + (location['base_hrs'] * 2)} hours*")
             embed.add_field(name="Time Bonus:", value=f"x{item_bonus}")
-            if cost:
-                embed.add_field(name="Cost to Visit:", value=f"x{cost}")
-
+            
             return embed
 
         class TimeSelectionView(View):
