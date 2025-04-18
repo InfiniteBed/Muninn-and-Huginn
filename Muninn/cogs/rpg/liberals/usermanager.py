@@ -455,7 +455,7 @@ class StatsManager(commands.Cog):
         c.execute("SELECT progress FROM job_progress WHERE user_id = ?", (user_id,))
         result = c.fetchone()
         
-        if not result[0]:
+        if not result or result[0] == None:
             self.init_users_job_progress(user_id, job_data)
             return
         
@@ -502,7 +502,7 @@ class StatsManager(commands.Cog):
         c.execute("SELECT progress FROM job_progress WHERE user_id = ?", (user_id,))
         result = c.fetchone()
         
-        if not result[0]:
+        if not result or result[0] == None:
             self.init_users_job_progress(user_id, job_data)
             return 0
 
