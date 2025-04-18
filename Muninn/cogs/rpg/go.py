@@ -135,6 +135,10 @@ class Go(commands.Cog):
             embed.add_field(name="Time Bonus:", value=f"x{item_bonus}")
             
             return embed
+        
+        def job_already_applied_embed():
+            return discord.Embed(description="This job has already been applied to a slot!",
+                                  color=discord.Color.red())
 
         class TimeSelectionView(View):
             def __init__(self, ctx, location, hours, parent_cog, job):
@@ -322,21 +326,36 @@ class Go(commands.Cog):
                 self.job_data = job_data
                 self.parent_cog = parent_cog
                 super().__init__(timeout=None)
+                self.job1 = user_stats.get('job1')
+                self.job2 = user_stats.get('job2')
+                self.job3 = user_stats.get('job3')
  
             @discord.ui.button(label="Slot 1", style=discord.ButtonStyle.grey)
             async def slot1_button(self, interaction: discord.Interaction, button: Button):
+                if self.job1 == self.job_data['name'] or self.job2 == self.job_data['name'] or self.job3 == self.job_data['name']:
+                    embed = job_already_applied_embed()
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                    return
                 applied_embed = job_applied_embed(slot=1, job=self.job_data)
                 apply_job(slot=1, job=self.job_data['name'])
                 await interaction.response.edit_message(embed=applied_embed, view=None)
                 
             @discord.ui.button(label="Slot 2", style=discord.ButtonStyle.grey)
             async def slot2_button(self, interaction: discord.Interaction, button: Button):
+                if self.job1 == self.job_data['name'] or self.job2 == self.job_data['name'] or self.job3 == self.job_data['name']:
+                    embed = job_already_applied_embed()
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                    return
                 applied_embed = job_applied_embed(slot=2, job=self.job_data)
                 apply_job(slot=2, job=self.job_data['name'])
                 await interaction.response.edit_message(embed=applied_embed, view=None)
                 
             @discord.ui.button(label="Slot 3", style=discord.ButtonStyle.grey)
             async def slot3_button(self, interaction: discord.Interaction, button: Button): 
+                if self.job1 == self.job_data['name'] or self.job2 == self.job_data['name'] or self.job3 == self.job_data['name']:
+                    embed = job_already_applied_embed()
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                    return
                 applied_embed = job_applied_embed(slot=3, job=self.job_data)
                 apply_job(slot=3, job=self.job_data['name'])
                 await interaction.response.edit_message(embed=applied_embed, view=None)
