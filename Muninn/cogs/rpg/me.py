@@ -478,7 +478,7 @@ class Status(commands.Cog):
                         if activity_data.get('result'):
                             result = str.format(activity_data.get('result'), name=username, pclass=pclass)
                             result = self.format_gendered(result, user_stats['gender_letter'])
-                        
+                            
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
                                               description=description, 
                                               color=discord.Color.green())
@@ -490,7 +490,23 @@ class Status(commands.Cog):
                             @discord.ui.button(label="See Expedition Results", style=discord.ButtonStyle.blurple)
                             async def accept_button(self, interaction: discord.Interaction, button: Button):
                                 await interaction.response.edit_message(view=None)
-                                await interaction.channel.send(result)
+                                
+                                if len(result) <= 2000:
+                                    await ctx.send(result)
+                                    return
+
+                                lines = result.split('\n')
+                                chunk = ""
+                                for line in lines:
+                                    if len(chunk) + len(line) + 1 > 2000:
+                                        await ctx.send(chunk)
+                                        chunk = line + "\n"
+                                    else:
+                                        chunk += line + "\n"
+
+                                if chunk:
+                                    await ctx.send(chunk)
+                            
 
                         view = SeeExpeditionResults()
                         

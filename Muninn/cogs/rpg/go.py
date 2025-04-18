@@ -35,7 +35,7 @@ class Go(commands.Cog):
         if len(all_jobs) == len(user_jobs):
             random_job = None
         else:
-            available_jobs = [job for job in all_jobs if job not in user_jobs]
+            available_jobs = [job for job in all_jobs if job['name'] not in user_jobs]
             random_job = random.choice(available_jobs)
                 
         available_jobs_data = []

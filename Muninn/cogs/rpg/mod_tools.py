@@ -99,7 +99,21 @@ class ModTools(commands.Cog):
         result = str.format(result['text'], name=username, pclass=pclass)
         result = format_gendered(result, user_stats['gender_letter'])
         
-        await ctx.send(result)
+        if len(result) <= 2000:
+            await ctx.send(result)
+            return
+
+        lines = result.split('\n')
+        chunk = ""
+        for line in lines:
+            if len(chunk) + len(line) + 1 > 2000:
+                await ctx.send(chunk)
+                chunk = line + "\n"
+            else:
+                chunk += line + "\n"
+
+        if chunk:
+            await ctx.send(chunk)
 
     @commands.command()
     async def gen_items_HC(self, ctx):
