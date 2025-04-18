@@ -2,6 +2,7 @@ import random
 import asyncio
 import time
 from discord.ext import commands
+INSULT_FEATURE_ENABLED = False
 
 class InsultCog(commands.Cog):
     def __init__(self, bot, db_cursor):
@@ -12,6 +13,8 @@ class InsultCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if not INSULT_FEATURE_ENABLED:
+            return
         chance_to_respond = .01
         
         print(random.random(), message.author.id, self.opted_in_users)
