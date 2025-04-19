@@ -19,7 +19,7 @@ class Status(commands.Cog):
         self.stats_manager = bot.get_cog("StatsManager")
         self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
         
-    def format_gendered(text, gender):
+    def format_gendered(self, text, gender):
         pattern = re.compile(r'\[([^\[\]]+?)\]')
         gender_index = 0 if gender.lower() == 'm' else 1
 
@@ -417,7 +417,7 @@ class Status(commands.Cog):
 
             # Add a button for expedition results if the expedition is completed
             if expedition_completed:
-                @discord.ui.button(label="Activity Results", style=discord.ButtonStyle.success)
+                @discord.ui.button(label="Activity Results", style=discord.ButtonStyle.success, row=3)
                 async def expedition_results_button(self, interaction: discord.Interaction, button: Button):
                 
                     await self.parent_cog.process_activity(ctx, user, activity_data)
@@ -477,7 +477,7 @@ class Status(commands.Cog):
 
                         if activity_data.get('result'):
                             result = str.format(activity_data.get('result'), name=username, pclass=pclass)
-                            result = self.format_gendered(result, user_stats['gender_letter'])
+                            result = self.parent_cog.format_gendered(result, user_stats['gender_letter'])
                             
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
                                               description=description, 
