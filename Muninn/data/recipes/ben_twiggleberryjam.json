@@ -1,0 +1,12 @@
+{
+    "name": "Twiggleberry Jam",
+    "type": "equipment",
+    "required_skill": "cooking",
+    "skill_level": 4,
+    "recipe": [
+        {
+            "name": "Twiggleberry",
+            "amount": 30
+        }
+    ]
+}

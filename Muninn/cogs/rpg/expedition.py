@@ -75,6 +75,8 @@ class ExpeditionBoard(commands.Cog):
 
     @commands.command()
     async def board(self, ctx):
+        await ctx.send("This command has been deprecated, in favor of the new job system!\nUse `!go` to search for, apply to, and work at a variety of jobs.")
+        
         user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
 
         if user_stats['activity']:

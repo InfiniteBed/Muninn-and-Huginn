@@ -1,0 +1,23 @@
+{
+    "name": "Deathcoil Spring",
+    "description": "A deadly, coiled metal spring under immense tension. A single misstep could unleash a devastating blast of kinetic force, sending foes into oblivion. Its volatile energy makes it both unpredictable and lethal in the wrong hands.",
+    "slot": "hand",
+    "base_price": 250,
+    "actions": [
+      {
+        "name": "Bounceback Bash",
+        "description": "Grip the coiled spring, unleash a brutal swing and club your target.",
+        "lines": [
+          "This is why we torque to spec!"
+        ],
+        "damage": 8,
+        "defense": 2
+      },
+      {
+        "name": "Stabilizer's Oath",
+        "description": "Unleash the spring—let it detonate like a rocket, driving the far end straight into the enemy's chest with brutal force.",
+        "damage": 24,
+        "defense": -10
+      }
+    ]
+}
