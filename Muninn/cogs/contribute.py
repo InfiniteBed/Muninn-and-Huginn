@@ -47,6 +47,7 @@ class ContributionTypeView(View):
 
         # Add buttons with unique callbacks
         self.add_item(ContributionButton("Randomized Insults", "Randomized Insults", bot, author, initial_response))
+        self.add_item(ContributionButton("Mention Response", "Mention Response", bot, author, initial_response))
         self.add_item(ContributionButton("Randomized Prompts", "Randomized Prompts", bot, author, initial_response))
         self.add_item(ContributionButton("Message Rewards", "Message Rewards", bot, author, initial_response))
         self.add_item(ContributionButton("Custom Graphs", "Custom Graphs", bot, author, initial_response))
