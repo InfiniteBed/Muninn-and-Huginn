@@ -8,21 +8,8 @@ import sqlite3
 class Contribution(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.file_path = "contributions.json"
-        self.load_data()
         self.db_file = "discord.db"
         self.create_star_table()
-
-    def load_data(self):
-        try:
-            with open(self.file_path, "r") as f:
-                self.data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.data = {}
-
-    def save_data(self):
-        with open(self.file_path, "w") as f:
-            json.dump(self.data, f, indent=4)
 
     def create_star_table(self):
         conn = sqlite3.connect(self.db_file)
@@ -85,25 +72,17 @@ class ContributionButton(Button):
             return
 
         # Disable all buttons immediately after a valid interaction
-        for item in self.view.children:
-            if isinstance(item, Button):
-                item.disabled = True
-        await interaction.message.edit(view=self.view)
+        embed = discord.Embed(title="You made a contribution!",
+                              description=f"Your Contribution: **{self.initial_response}**\n\nContribution Type: **{self.contribution_type}**")
+        
+        await interaction.message.edit(embed=embed, view=None)
 
         await interaction.response.send_message(
             f"You selected **{self.contribution_type}**. Your contribution has been sent to the bot owner.",
             ephemeral=True
         )
 
-        cog = self.bot.get_cog("Contribution")
-        cog.data.setdefault("submissions", []).append({
-            "user": self.author.name,
-            "type": self.contribution_type,
-            "initial_response": self.initial_response
-        })
-        cog.save_data()
-
-        conn = sqlite3.connect(cog.db_file)
+        conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
 
         cursor.execute('SELECT stars FROM stars WHERE guild_id = ? AND user_id = ?', (interaction.guild.id, self.author.id))
