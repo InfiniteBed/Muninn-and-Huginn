@@ -3,12 +3,15 @@ from discord.ext import commands
 import json
 from discord.ui import View, Button
 import asyncio
+import sqlite3
 
 class Contribution(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file_path = "contributions.json"
         self.load_data()
+        self.db_file = "discord.db"
+        self.create_star_table()
 
     def load_data(self):
         try:
@@ -20,6 +23,19 @@ class Contribution(commands.Cog):
     def save_data(self):
         with open(self.file_path, "w") as f:
             json.dump(self.data, f, indent=4)
+
+    def create_star_table(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS stars (
+            guild_id INTEGER,
+            user_id INTEGER,
+            stars INTEGER,
+            PRIMARY KEY (guild_id, user_id)
+        )''')
+        conn.commit()
+        conn.close()
 
     @commands.command()
     async def contribute(self, ctx, *, initial_response: str = None):
@@ -46,13 +62,13 @@ class ContributionTypeView(View):
         self.initial_response = initial_response
 
         # Add buttons with unique callbacks
-        self.add_item(ContributionButton("Randomized Insults", "Randomized Insults", bot, author, initial_response))
-        self.add_item(ContributionButton("Mention Response", "Mention Response", bot, author, initial_response))
-        self.add_item(ContributionButton("Randomized Prompts", "Randomized Prompts", bot, author, initial_response))
+        self.add_item(ContributionButton("Muninn @ Response", "Muninn @ Response", bot, author, initial_response))
+        self.add_item(ContributionButton("Huginn @ Response", "Huginn @ Response", bot, author, initial_response))
+        self.add_item(ContributionButton("Random Insults", "Random Insults", bot, author, initial_response))
+        self.add_item(ContributionButton("Random Prompts", "Random Prompts", bot, author, initial_response))
         self.add_item(ContributionButton("Message Rewards", "Message Rewards", bot, author, initial_response))
-        self.add_item(ContributionButton("Custom Graphs", "Custom Graphs", bot, author, initial_response))
         self.add_item(ContributionButton("Items/Weapons/Armor", "Items/Weapons/Armor", bot, author, initial_response))
-        self.add_item(ContributionButton("Expeditions", "Expeditions", bot, author, initial_response))
+        self.add_item(ContributionButton("Jobs", "Jobs", bot, author, initial_response))
         self.add_item(ContributionButton("Commands", "Commands", bot, author, initial_response))
 
 class ContributionButton(Button):
@@ -86,6 +102,20 @@ class ContributionButton(Button):
             "initial_response": self.initial_response
         })
         cog.save_data()
+
+        conn = sqlite3.connect(cog.db_file)
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT stars FROM stars WHERE guild_id = ? AND user_id = ?', (interaction.guild.id, self.author.id))
+        result = cursor.fetchone()
+
+        if result:
+            cursor.execute('UPDATE stars SET stars = stars + 1 WHERE guild_id = ? AND user_id = ?', (interaction.guild.id, self.author.id))
+        else:
+            cursor.execute('INSERT INTO stars (guild_id, user_id, stars) VALUES (?, ?, ?)', (interaction.guild.id, self.author.id, 1))
+
+        conn.commit()
+        conn.close()
 
         bot_owner = self.bot.get_user(self.bot.owner_id)
         embed_to_author = discord.Embed(
