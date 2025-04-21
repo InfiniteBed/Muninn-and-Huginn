@@ -472,6 +472,7 @@ class Go(commands.Cog):
                 index = int(self.values[0])
 
                 embed = location_details_embed(gather_locations[index])
+                location = gather_locations[index]
 
                 detail_view = ExploreDetailView(ctx, location, 1, self.parent_cog, job=None)
                 await interaction.response.edit_message(embed=embed, view=detail_view)
