@@ -6,6 +6,8 @@ from icecream import ic
 from datetime import datetime, timedelta, timezone
 import random
 import math
+import time
+import asyncio
 
 class StatsManager(commands.Cog):
     def __init__(self, bot):
@@ -373,6 +375,16 @@ class StatsManager(commands.Cog):
         activity['item_results'] = item_results
         return activity
     
+    async def activity_dm(self, interaction, user_stats, hours):
+        time.sleep(hours*60*60)
+        
+        embed = discord.Embed(title=f"{user_stats['profile_name']} has completed an activity!",
+                              description=f"Go into {interaction.guild.name} to see your results!")
+        
+        interaction.author.send(embed=embed)
+        
+        return
+    
     async def update_activity(self, interaction, activity, duration_hours, cost):
         # The reward pool will consist of high, medium, and low luck results. This  will predetermine the results, and then store them
         user_stats = await self.fetch_user_stats(interaction.user)
@@ -401,7 +413,9 @@ class StatsManager(commands.Cog):
         cursor = conn.cursor()
         cursor.execute('UPDATE stats SET activity = ? WHERE user_id = ?', (json.dumps(resulting_activity), interaction.user.id))
         conn.commit()
-        conn.close()        
+        conn.close()       
+        
+        asyncio.create_task(self.activity_dm(interaction, user_stats, hours=duration_hours))
     
         # Save the updated activity to the user
         return end_time_str
