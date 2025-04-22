@@ -16,9 +16,6 @@ class AtResponse(commands.Cog):
         
         print(message.content)
         
-        if message.author.bot:
-            return
-
         if self.bot.user.mentioned_in(message):
             await message.channel.send(str.format(random.choice(responses), user=message.author.display_name))
 
