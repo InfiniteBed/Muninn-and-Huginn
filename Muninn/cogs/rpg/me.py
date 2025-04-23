@@ -95,7 +95,7 @@ class Status(commands.Cog):
         info_embed.add_field(name="Bio", value=user_stats['bio'], inline=True)
 
         # Profession page embed
-        professions_clean = ["📚 Author", "🥖 Baking", "☕️ Brewer", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
+        professions_clean = ["📚 Author", "🥖 Baking", "☕️ Brewing", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
 
         professions_str = ""
         query = f"SELECT * FROM proficiencies WHERE user_id = ?"

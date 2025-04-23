@@ -164,14 +164,14 @@ class Go(commands.Cog):
             @discord.ui.button(label="1/2 hrs", style=discord.ButtonStyle.grey)
             async def decrease_button(self, interaction: discord.Interaction, button: Button):
                 self.hours = self.hours/2
-                embed = await self.build_details_embed(location, self.hours)
+                embed = await self.build_details_embed(self.location, self.hours)
                 self.disable_buttons(self.hours)
                 await interaction.response.edit_message(embed=embed, view=self)
 
             @discord.ui.button(label="x2 hrs", style=discord.ButtonStyle.grey)
             async def increase_button(self, interaction: discord.Interaction, button: Button):
                 self.hours = self.hours*2
-                embed = await self.build_details_embed(location, self.hours)
+                embed = await self.build_details_embed(self.location, self.hours)
                 self.disable_buttons(self.hours)
                 await interaction.response.edit_message(embed=embed, view=self)
 
@@ -198,7 +198,7 @@ class Go(commands.Cog):
                 random_job['type'] = 'job_search'
                 random_job['chance'] = (15 * hours)
                 random_job['job_name'] = random_job['name']
-                random_job['name'] = 'Searching for a Job'
+                random_job['name'] = 'Searching for a Job'  
 
                 eta = await self.parent_cog.stats_manager.update_activity(interaction, random_job, hours, cost=0)
 
@@ -426,14 +426,14 @@ class Go(commands.Cog):
                 
                 cost = location.get('visit_cost')
                 
-                if user_stats['coins'] < cost:
-                    embed = discord.Embed(
-                        title=f"You don's have enough coins to go on this expedition!",
-                        color=discord.Color.red()
-                    )
-                    interaction.response.send_message(embed=embed, ephemeral=True)
-
                 if cost:
+                    if user_stats['coins'] < cost:
+                        embed = discord.Embed(
+                            title=f"You don's have enough coins to go on this expedition!",
+                            color=discord.Color.red()
+                        )
+                        interaction.response.send_message(embed=embed, ephemeral=True)
+
                     await self.parent_cog.stats_manager.modify_user_stat(ctx.author, 'coins', (cost * -1))
                 
                 eta = await self.parent_cog.stats_manager.update_activity(

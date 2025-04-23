@@ -30,7 +30,7 @@ class StatsManager(commands.Cog):
         c.execute("SELECT * FROM proficiencies WHERE user_id = ?", (user.id,))
         raw_inventory = (c.fetchone())[0]
 
-        c.execute("SELECT author, baking, brewer, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance FROM proficiencies WHERE user_id = ?", (user.id,))
+        c.execute("SELECT author, baking, brewing, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance FROM proficiencies WHERE user_id = ?", (user.id,))
         proficiencies = (c.fetchone())[0]
 
         c.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user.id,))
@@ -376,16 +376,16 @@ class StatsManager(commands.Cog):
         return activity
     
     async def activity_dm(self, interaction, user_stats, hours):
-        time.sleep(hours*60*60)
+        await asyncio.sleep(hours*60*60)
         
         embed = discord.Embed(title=f"{user_stats['profile_name']} has completed an activity!",
                               description=f"Go into {interaction.guild.name} to see your results!")
         
-        interaction.author.send(embed=embed)
+        await interaction.user.send(embed=embed)
         
         return
     
-    async def update_activity(self, interaction, activity, duration_hours, cost):
+    async def update_activity(self, interaction, activity, duration_hours, cost: int = 0):
         # The reward pool will consist of high, medium, and low luck results. This  will predetermine the results, and then store them
         user_stats = await self.fetch_user_stats(interaction.user)
 
