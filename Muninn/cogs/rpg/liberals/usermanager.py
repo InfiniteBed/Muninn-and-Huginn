@@ -111,8 +111,15 @@ class StatsManager(commands.Cog):
     async def modify_user_stat(self, user, stat, amount):
         conn = sqlite3.connect('discord.db')
         c = conn.cursor()
+        
+        if isinstance(user, int):
+            user_id = user
+        elif isinstance(user, (discord.User, discord.Member)):
+            user_id = user.id
+        else:
+            raise TypeError("Unsupported user type")
 
-        c.execute(f'SELECT {stat}, health_max FROM stats WHERE user_id = ?', (user.id,))
+        c.execute(f'SELECT {stat}, health_max FROM stats WHERE user_id = ?', (user_id,))
         current_value, health_max = c.fetchone()
 
         if stat == 'health':
@@ -124,7 +131,7 @@ class StatsManager(commands.Cog):
         else:
             new_value = max(0, current_value + amount)
 
-        c.execute(f'UPDATE stats SET {stat} = ? WHERE user_id = ?', (new_value, user.id))
+        c.execute(f'UPDATE stats SET {stat} = ? WHERE user_id = ?', (new_value, user_id))
         conn.commit()
         conn.close()
         
@@ -302,29 +309,25 @@ class StatsManager(commands.Cog):
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
 
-        #Check if inventotry is empty, then skip if empty. theres definitely a waaaaay better way to do this
-        cursor.execute("SELECT user_id FROM inventory WHERE inventory IS NULL")
-        data = cursor.fetchall()
+        # Try to get the inventory for this user
+        cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        ic(result)
 
-        if len(data) < 1:
-            cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
-            result = cursor.fetchone()
-            ic(result)
+        if result is None or result[0] is None:
+            user_inventory = []
+        else:
             user_inventory = json.loads(result[0])
 
-        for id in data:
-            if id[0] == user_id:
-                user_inventory = []
-                break
-            else:
-                cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
-                result = cursor.fetchone()
-                ic(result)
-                user_inventory = json.loads(result[0])
-
+        # Append the new item
         user_inventory.append(item_data)
 
-        cursor.execute("INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)", (user_id, json.dumps(user_inventory)))
+        # Save it back
+        cursor.execute(
+            "INSERT OR REPLACE INTO inventory (user_id, inventory) VALUES (?, ?)",
+            (user_id, json.dumps(user_inventory))
+        )
+
         conn.commit()
         conn.close()
 
@@ -353,24 +356,19 @@ class StatsManager(commands.Cog):
                 
             return activity
 
-        if 'skill_test' not in activity:
-            for item in activity['item_pool']:
-                if random.random() < item['chance_to_appear']:
-                    std_deviation = item['std_deviation']
+        for item in activity['item_pool']:
+            if random.random() < item['chance_to_appear']:
+                std_deviation = item['std_deviation']
 
-                    item_data = await self.item_randomizer.generate_item(item['type'], item['name'])
+                item_data = await self.item_randomizer.generate_item(item['type'], item['name'])
 
-                    deviation = random.randint(-std_deviation, std_deviation)
-                    item_count = math.ceil(float(item['std_amount'] + deviation) * item_bonus)
+                deviation = random.randint(-std_deviation, std_deviation)
+                item_count = math.ceil(float(item['std_amount'] + deviation) * item_bonus)
 
-                    for i in range(item_count):
-                        item_results.append(item_data)
-                    
-                    print("Generated activity :)")
-        else:
-            pass
-            ## IMPLEMENT OR DIE
-            ## (based off job skills)
+                for i in range(item_count):
+                    item_results.append(item_data)
+                
+                print("Generated activity :)")
 
         activity['item_results'] = item_results
         return activity
@@ -393,13 +391,6 @@ class StatsManager(commands.Cog):
         if user_stats['activity']:
             await interaction.response.send_message(f"{user_stats['profile_name']} is already busy doing something else!")
             return
-
-        if user_stats['coins'] < cost:
-            await interaction.response.send_message(f"You do not have enough coins to do this! You need {cost} coins.")
-            return
-
-        # Deduct the cost
-        await self.modify_user_stat(interaction.user, 'coins', -cost)
 
         resulting_activity = await self.calculate_activity_results(interaction, activity)
 

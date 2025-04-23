@@ -126,17 +126,18 @@ class GoMarket(commands.Cog):
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
         cursor.execute("SELECT items FROM vendors WHERE user = ?", (vendor_id,))
-        row = cursor.fetchone()
-        items = row[0] if row else None  # Preserve current items, or None if new
+        items = cursor.fetchone()
         
-        if not items:
-            items = [item_data]
+        if items is None or items[0] is None:
+            new_items = []
         else:
-            items.append(item_data)
+            new_items = json.loads(items[0])
+
+        new_items.append(item_data)
             
         name, description = self.get_default_values(vendor_id)
         
-        cursor.execute("INSERT OR REPLACE INTO vendors (user, name, description, items) VALUES (?, ?, ?, ?)", (vendor_id, name, description, json.dumps(items)))
+        cursor.execute("INSERT OR REPLACE INTO vendors (user, name, description, items) VALUES (?, ?, ?, ?)", (vendor_id, name, description, json.dumps(new_items)))
         conn.commit()
         conn.close()
         
@@ -192,7 +193,8 @@ class GoMarket(commands.Cog):
         
         combined_name = f"*{item.get('prefix', '')}* {item['name']}".strip()
         embed = discord.Embed(title=combined_name, color=discord.Color.blue())
-        embed.add_field(name="Description", value=item['description'], inline=False)
+        if item.get('description'):
+            embed.add_field(name="Description", value=item['description'], inline=False)
         embed.add_field(name="Price", value=f"{item['base_price']} coins", inline=False)
         embed.set_footer(text=f"{user_data['profile_name']} has {user_data['coins']} coins")
         
@@ -312,7 +314,7 @@ class GoMarket(commands.Cog):
     
         return embed, view
     
-    async def market_browse_embed_view(self, ctx, market_cog, user_data, message):
+    async def market_browse_embed_view(self, ctx, market_cog, user_data, message, interaction):
         market_data = self.market_serialize()
 
         embed = discord.Embed(
@@ -321,6 +323,26 @@ class GoMarket(commands.Cog):
             color=0xFFCF50
         )
         embed.set_footer(text="written by Luci")
+        
+        options = []
+
+        for index, market in enumerate(market_data[:25]):  # Max 25 options allowed
+            user, name, description, items, username = market_cog.market_analyze(market)
+            
+            if not items:
+                continue
+            
+            
+            label = f"{username}'s Shop"
+            option_description = name if len(name) < 100 else name[:97] + "..."
+            options.append(SelectOption(label=label, description=option_description, value=str(index)))
+    
+        if len(options) is 0:
+            embed = discord.Embed(title='The Market is completely empty!',
+                                  description="Come back later, or sell some of your own items!",
+                                  color=discord.Color.red())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
         class VendorDropdown(Select):
             def __init__(self, market_data, user_data):
@@ -334,6 +356,7 @@ class GoMarket(commands.Cog):
                     label = f"{username}'s Shop"
                     option_description = name if len(name) < 100 else name[:97] + "..."
                     options.append(SelectOption(label=label, description=option_description, value=str(index)))
+
 
                 super().__init__(placeholder="Select a vendor...", options=options, min_values=1, max_values=1)
 
@@ -386,7 +409,7 @@ class GoMarket(commands.Cog):
                     prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (heals {item.get('base_heal')} HP)" if item.get('base_heal') else ""
                     label = f"{prefix} {item['name']} {heal_info}".strip()
-                    options.append(SelectOption(label=label, description=item_data['description'], value=str(index)))
+                    options.append(SelectOption(label=label, description=item_data.get('description'), value=str(index)))
 
                 return cls(options)
 
@@ -450,7 +473,7 @@ class GoMarket(commands.Cog):
 
             @discord.ui.button(label="Browse Market", style=discord.ButtonStyle.blurple)
             async def browse_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await market_cog.market_browse_embed_view(ctx, market_cog, user_data, message)
+                embed, view = await market_cog.market_browse_embed_view(ctx, market_cog, user_data, message, interaction)
                 await interaction.response.edit_message(embed=embed, view=view)
                 
             if not market_cog.if_user_has_stall(ctx):

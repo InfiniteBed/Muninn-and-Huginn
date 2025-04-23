@@ -1,12 +1,13 @@
 import sqlite3
 import json
-import datetime
+from datetime import datetime, timedelta
 import discord
 from discord import app_commands, SelectOption
 from discord.ext import commands
 import asyncio
 import math
 import ast
+from dateutil import parser  # Add this import
 from icecream import ic
 from discord.ui import View, Button, Select
 import random
@@ -16,6 +17,7 @@ class Go(commands.Cog):
         self.bot = bot
         self.db_path = "discord.db"
         self.item_generator = bot.get_cog('ItemFetch')
+        self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = self.bot.get_cog("StatsManager")
         self.data_manager = self.bot.get_cog("DataManager")
         self.go_market = self.bot.get_cog("GoMarket")
@@ -198,7 +200,7 @@ class Go(commands.Cog):
                 random_job['type'] = 'job_search'
                 random_job['chance'] = (15 * hours)
                 random_job['job_name'] = random_job['name']
-                random_job['name'] = 'Searching for a Job'  
+                random_job['name'] = 'Searching for a Job'
 
                 eta = await self.parent_cog.stats_manager.update_activity(interaction, random_job, hours, cost=0)
 
@@ -220,6 +222,13 @@ class Go(commands.Cog):
             ic(job_data)
             
             eta = await stats_manager.update_activity(interaction, job_data, job_data['hours'], cost=0)
+            
+            end_time = datetime.strptime(eta, "%Y-%m-%d %H:%M:%S")
+            current_time = datetime.now()
+            california_time = await self.timezone_converter.convert_time(str(end_time))
+            # Adjust parsing to handle timezone abbreviations
+            california_time = parser.parse(california_time)  # Use dateutil.parser to parse the time
+            formatted_start_time = california_time.strftime("%b. %d at %I:%M %p")
 
             embed = discord.Embed(
                 title=f"{user_stats['profile_name']} went to work at {job_data['name']}!",
@@ -227,7 +236,7 @@ class Go(commands.Cog):
                 color=discord.Color.gold()
             )
             
-            embed.add_field(name="ETA", value=eta)
+            embed.add_field(name="ETA", value=formatted_start_time)
             embed.add_field(name="Time Working:", value=f"{job_data['hours']} hours")
             embed.add_field(name="Wage:", value=f"**{job_data['coins_change']}** coins")
             
@@ -241,7 +250,7 @@ class Go(commands.Cog):
             if story_progress_int+1 > len(job_data['results']):
                 embed = discord.Embed(title = f"There's nothing for you here!",
                                       description = f"{job_data['name']} doesn't need you to work yet!\n\nCome back later...") 
-                return embed
+                return embed, None
             
             result_data = job_data['results'][story_progress_int]
             
@@ -364,23 +373,33 @@ class Go(commands.Cog):
             async def home_button(self, interaction: discord.Interaction, button: Button):
                 await interaction.response.edit_message(embed=self.main_embed, view=nav_buttons)
  
-        class JobApplyView(View):
+        class JobApplyDropdown(Select):
             def __init__(self, ctx, parent_cog):
                 self.main_embed = main_embed
                 self.nav_buttons = nav_buttons
                 self.parent_cog = parent_cog
-                super().__init__(timeout=None)
+                options = []
+                for index, job in enumerate(available_jobs_data):
+                    options.append(SelectOption(label=job['name'], description=job['introduction'][:100], value=str(index)))
 
-            for job in available_jobs_data:
-                @discord.ui.button(label=job['name'], style=discord.ButtonStyle.grey)
-                async def search_button(self, interaction: discord.Interaction, button: Button):
-                    job_search_view = JobApplySlotView(ctx, parent_cog=self.parent_cog, job_data=job)
-                    apply_slot_embed = job_apply_slot_embed()
-                    await interaction.response.edit_message(embed=apply_slot_embed, view=job_search_view)
-                    
-            @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
-            async def home_button(self, interaction: discord.Interaction, button: Button):
-                await interaction.response.edit_message(embed=self.main_embed, view=nav_buttons)
+                super().__init__(placeholder="Select a job to apply...", options=options, min_values=1, max_values=1)
+
+            async def callback(self, interaction: discord.Interaction):
+                if interaction.user.id != ctx.author.id:
+                    await interaction.response.send_message("Sorry, this menu isn't for you.", ephemeral=True)
+                    return
+                
+                index = int(self.values[0])
+                selected_job = available_jobs_data[index]
+                
+                job_search_view = JobApplySlotView(ctx, parent_cog=self.parent_cog, job_data=selected_job)
+                apply_slot_embed = job_apply_slot_embed()
+                await interaction.response.edit_message(embed=apply_slot_embed, view=job_search_view)
+
+        class JobApplyView(View):
+            def __init__(self, ctx, parent_cog):
+                super().__init__(timeout=60)
+                self.add_item(JobApplyDropdown(ctx, parent_cog))
                 
         class JobView(View):
             def __init__(self, ctx, nav_buttons, parent_cog):
@@ -429,10 +448,11 @@ class Go(commands.Cog):
                 if cost:
                     if user_stats['coins'] < cost:
                         embed = discord.Embed(
-                            title=f"You don's have enough coins to go on this expedition!",
+                            title=f"You don't have enough coins to go on this expedition!",
                             color=discord.Color.red()
                         )
-                        interaction.response.send_message(embed=embed, ephemeral=True)
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                        return
 
                     await self.parent_cog.stats_manager.modify_user_stat(ctx.author, 'coins', (cost * -1))
                 
@@ -442,7 +462,7 @@ class Go(commands.Cog):
                     (hours + (location['base_hrs'] * 2)),
                     0
                 )
-
+                
                 embed = discord.Embed(
                     title=f"{user_stats['profile_name']} went to gather items!",
                     description=f"{user_stats['profile_name']} is traveling to **{location['name']}** to explore.",

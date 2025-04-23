@@ -17,7 +17,7 @@ class Status(commands.Cog):
         self.utils = bot.get_cog('Utils')
         self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = bot.get_cog("StatsManager")
-        self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
+        self.data_manager = self.bot.get_cog("DataManager")
         
     def format_gendered(self, text, gender):
         pattern = re.compile(r'\[([^\[\]]+?)\]')
@@ -561,6 +561,7 @@ class Status(commands.Cog):
 
         if activity_data.get('item_results'):
             for item in activity_data['item_results']:
+                ic(item)
                 self.stats_manager.add_to_user_inventory(user.id, item)
         
         if activity_data.get('coins_change'):
