@@ -387,7 +387,7 @@ class GoMarket(commands.Cog):
 
         embed = discord.Embed(
             title="Sell Item",
-            description="The stall is looking a little bare... it's probably time to restock.",
+            description="The stall lay barren. The splintering wood creaked idly with the wind. Everything was mad for a purpose, and this stall was made to display wares for selling. Now, it seemed almost downcast without anything on it's worn shelves. It has been without fulfilling it's purpose for long enough... maybe it's time to restock?",
             color=0xFF8250
         )
 
@@ -423,7 +423,7 @@ class GoMarket(commands.Cog):
                 item = user_data['inventory'][index]
 
                 index = int(self.values[0])
-                embed = discord.Embed(title=f"{user_data['profile_name']} put the {item['name']} up for sale!", 
+                embed = discord.Embed(title=f"{user_data['profile_name']} put the {item['name']} up for sale! You've made the stall happy :)", 
                                       color=0xFF8250, 
                                       description="")
                 

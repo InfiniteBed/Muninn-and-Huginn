@@ -81,19 +81,16 @@ class Home(commands.Cog):
             end_index = start_index + items_per_page
             page_items = parsed_inventory[start_index:end_index]
 
-            inventory_embed = discord.Embed(title=f"Inventory (Page {page}/{total_pages})", color=discord.Color.yellow())
+            inventory_embed = discord.Embed(title=f"Crafting Item Chest (Page {page}/{total_pages})", color=discord.Color.yellow())
             
             if page_items:
                 inventory_list = []
                 for index, item in enumerate(page_items, start=1):
                     item_data = await self.data_manager.find_data(item['type'], item['name'])
-                    description = item_data.get('description')
-                    prefix = item.get('prefix', '')  # Get the prefix if available
-                    heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""
-                    inventory_list.append(f"**{index + start_index}. *{prefix}* {item['name']}** - {description}{heal_info}".strip())
+                    inventory_list.append(f"**{index + start_index}.** {item['name']}".strip())
                 inventory_embed.description = "\n".join(inventory_list)
             else:
-                inventory_embed.description = "Your inventory is empty."
+                inventory_embed.description = "Your crafting item chest is empty."
             return inventory_embed, page_items
 
         class InventoryView(View):
