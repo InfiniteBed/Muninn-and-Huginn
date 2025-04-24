@@ -58,20 +58,21 @@ class Tinker(commands.Cog):
                 return False
             else: return True
             
-        async def build_recipe_embed(user_stats, recipe, recipes):     
-            considered_items = []
+        async def build_recipe_embed(user_stats, recipe, recipes):
             got_items_str = ""
             craftable = True
 
             for item in recipe['recipe']:
                 item_data = await self.item_manager.generate_item("crafting", item['name'])
-                if user_stats['inventory'] is []:
-                    inv_count = user_stats['inventory'].count(item_data)
+                inv_count = 0
+                
+                if len(user_stats['inventory']) > 0:
+                    for inv_item in user_stats['inventory']:
+                        if inv_item['name'] == item['name']:
+                            inv_count += 1
                 else:
                     inv_count = 0
                
-                ic(item_data, user_stats['inventory'][0], inv_count)
-                ic(item)
                 got_items_str += f"**`{item['amount']}`** {item['name']} *(Have `{inv_count}`)*\n"
                 if inv_count < item['amount']:
                     craftable = False
@@ -79,7 +80,7 @@ class Tinker(commands.Cog):
             recipe_data = await self.data_manager.find_data(recipe['type'], recipe['name'])
                     
             recipe_embed = discord.Embed(title=f"Craft {recipe['name']}?", 
-                                         description=recipe_data['description'],
+                                         description=recipe_data.get('description'),
                                          color=0x3617FE)
             recipe_embed.add_field(name="Required Items:", value=got_items_str)
             
@@ -191,6 +192,9 @@ class Tinker(commands.Cog):
         ic(unifieddata)
         user_stats = await self.user_manager.fetch_user_stats(interaction.author)
         embed, view = build_page_embed(user_stats, 1, unifieddata)
+        embed = discord.Embed(title=embed.title,
+                              color=embed.color,
+                              description=("The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.\n\n**To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\nItems, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
         await interaction.send(embed=embed, view=view)        
         
         

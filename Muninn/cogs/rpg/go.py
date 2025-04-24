@@ -135,6 +135,7 @@ class Go(commands.Cog):
             embed.add_field(name="Time to Return:", value=base_hrs_str)
             embed.add_field(name="Total Time:", value=f"*{time_gathering + (location['base_hrs'] * 2)} hours*")
             embed.add_field(name="Time Bonus:", value=f"x{item_bonus}")
+            embed.set_footer(text=f"It will cost {cost} Coins to explore this area!")
             
             return embed
         

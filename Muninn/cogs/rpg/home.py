@@ -254,28 +254,28 @@ class Home(commands.Cog):
                 self.user_stats = user_stats
                 self.ctx = ctx
 
-            @discord.ui.button(label="Rest", style=discord.ButtonStyle.green)
-            async def rest_button(self, interaction: discord.Interaction, button: Button):
-                conn = sqlite3.connect('discord.db')
-                c = conn.cursor()
+            # @discord.ui.button(label="Rest", style=discord.ButtonStyle.green)
+            # async def rest_button(self, interaction: discord.Interaction, button: Button):
+            #     conn = sqlite3.connect('discord.db')
+            #     c = conn.cursor()
 
-                # Check if the user has any ongoing activity
-                c.execute('SELECT activity FROM stats WHERE user_id = ?', (self.user_id,))
-                activity = c.fetchone()
+            #     # Check if the user has any ongoing activity
+            #     c.execute('SELECT activity FROM stats WHERE user_id = ?', (self.user_id,))
+            #     activity = c.fetchone()
 
-                if activity and activity[0]:
-                    await interaction.response.send_message("You cannot rest while engaged in another activity.", ephemeral=True)
-                else:
-                    # Update the activity to "long rest"
-                    c.execute('UPDATE stats SET activity = ? WHERE user_id = ?', ("long rest", self.user_id))
-                    conn.commit()
-                    await interaction.response.send_message("You are now taking a long rest.", ephemeral=True)
+            #     if activity and activity[0]:
+            #         await interaction.response.send_message("You cannot rest while engaged in another activity.", ephemeral=True)
+            #     else:
+            #         # Update the activity to "long rest"
+            #         c.execute('UPDATE stats SET activity = ? WHERE user_id = ?', ("long rest", self.user_id))
+            #         conn.commit()
+            #         await interaction.response.send_message("You are now taking a long rest.", ephemeral=True)
 
-                conn.close()
+            #     conn.close()
             
-            @discord.ui.button(label="Pack", style=discord.ButtonStyle.secondary, row=0)
+            @discord.ui.button(label="Crafting Items", style=discord.ButtonStyle.secondary, row=0)
             async def inventory_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Pack"
+                self.current_menu = "Crafting Items"
                 inventory_view = InventoryView(self.ctx.author, self.user_stats, Home)
                 await inventory_view.initialize_inventory()
                 await interaction.response.edit_message(embed=inventory_view.current_embed, view=inventory_view)

@@ -8,24 +8,6 @@ class DataManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    @commands.is_owner()
-    async def validate(self, ctx):
-        unifieddata = []
-
-        for dirpath, _, filenames in os.walk("./data"):
-            for file in filenames:
-                if file.endswith(".json"):
-                    file_path = os.path.join(dirpath, file)
-                    with open(file_path, 'r') as f:
-                        try:
-                            data = json.load(f)
-                            unifieddata.append(data)
-                        except json.JSONDecodeError:
-                            print(f"Skipping invalid JSON: {file_path}")
-
-        print(f"Data validated!")
-
     ## Returns all data of a certain type
     async def get_data_of_type(self, data_type: str = None):
         print('Getting data of type...')
