@@ -177,6 +177,16 @@ class GoMarket(commands.Cog):
         finally:
             conn.commit()
             conn.close()
+            
+        vendor_user = self.bot.get_user(vendor_id)
+        
+        embed = discord.Embed(
+            title=f"{ctx.author.display_name} bought your {item['name']}!",
+            description=f"{ctx.author.display_name} has purchased **{item['name']}** for **{price} coins**!\nI'm sure they'll put it to good use!",
+            color=discord.Color.green()
+        )
+        
+        await vendor_user.send(embed=embed)
 
         # Display the final page
         final_embed = discord.Embed(
