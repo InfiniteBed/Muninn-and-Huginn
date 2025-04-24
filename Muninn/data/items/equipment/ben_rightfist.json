@@ -1,9 +1,8 @@
 {
     "name": "Right Fist",
     "description": "Your right fist.",
-    "shop": false,
     "slot": "hand",
-    "dev": true,
+    "base_price": 999,
     "actions": [
       {
         "name": "Hook",

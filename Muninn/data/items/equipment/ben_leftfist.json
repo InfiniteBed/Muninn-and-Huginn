@@ -1,8 +1,8 @@
 {
     "name": "Left Fist",
     "description": "Your left fist.",
-    "dev": true,
     "slot": "hand",
+    "base_price": 999,
     "actions": [
         {
         "name": "Punch",

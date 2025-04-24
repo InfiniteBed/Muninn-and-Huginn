@@ -68,7 +68,7 @@ class Verify(commands.Cog):
             file_name = crafting_item.get('file_name')
             
             await self.type_test(ctx, file_name, data=crafting_item, key_name='name', type=str, required_field=True)
-            await self.type_test(ctx, file_name, data=crafting_item, key_name='base_price', type=str, required_field=True)
+            await self.type_test(ctx, file_name, data=crafting_item, key_name='base_price', type=int, required_field=True)
         
         ## Verify Equipment Items
         for equipment_item in unifieddata['items/equipment']:
@@ -107,7 +107,7 @@ class Verify(commands.Cog):
             await self.type_test(ctx, file_name, data=gathering_location, key_name='type', type=str, required_field=True)
             await self.value_test(ctx, file_name, data=gathering_location, key_name='type', values=['gathering'], required_field=True)
             await self.type_test(ctx, file_name, data=gathering_location, key_name='description', type=str, required_field=True)
-            await self.type_test(ctx, file_name, data=gathering_location, key_name='base_hrs', type=int, required_field=True)
+            await self.type_test(ctx, file_name, data=gathering_location, key_name='base_hrs', type=float, required_field=True)
             await self.type_test(ctx, file_name, data=gathering_location, key_name='visit_cost', type=int, required_field=False)
             await self.type_test(ctx, file_name, data=gathering_location, key_name='skill_test', type=int, required_field=True)
             await self.type_test(ctx, file_name, data=gathering_location, key_name='item_pool', type=list, required_field=True)
@@ -126,8 +126,6 @@ class Verify(commands.Cog):
         for job in unifieddata['locations/jobs']:
             file_name = job.get('file_name')
             
-            ic(job)
-            
             await self.type_test(ctx, file_name, data=job, key_name='name', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=job, key_name='introduction', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=job, key_name='proficiency', type=str, required_field=True)
@@ -143,7 +141,6 @@ class Verify(commands.Cog):
                 await ctx.send(F"`{file_name}`: This work location has no work results!")
         
         await ctx.send("Verification Complete!")
-        ic(unifieddata)
 
 async def setup(bot):
     await bot.add_cog(Verify(bot))
