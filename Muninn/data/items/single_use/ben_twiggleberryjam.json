@@ -2,6 +2,6 @@
     "name": "Twiggleberry Jam",
     "description": "A bright pink-red jam, made from twiggleberries. It has a distinct pink-lemonade taste, with hints of cinammon.",
     "type": "consumable",
-    "base_heal": 12,
+    "base_heal": 7,
     "base_price": 16
 }

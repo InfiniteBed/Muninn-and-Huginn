@@ -1,0 +1,10 @@
+{
+    "name": "Coffee",
+    "type": "single_use",
+    "recipe": [
+        {
+            "name": "Coffee Bean",
+            "amount": 3
+        }
+    ]
+}

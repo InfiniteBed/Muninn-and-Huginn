@@ -1,0 +1,7 @@
+{
+    "name": "Cooked Drumstick",
+    "description": "A nice, crispy, golden-brown chicken leg, ready to be eaten. It’s a bit greasy and flavourless, but it’s still delicious.",
+    "type": "consumable",
+    "base_heal": 10,
+    "base_price": 40
+}

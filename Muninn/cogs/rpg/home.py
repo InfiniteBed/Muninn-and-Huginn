@@ -281,7 +281,7 @@ class Home(commands.Cog):
         embed, crafting_view = build_page_embed(user_stats, 1, unifieddata)
         craft_embed = discord.Embed(title=embed.title,
                               color=embed.color,
-                              description=("The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.\n\n**To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\nItems, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
+                              description=("*The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.*\n\n**To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\nItems, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
         
         
         class HomeView(View):

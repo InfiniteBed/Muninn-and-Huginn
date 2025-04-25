@@ -10,8 +10,8 @@ class Battle(commands.Cog):
         self.bot = bot
         self.search = bot.get_cog('Search')  # For User Find
         self.utils = bot.get_cog('Utils')  # For Player's Icon
-        self.stats_manager = self.bot.get_cog("StatsManager")  # For Player Info
-        self.data_manager = self.bot.get_cog("DataManager")  # For Player Info
+        self.stats_manager = self.bot.get_cog("StatsManager") 
+        self.data_manager = self.bot.get_cog("DataManager")  
         self.active_battles = set()
 
     @commands.command()
@@ -112,11 +112,14 @@ class Battle(commands.Cog):
             for slot in item_slots:
                 if not player_stats[slot]:
                     continue
-
-                print(player_stats[slot])  # Debugging print to verify item data
-                item = json.loads(player_stats[slot])
-                ic(item)
-                item_data = await self.data_manager.find_data(item['type'], item['name'])
+                
+                if slot == 'hand_left' and not player_stats[slot]:
+                    item_data = await self.data_manager.find_data('equipment', 'Right Fist')
+                elif slot == 'hand_right' and player_stats[slot] is None:
+                    item_data = await self.data_manager.find_data('equipment', 'Left Fist')
+                else:
+                    item = json.loads(player_stats[slot])
+                    item_data = await self.data_manager.find_data(item['type'], item['name'])
 
                 if 'actions' in item_data and isinstance(item_data['actions'], list):
                     actions.extend(item_data['actions'])  # Ensure actions are appended correctly

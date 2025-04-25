@@ -8,6 +8,7 @@ import time
 class Verify(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.data_manager = self.bot.get_cog("DataManager")  
 
     async def type_test(self, ctx, file, data, key_name, type, required_field: bool = False):
         object = data.get(key_name)
@@ -26,6 +27,10 @@ class Verify(commands.Cog):
             return
         if object not in values and object is not None:
             await ctx.send(F"`{file}`: Key `{key_name}` is not a valid value: `{object}`!")
+            
+    async def item_test(self, ctx, file, item_name, type):
+        if not await self.data_manager.find_data(type, item_name):
+            await ctx.send(F"`{file}`: `{type}` item `{item_name}` is not a valid item!")
         
     @commands.command()
     @commands.is_owner()
@@ -53,6 +58,8 @@ class Verify(commands.Cog):
         for recipe in unifieddata['recipes']:
             file_name = recipe.get('file_name')
             
+            await self.item_test(ctx, file_name, item_name=recipe['name'], type=recipe['type'])
+            
             await self.type_test(ctx, file_name, data=recipe, key_name='name', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=recipe, key_name='type', type=str, required_field=True)
             
@@ -60,6 +67,8 @@ class Verify(commands.Cog):
                 await self.type_test(ctx, file_name, data=recipe, key_name='skill_level', type=str, required_field=True)
                 
             for component in recipe['recipe']:
+                await self.item_test(ctx, file_name, item_name=component['name'], type='crafting')
+                
                 await self.type_test(ctx, file_name, data=component, key_name='name', type=str, required_field=True)
                 await self.type_test(ctx, file_name, data=component, key_name='amount', type=int, required_field=True)
 

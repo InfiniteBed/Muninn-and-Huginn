@@ -1,0 +1,10 @@
+{
+    "name": "Steaming Tea",
+    "type": "single_use",
+    "recipe": [
+        {
+            "name": "Tea Leaves",
+            "amount": 2
+        }
+    ]
+}

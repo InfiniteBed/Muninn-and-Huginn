@@ -1,0 +1,10 @@
+{
+    "name": "Cooked Drumstick",
+    "type": "single_use",
+    "recipe": [
+        {
+            "name": "Raw Drumstick",
+            "amount": 1
+        }
+    ]
+}

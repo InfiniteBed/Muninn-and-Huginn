@@ -69,9 +69,9 @@ class StatsManager(commands.Cog):
 
         # Ensure users can Still fight without weapons
         if not hand_right:
-            hand_right = "{\"name\": \"Right Fist\"}"
+            hand_right = "{\"name\": \"Right Fist\", \"type\": \"equipment\"}"
         if not hand_left:
-            hand_left = "{\"name\": \"Left Fist\"}"
+            hand_left = "{\"name\": \"Left Fist\", \"type\": \"equipment\"}"
 
         return {
             'profile_name': profile_name,
