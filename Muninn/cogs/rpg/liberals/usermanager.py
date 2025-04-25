@@ -234,6 +234,8 @@ class StatsManager(commands.Cog):
         
         user_inventory = json.loads(result[0])
 
+        ic(item_data)
+
         #Remove item from inventory
         user_inventory.remove(item_data)
 
@@ -339,7 +341,11 @@ class StatsManager(commands.Cog):
         cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
 
-        return json.loads(result[index])
+        item = json.loads(result[0])[index]
+
+        ic(item)
+
+        return item
     
     async def calculate_activity_results(self, interaction, activity):
         item_bonus = activity.get('item_bonus', 1)
