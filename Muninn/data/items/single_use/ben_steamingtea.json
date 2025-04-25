@@ -2,6 +2,7 @@
     "name": "Steaming Tea",
     "description": "Nearly boiling-temperature water, infused with black tea leaves. It has a gentle sage odour.",
     "type": "consumable",
+    "skill": "brewing",
     "base_heal": 4,
     "base_price": 10
 }
