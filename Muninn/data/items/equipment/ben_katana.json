@@ -1,5 +1,6 @@
 {
     "name": "Katana",
+    "type": "equipment",
     "description": "A weapon originating from Japan that takes skill to strike effectively.",
     "slot": "hand",
     "base_price": 50,

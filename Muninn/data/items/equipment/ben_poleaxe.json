@@ -1,5 +1,6 @@
 {
     "name": "Poleaxe",
+    "type": "equipment",
     "description": "A long-handled weapon with an axe-head at the end.",
     "slot": "hand",
     "base_price": 50,

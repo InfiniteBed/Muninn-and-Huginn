@@ -1,5 +1,6 @@
 {
     "name": "Steel Sword",
+    "type": "equipment",
     "description": "A basic iron sword for melee attacks",
     "shop": true,
     "slot": "hand",

@@ -1,5 +1,6 @@
 {
     "name": "Training Sword",
+    "type": "equipment",
     "description": "A wooden sword used to train squires.",
     "shop": true,
     "slot": "hand",

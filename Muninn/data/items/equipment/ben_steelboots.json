@@ -1,5 +1,6 @@
 {
     "name": "Steel Boots",
+    "type": "equipment",
     "description": "A knight's chest piece. Protects the chest from hard blows and sharp point.",
     "slot": "upper",
     "base_defense": 2,

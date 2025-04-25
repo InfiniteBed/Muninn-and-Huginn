@@ -1,5 +1,6 @@
 {
     "name": "Right Fist",
+    "type": "equipment",
     "description": "Your right fist.",
     "slot": "hand",
     "base_price": 999,

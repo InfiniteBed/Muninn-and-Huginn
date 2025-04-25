@@ -1,5 +1,6 @@
 {
     "name": "Deathcoil Spring",
+    "type": "equipment",
     "description": "A deadly, coiled metal spring under immense tension. A single misstep could unleash a devastating blast of kinetic force, sending foes into oblivion. Its volatile energy makes it both unpredictable and lethal in the wrong hands.",
     "slot": "hand",
     "base_price": 250,

@@ -1,5 +1,6 @@
 {
     "name": "Whittled Knife",
+    "type": "equipment",
     "description": "A small knife carved out of a tree branch.",
     "slot": "hand",
     "base_price": 25,

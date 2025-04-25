@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import threading
 import json
+from icecream import ic
 
 class Battle(commands.Cog):
     def __init__(self, bot):
@@ -10,7 +11,7 @@ class Battle(commands.Cog):
         self.search = bot.get_cog('Search')  # For User Find
         self.utils = bot.get_cog('Utils')  # For Player's Icon
         self.stats_manager = self.bot.get_cog("StatsManager")  # For Player Info
-        self.list_manager = bot.get_cog('ListManager')  # For Item and Expedition Info
+        self.data_manager = self.bot.get_cog("DataManager")  # For Player Info
         self.active_battles = set()
 
     @commands.command()
@@ -113,9 +114,9 @@ class Battle(commands.Cog):
                     continue
 
                 print(player_stats[slot])  # Debugging print to verify item data
-
                 item = json.loads(player_stats[slot])
-                item_data = await self.list_manager.get_item_data(item['name'])
+                ic(item)
+                item_data = await self.data_manager.find_data(item['type'], item['name'])
 
                 if 'actions' in item_data and isinstance(item_data['actions'], list):
                     actions.extend(item_data['actions'])  # Ensure actions are appended correctly

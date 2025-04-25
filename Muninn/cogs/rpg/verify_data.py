@@ -76,6 +76,7 @@ class Verify(commands.Cog):
             
             await self.type_test(ctx, file_name, data=equipment_item, key_name='name', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=equipment_item, key_name='description', type=str, required_field=True)
+            await self.type_test(ctx, file_name, data=equipment_item, key_name='type', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=equipment_item, key_name='slot', type=str, required_field=True)
             await self.value_test(ctx, file_name, data=equipment_item, key_name='slot', values=['hand', 'feet', 'lower', 'upper', 'head'], required_field=True)
             await self.type_test(ctx, file_name, data=equipment_item, key_name='base_price', type=int, required_field=True)
