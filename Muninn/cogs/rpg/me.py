@@ -273,8 +273,8 @@ class Status(commands.Cog):
                     if row >= 4:
                         break
                     custom_id = f"use_item_{index}"
-                    button = CustomButton(label=f"Use {item['name']}", style=discord.ButtonStyle.success, row=row, custom_id=custom_id)
-                    button.callback = self.create_button_callback(index) 
+                    button = CustomButton(label=f"Consume {item['prefix']} {item['name']}", style=discord.ButtonStyle.blurple, row=row, custom_id=custom_id)
+                    button.callback = self.create_button_callback(index)
                     self.add_item(button)
 
                 self.previous_page_button.disabled = self.current_page == 1
@@ -296,7 +296,7 @@ class Status(commands.Cog):
                 if not await self.ensure_correct_user(interaction):
                     return
 
-                if item.get("type") == "consumable":
+                if item.get("type") == "single_use":
                     # Fetch the user's current stats
                     user_stats = await self.navigation_view.parent_cog.stats_manager.fetch_user_stats(self.profile_user)
                     current_health = user_stats['health']
@@ -309,7 +309,7 @@ class Status(commands.Cog):
                             description=f"Your health is already at maximum (**{current_health}/{max_health}**).",
                             color=discord.Color.red()
                         )
-                        await interaction.followup.send(embed=max_health_embed, ephemeral=True)
+                        await interaction.response.send_message(embed=max_health_embed, ephemeral=True)
                         return
 
                     # Apply the healing effect
@@ -326,7 +326,7 @@ class Status(commands.Cog):
                         description=f"You used **{item['name']}** and healed for **{heal_amount} HP**.\nYour current health is now **{updated_health}**.",
                         color=discord.Color.green()
                     )
-                    await interaction.followup.send(embed=heal_embed, ephemeral=True)
+                    await interaction.response.send_message(embed=heal_embed, ephemeral=True)
 
                     # Remove the used item from the inventory
                     self.current_items.remove(item)
