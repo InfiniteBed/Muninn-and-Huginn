@@ -97,12 +97,22 @@ class Home(commands.Cog):
             ##Generate the item...
             generated_item = await self.item_manager.generate_item(recipe['type'], recipe['name'])
             
-            ##First, remove the items to craft
+            ## First, remove the items to craft
             for item in recipe['recipe']:
-                for _ in range(item['amount']):
-                    item_data = await self.item_manager.generate_item("crafting", item['name'])
-                    self.user_manager.remove_from_user_inventory(user_id, item_data)
-                    
+                amount_to_remove = item['amount']
+                item_name = item['name']
+                removed = 0
+
+                for index in range(len(user_stats['inventory'])):
+                    inv_item = user_stats['inventory'][index]
+                    if inv_item['name'] == item_name:
+                        item_data = self.user_manager.get_item_in_inventory(interaction.author.id, index)
+                        ic(item_data)
+                        self.user_manager.remove_from_user_inventory(user_id, item_data)
+                        removed += 1
+                        if removed >= amount_to_remove:
+                            break
+
             ##Then add to inventory
             generated_item
             
@@ -189,7 +199,7 @@ class Home(commands.Cog):
         chest_view = ChestView()
             
         def build_page_embed(user_stats, page, recipes):
-            page_beginning_index = (5 * (page-1))
+            page_beginning_index = (5 * (page-1)) - 1
             total_pages = math.ceil(len(recipes)/5)
             eval_item_index = page_beginning_index
             description = ""
@@ -199,7 +209,12 @@ class Home(commands.Cog):
                     continue
                 
                 recipe = recipes[eval_item_index]
-                description += f"{eval_item_index}. {recipe['name']}\n"
+                locked = recipe.get('locked')
+                                
+                if locked:
+                    description += f"~~{eval_item_index+2}. {recipe['name']}:~~ `Requires {recipe['required_skill'].title()} {recipe['skill_level']}`\n"
+                elif not locked:
+                    description += f"{eval_item_index+2}. {recipe['name']}\n"
                  
                 eval_item_index += 1
 
@@ -237,12 +252,12 @@ class Home(commands.Cog):
             
                 @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
                 async def prev_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = self.build_page_embed(user_stats, page-1, recipes)
+                    embed, view = build_page_embed(user_stats, page-1, recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Next", style=discord.ButtonStyle.grey)
                 async def next_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = self.build_page_embed(user_stats, page+1, recipes)
+                    embed, view = build_page_embed(user_stats, page+1, recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Return", style=discord.ButtonStyle.red)
@@ -250,6 +265,25 @@ class Home(commands.Cog):
                     await interaction.response.edit_message(embed=home_embed, view=home_view)
             
             view = CraftView()
+            
+            start_index = (page - 1) * 5
+            buttons = [
+                view.first_button,
+                view.second_button,
+                view.third_button,
+                view.fourth_button,
+                view.fifth_button,
+            ]
+
+            for i, button in enumerate(buttons):
+                index = start_index - 1 + i  # start at -1, 0, 1, 2, 3
+                if 0 <= index < len(recipes):
+                    button.disabled = recipes[index].get('locked')
+                else:
+                    button.disabled = True  # Disable button if recipe doesn't exist
+
+            
+            ic(recipes[((page-1)*5)+1])
             
             if page == 1:
                 view.prev_button.disabled = True
@@ -272,16 +306,17 @@ class Home(commands.Cog):
                                 unifieddata.append(data)
                                 print("Added recipe!")
                             else:     
-                                print("User has not unlocked recipe!")                                
+                                data['locked'] = True
+                                unifieddata.append(data)   
+                                print("Added locked recipe!")                          
                         except json.JSONDecodeError as e:
                             print(f"Skipping invalid JSON: {file_path}, {e}")
-                            
-        ic(unifieddata)
+                         
         user_stats = await self.user_manager.fetch_user_stats(interaction.author)
         embed, crafting_view = build_page_embed(user_stats, 1, unifieddata)
         craft_embed = discord.Embed(title=embed.title,
                               color=embed.color,
-                              description=("*The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.*\n\n**To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\nItems, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
+                              description=("-# *The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.*\n\n-# **To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\n-# Items, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
         
         
         class HomeView(View):
