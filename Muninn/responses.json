@@ -40,7 +40,9 @@
         "6600": "I'm employed, what does this mean {nick}?\n\"6,600: *{message}*\"",
         "6800": "Slow down, you'll break your keyboard {nick}\n\"6,800: *{message}*\"",
         "7000": "SLOW DOWN {nick} DAWG\n\"7,000: *{message}*\"",
-        "7200": "These numbers are getting ridiculous {nick}...\n\"7,200: *{message}*\""
+        "7200": "These numbers are getting ridiculous {nick}...\n\"7,200: *{message}*\"",
+        "7400": "Another milestone already {nick}? Did you like, crash out or something?\n\"7,400: *{message}*\"",
+        "7600": "do you not have a job or something {nick}?\n\"7,600: *{message}*\""
     },
     "thank_you_responses": {
         "normal": [

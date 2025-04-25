@@ -25,11 +25,12 @@ class GifDetector(commands.Cog):
 
         # Check for GIF in embeds (like Tenor or Giphy)
         for embed in message.embeds:
-            if embed.type == "gifv" or (embed.url and embed.url.endswith(".gif")):
+            if embed.type == "gifv" or embed.type == "gif" or (embed.url and embed.url.endswith(".gif") or ("gif" in embed.url)):
                 gif_found = True
                 break
 
         if gif_found:
+            print("Gif found!!!")
             # Remove old GIFs from count (outside 3-hour window)
             if user_id in self.user_gif_data:
                 self.user_gif_data[user_id] = [

@@ -46,7 +46,7 @@ bot.owner_id = 867261583871836161
 # Load bot token from config file
 config = configparser.ConfigParser()
 config.read("config.ini")
-BOT_TOKEN = config["Muninn"]["BotToken"]  # Updated to use the Muninn section
+BOT_TOKEN = config["Muninn"]["BotToken"]
 
 async def load_cogs():
     for foldername, subfolders, files in os.walk("./cogs"):
