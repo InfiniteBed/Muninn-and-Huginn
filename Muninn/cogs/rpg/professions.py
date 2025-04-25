@@ -1,10 +1,10 @@
 import sqlite3
 PROFESSIONS = [
-    "baking", "brewer", "carpentry", "cleaning", "coachman", "cooking", "cupbearing",
+    "baking", "brewing", "carpentry", "cleaning", "coachman", "cooking", "cupbearing",
     "farming", "fishing", "floristry", "gardening", "guarding", "glassblowing", "healing",
     "husbandry", "innkeeping", "knighthood", "leadership", "masonry", "metalworking",
     "painting", "pottery", "royalty", "sculpting", "smithing", "spinning", "stablekeeping",
-    "tailoring", "teaching", "vigilance"
+    "tailoring", "teaching", "vigilance", "woodworking"
 ]
 from discord.ext import commands
 

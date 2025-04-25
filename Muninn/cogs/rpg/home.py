@@ -93,7 +93,7 @@ class Home(commands.Cog):
                 inventory_embed.description = "Your crafting item chest is empty."
             return inventory_embed
 
-        async def craft_item(recipe, user_id):         
+        async def craft_item(recipe, user_id, ctx):         
             ##Generate the item...
             generated_item = await self.item_manager.generate_item(recipe['type'], recipe['name'])
             
@@ -118,15 +118,21 @@ class Home(commands.Cog):
             
             self.user_manager.add_to_user_inventory(user_id, generated_item)
             
+            ##Give Experience if Applicable
+            proficiency = recipe['skill']
+            if proficiency:
+                await self.user_manager.proficency_increase(interaction.author, proficiency, 1, ctx)
+            
             if generated_item.get('prefix'):
                 prefix = f"*{generated_item.get('prefix')}* "
             else:
                 prefix = ""
             
             embed = discord.Embed(title=f"Successfully crafted {recipe['name']}!",
-                                  description=f"{prefix}{generated_item['name']}".strip(),
+                                  description=f"{prefix}{generated_item['name']} crafted.".strip(),
                                   color=0x7B12B4)
-            
+            if proficiency:
+                embed.description += f"\n\nIncreased `{proficiency}` proficiency by `1`!"
             return embed
             
         async def skill_unlocks(recipe, user_id):
@@ -141,7 +147,7 @@ class Home(commands.Cog):
                 return False
             else: return True
             
-        async def build_recipe_embed(user_stats, recipe, recipes):
+        async def build_recipe_embed(user_stats, recipe, recipes, ctx):
             got_items_str = ""
             craftable = True
 
@@ -173,12 +179,12 @@ class Home(commands.Cog):
                 
                 @discord.ui.button(label="Craft", style=discord.ButtonStyle.blurple)
                 async def craft_button(self, interaction: discord.Interaction, button: Button):
-                    embed = await craft_item(recipe, interaction.user.id)
+                    embed = await craft_item(recipe, interaction.user.id, ctx)
                     await interaction.response.edit_message(embed=embed, view=None)
             
                 @discord.ui.button(label=f"Cancel", style=discord.ButtonStyle.grey)
                 async def cancel_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = build_page_embed(user_stats, 1, recipes)
+                    embed, view = build_page_embed(user_stats, 1, recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
             view = CraftView()
@@ -198,7 +204,7 @@ class Home(commands.Cog):
             
         chest_view = ChestView()
             
-        def build_page_embed(user_stats, page, recipes):
+        def build_page_embed(user_stats, page, recipes, ctx):
             page_beginning_index = (5 * (page-1)) - 1
             total_pages = math.ceil(len(recipes)/5)
             eval_item_index = page_beginning_index
@@ -227,37 +233,37 @@ class Home(commands.Cog):
                 
                 @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.grey)
                 async def first_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)-1], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)-1], recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.grey)
                 async def second_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)], recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.grey)
                 async def third_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+1], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+1], recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.grey)
                 async def fourth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+2], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+2], recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.grey)
                 async def fifth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+3], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+3], recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
                 async def prev_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = build_page_embed(user_stats, page-1, recipes)
+                    embed, view = build_page_embed(user_stats, page-1, recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Next", style=discord.ButtonStyle.grey)
                 async def next_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = build_page_embed(user_stats, page+1, recipes)
+                    embed, view = build_page_embed(user_stats, page+1, recipes, ctx)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Return", style=discord.ButtonStyle.red)
@@ -313,7 +319,7 @@ class Home(commands.Cog):
                             print(f"Skipping invalid JSON: {file_path}, {e}")
                          
         user_stats = await self.user_manager.fetch_user_stats(interaction.author)
-        embed, crafting_view = build_page_embed(user_stats, 1, unifieddata)
+        embed, crafting_view = build_page_embed(user_stats, 1, unifieddata, interaction)
         craft_embed = discord.Embed(title=embed.title,
                               color=embed.color,
                               description=("-# *The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.*\n\n-# **To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\n-# Items, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))

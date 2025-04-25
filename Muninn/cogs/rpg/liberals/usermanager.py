@@ -13,6 +13,7 @@ class StatsManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.item_randomizer = self.bot.get_cog("ItemRandomizer") # For Item and Expedition Info
+        self.data_manager = self.bot.get_cog("DataManager") # For Item and Expedition Info
 
     async def fetch_user_stats(self, user):
         conn = sqlite3.connect('discord.db')
@@ -433,7 +434,17 @@ class StatsManager(commands.Cog):
         conn.close()
         return result
     
-    async def proficency_increase(self, user, proficiency, amount: int):
+    async def check_recipe_unlocks(self, ctx, proficiency, old_value, new_value):
+        data = await self.data_manager.get_data_of_type('crafting')
+        
+        for item in data:
+            skill = item.get('required_skill')
+            if skill != proficiency:
+                continue
+            if old_value < item <= new_value:
+                await ctx.channel.send(f"WOAAAAAA YOU GOT A NEW RECIPE!!!!\n{item['name']}")
+    
+    async def proficency_increase(self, user, proficiency, amount: int, ctx = None):
         query = f"SELECT {proficiency} FROM proficiencies WHERE user_id = ?"
         execute = f"UPDATE proficiencies SET {proficiency} = ? WHERE user_id = ?"
         conn = sqlite3.connect('discord.db')
@@ -446,6 +457,9 @@ class StatsManager(commands.Cog):
         c.execute(execute, (proficiency_value, user.id,))
         conn.commit()
         conn.close()
+        
+        if ctx:
+            await self.check_recipe_unlocks(ctx, proficiency, proficiency_value-amount, proficiency_value)
         
     def init_users_job_progress(self, user_id, job_data):
         insertion = {job_data['name']: {"name": job_data['name'],"progress": 0}}
