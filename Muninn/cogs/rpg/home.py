@@ -227,27 +227,27 @@ class Home(commands.Cog):
                 
                 @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.grey)
                 async def first_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+0], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)-1], recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.grey)
                 async def second_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+1], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)], recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.grey)
                 async def third_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+2], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+1], recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.grey)
                 async def fourth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+3], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+2], recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.grey)
                 async def fifth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+4], recipes)
+                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+3], recipes)
                     await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
