@@ -4,5 +4,5 @@
     "type": "consumable",
     "skill": "cooking",
     "base_heal": 10,
-    "base_price": 40
+    "base_price": 19
 }

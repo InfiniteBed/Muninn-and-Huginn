@@ -1,6 +1,7 @@
 {
     "name": "Twiggleberry Jam",
     "type": "single_use",
+    "skill": "cooking",
     "required_skill": "cooking",
     "skill_level": 4,
     "recipe": [

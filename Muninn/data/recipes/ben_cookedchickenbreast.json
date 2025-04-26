@@ -1,10 +1,10 @@
 {
-    "name": "Cooked Drumstick",
+    "name": "Cooked Chicken Breast",
     "type": "single_use",
     "skill": "cooking",
     "recipe": [
         {
-            "name": "Raw Drumstick",
+            "name": "Raw Chicken Breast",
             "amount": 1
         }
     ]

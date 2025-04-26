@@ -1,0 +1,7 @@
+{
+    "name": "The Amstein Press",
+    "description": "This cup of Joseph is brewed with a special technique that makes it taste like a cup of Joseph, but with a hint of milk. It’s the perfect drink for those who want to enjoy the taste of Joseph without the bitterness.",
+    "type": "consumable",
+    "base_heal": 9,
+    "base_price": 16
+}

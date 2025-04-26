@@ -1,4 +1,5 @@
 {
     "name": "Feather",
-    "base_price": 3
+    "base_price": 3,
+    "type": "crafting"
 }
