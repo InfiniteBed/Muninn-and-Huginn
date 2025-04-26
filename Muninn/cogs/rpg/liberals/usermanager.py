@@ -29,7 +29,7 @@ class StatsManager(commands.Cog):
         equipped_armor = c.fetchone()
 
         c.execute("SELECT * FROM proficiencies WHERE user_id = ?", (user.id,))
-        raw_inventory = (c.fetchone())[0]
+        proficiencies = (c.fetchone())[0]
 
         c.execute("SELECT author, baking, brewing, carpentry, cleaning, coachman, cooking, cupbearing, farming, fishing, floristry, gardening, guarding, glassblowing, healing, husbandry, innkeeping, knighthood, leadership, masonry, metalworking, painting, pottery, royalty, sculpting, smithing, spinning, stablekeeping, tailoring, teaching, vigilance FROM proficiencies WHERE user_id = ?", (user.id,))
         proficiencies = (c.fetchone())[0]

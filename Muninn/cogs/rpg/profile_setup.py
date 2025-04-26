@@ -409,6 +409,11 @@ class Setup(commands.Cog):
                 VALUES (?)
             ''', (ctx.author.id,))
             
+            c.execute('''
+                INSERT INTO proficiencies (user_id)
+                VALUES (?)
+            ''', (ctx.author.id,))
+            
             conn.commit()
             
         except sqlite3.Error as e:

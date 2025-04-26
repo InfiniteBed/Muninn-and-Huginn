@@ -141,7 +141,7 @@ class GoMarket(commands.Cog):
         conn.commit()
         conn.close()
         
-    async def buy_item(self, ctx, item, items, vendor_id, vendor_name):
+    async def buy_item(self, ctx, item, items, vendor_id, vendor_name, vendor_description):
         """Handle the item purchase."""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -173,7 +173,7 @@ class GoMarket(commands.Cog):
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT OR REPLACE INTO vendors (user, name, items) VALUES (?, ?, ?)", (vendor_id, vendor_name, json.dumps(new_shop_data)))
+            cursor.execute("INSERT OR REPLACE INTO vendors (user, name, description, items) VALUES (?, ?, ?, ?)", (vendor_id, vendor_name, description, json.dumps(new_shop_data)))
         finally:
             conn.commit()
             conn.close()
@@ -223,7 +223,7 @@ class GoMarket(commands.Cog):
             
             @discord.ui.button(label=f"Purchase", style=discord.ButtonStyle.green)
             async def buy_button(self, interaction: discord.Interaction, button: Button):
-                embed = await market_cog.buy_item(ctx, item, market[3], market[0], market[1])
+                embed = await market_cog.buy_item(ctx, item, market[3], market[0], market[1], market[2])
                 await interaction.response.edit_message(embed=embed, view=None)
             
             @discord.ui.button(label=f"Back", style=discord.ButtonStyle.red)
@@ -244,12 +244,14 @@ class GoMarket(commands.Cog):
         description = f"{user_data['profile_name']} has **{user_data['coins']} coins**.\n"
         
         for i in range(5):
-            ic(eval_item_index)
-            if ((i+1)*page) > (len(items)):
-                continue
+            if ((i)*page) > (len(items)-1):
+                break
+            if eval_item_index >= len(items):
+                break
+            
+            ic(len(items), i, (i+1)*page)
             
             item = items[eval_item_index]
-            ic(item, eval_item_index)
             if item.get('prefix'):
                 prefix = f"*{item['prefix']}* "
             else:
@@ -413,13 +415,14 @@ class GoMarket(commands.Cog):
             @classmethod
             async def create(cls):
                 options = []
-            
+                
                 for index, item in enumerate(user_data['inventory'][:25]):
                     item_data = await data_manager.find_data(item['type'], item['name'])
+                    description = item_data.get('description')[:100] if item_data.get('description') else None
                     prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (heals {item.get('base_heal')} HP)" if item.get('base_heal') else ""
                     label = f"{prefix} {item['name']} {heal_info}".strip()
-                    options.append(SelectOption(label=label, description=item_data.get('description'), value=str(index)))
+                    options.append(SelectOption(label=label, description=description, value=str(index)))
 
                 return cls(options)
 
@@ -427,7 +430,6 @@ class GoMarket(commands.Cog):
                 if interaction.user.id != ctx.author.id:
                     await interaction.response.send_message("Sorry, this menu isn't for you.", ephemeral=True)
                     return
-                
                 
                 index = int(self.values[0])           
                 item = user_data['inventory'][index]

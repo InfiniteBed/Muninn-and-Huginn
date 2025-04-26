@@ -119,7 +119,7 @@ class Home(commands.Cog):
             self.user_manager.add_to_user_inventory(user_id, generated_item)
             
             ##Give Experience if Applicable
-            proficiency = recipe['skill']
+            proficiency = recipe.get('skill')
             if proficiency:
                 await self.user_manager.proficency_increase(interaction.author, proficiency, 1, ctx)
             
