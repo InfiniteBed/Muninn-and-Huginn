@@ -2,6 +2,7 @@
     "name": "Coffee",
     "description": "A steaming, black cup of Joseph, ready to be drunk by those who—for some reason—like their coffee bitter and flavourless.",
     "type": "consumable",
+    "skill": "brewing",
     "base_heal": 9,
     "base_price": 16
 }

@@ -1,5 +1,5 @@
 {
-    "name": "The Amstein Press",
+    "name": "The Javelin",
     "type": "single_use",
     "skill": "brewing",
     "required_skill": "brewing",
@@ -7,11 +7,11 @@
     "recipe": [
         {
             "name": "Coffee Bean",
-            "amount": 15
+            "amount": 30
         },
         {
             "name": "Milk",
-            "amount": 2
+            "amount": 3
         }
     ]
 }
