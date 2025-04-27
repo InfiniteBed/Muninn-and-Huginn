@@ -75,6 +75,7 @@ class ModTools(commands.Cog):
         
         username = user_stats['profile_name']
         pclass = user_stats['class']
+        race = user_stats['race']
         
         def format_gendered(text, gender):
             pattern = re.compile(r'\[([^\[\]]+?)\]')
@@ -90,13 +91,13 @@ class ModTools(commands.Cog):
         
         if progress is None:
             for result in job_data['results']:
-                result = str.format(result['text'], name=username, pclass=pclass)
+                result = str.format(result['text'], name=username, pclass=pclass, race=race)
                 result = self.format_gendered(result, user_stats['gender_letter'])
                 await ctx.send(result)
             return
                 
         result = job_data['results'][progress]
-        result = str.format(result['text'], name=username, pclass=pclass)
+        result = str.format(result['text'], name=username, pclass=pclass, race=race)
         result = format_gendered(result, user_stats['gender_letter'])
         
         if len(result) <= 2000:
