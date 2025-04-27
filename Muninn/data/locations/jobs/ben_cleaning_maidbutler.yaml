@@ -58,18 +58,16 @@ results:
       Cleaning, just as instructed, was much the same as yesterday.
       Thanks to the now-building routine, the task was indeed done faster than last,
       allowing {name} about an hour more to polish the wooden furniture.
-      [He|She] found a cylindrical tin of polish in the same room that held your outfit,
+      [He|She] found a cylindrical tin of polish in the same room that held [his|her] outfit,
       and began spreading the polish across each wooden piece and buffing the wood out with a cloth.
       Before long, each piece of furniture within the front hall was sheened and clean.
 
-      “Good work.” He caught you right as you finished off the last piece.
-      It was an older piece among the collection—a sewing cabinet, you figured.
+      “Good work.” He caught {name} right as [he|she] finished off the last piece.
+      It was an older piece among the collection—a sewing cabinet, [he|she] figured.
       He rubbed the back of his finger against the top surface, noting the lack of grease left over
       and the glossy finish of the wood. “Very good.”
 
-      He dug into his pockets and extracted your wage.
-      “Get changed. I expect you back in two days.”
-
+      He dug into his pockets and extracted {name}'s wage. “Get changed. I expect you back in two days.”
       -# Written by Infinite_Bed
     coins_change: 24
     xp_change: 4
