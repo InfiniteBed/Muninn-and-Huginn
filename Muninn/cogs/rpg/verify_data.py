@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+import yaml
 from icecream import ic
 import os
 import time
@@ -42,11 +43,11 @@ class Verify(commands.Cog):
             folder_data = []
             
             for file in filenames:
-                if file.endswith(".json"):
+                if file.endswith(".json") or file.endswith(".yaml"):
                     file_path = os.path.join(dirpath, file)
                     with open(file_path, 'r') as f:
                         try:
-                            data = json.load(f)
+                            data = yaml.safe_load(f)
                             data['file_name'] = file_path
                             folder_data.append(data)
                         except json.JSONDecodeError:

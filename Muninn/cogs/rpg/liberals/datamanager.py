@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+import yaml
 from icecream import ic
 import os
 
@@ -30,11 +31,11 @@ class DataManager(commands.Cog):
 
         for dirpath, _, filenames in os.walk(datapath):
             for file in filenames:
-                if file.endswith(".json"):
+                if file.endswith(".json") or file.endswith(".yaml"):
                     file_path = os.path.join(dirpath, file)
                     with open(file_path, 'r') as f:
                         try:
-                            data = json.load(f)
+                            data = yaml.safe_load(f)
                             unifieddata.append(data)
                         except json.JSONDecodeError as e:
                             print(f"Skipping invalid JSON: {file_path}, {e}")
