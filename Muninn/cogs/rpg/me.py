@@ -467,6 +467,7 @@ class Status(commands.Cog):
                         
                         username = user_stats['profile_name']
                         pclass = user_stats['class']
+                        race = user_stats['race']
                         
                         ic(is_promotion)
                                                                                         
@@ -476,7 +477,7 @@ class Status(commands.Cog):
                             description += f"Increased **{activity_data['proficiency'].title()}** proficiency by `{activity_data['xp_change']}`.\n\n"
 
                         if activity_data.get('result'):
-                            result = str.format(activity_data.get('result'), name=username, pclass=pclass)
+                            result = str.format(activity_data.get('result'), name=username, pclass=pclass, race=race)
                             result = self.parent_cog.format_gendered(result, user_stats['gender_letter'])
                             
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
