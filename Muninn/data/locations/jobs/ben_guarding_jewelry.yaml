@@ -1,23 +1,24 @@
 name: Jul's Jewelry
 introduction: >
-  Jul's Jewelry has been broken into several times, and Jul just can't afford
-  any more break-ins. She's now looking for a reliable, strong security guard
-  to watch over the store after hours.
+  Jul's Jewelry has been broken into several times, and Jul just can't afford any more break-ins. She's now looking for a reliable, strong security guard to watch over the store after hours.
 proficiency: "guarding"
 results:
   - text: >
-      Suspicion flashed across her features as you—a {pclass} that clearly was not
-      here to purchase—approached the counter. But as [he|she] held up the *"Help Wanted"*
-      ad, her suspicion quickly molded to relief.
+      Suspicion flashed across her features as you—a {pclass} that clearly was not here to purchase—approached the counter. But as [he|she] held up the *"Help Wanted"* ad, her suspicion quickly molded to relief.
       
       "Oh, thank Praia..." The small elf stepped out from behind the counter.
       
-      "The job should be simple—as long as nothing happens—a-and we're not broken into..."
-      She caught herself in her muttering. "P-point is! All I want you to do is just stand
-      at the entrance and scare off the bad customers. It can't be too bad! Unless you get
-      in a fight or... something."
+      "The job should be simple—as long as nothing happens—a-and we're not broken into..." She caught herself in her muttering. "P-point is! All I want you to do is just stand at the entrance and scare off the bad customers. It can't be too bad! Unless you get in a fight or... something."
       
-      It seemed to be an easy enough job. Simply stand around and look tough. For a 
-    coins_change: 12
+      It seemed to be an easy enough job. Simply stay outside the store and look tough for the night. For a {race} like you, that was an easy enough job.
+
+      And easy enough it was. The entire night, nothing of note happened. Sure, you may have presumably scared off some unwanted customers, but no direct confrontations were made. As daybreak hit, you saw the elf approaching, shuffling with her keys. Her eyes lit up as she saw you out front. "Ah! I-I completely forgot!" She unlocked the door to her store, and allowed you in. "Thank you so much for your work."
+
+      She stepped behind the counter, counted out quite the number of coins, and handed them to you.
+
+      "I'll be needing security every night... especially with the recent protests... so if you could come in tonight as well, that really would be lovely."
+
+      "Of course. I'll be here," were your last words as you left the jeweler.
+    coins_change: 32
     xp_change: 4
-    hours: 8
+    hours: 12
