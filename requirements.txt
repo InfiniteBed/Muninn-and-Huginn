@@ -1,0 +1,9 @@
+discord.py
+requests
+pillow
+fuzzywuzzy
+matplotlib
+seaborn
+psycopg2
+regex
+icecream

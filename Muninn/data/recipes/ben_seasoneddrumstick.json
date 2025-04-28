@@ -1,0 +1,20 @@
+{
+    "name": "Seasoned Drumstick",
+    "type": "single_use",
+    "required_skill": "cooking",
+    "skill_level": 6,
+    "recipe": [
+        {
+            "name": "Raw Drumstick",
+            "amount": 1
+        },
+        {
+            "name": "Rosemary",
+            "amount": 3
+        },
+        {
+            "name": "Thyme",
+            "amount": 2
+        }
+    ]
+}
