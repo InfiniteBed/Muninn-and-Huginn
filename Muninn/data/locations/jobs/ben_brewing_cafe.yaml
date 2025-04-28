@@ -16,6 +16,7 @@ results:
       {name} learned a lot today.
 
       "I'll see you tomorrow, {name}!" She said [he|she] walked out the door.
+      -# Written by Infinite_Bed
     coins_change: 18
     xp_change: 2
     hours: 6
@@ -37,9 +38,10 @@ results:
       You weren't particularly busy as a {pclass}, anyway, so you accepted. Her familiar smile lit up again once you did.
 
       "Thank you so much, {name}. I'll see you then!"
-    coins_change: 24
-    xp_change: 4
-    hours: 8
+      -# Written by Infinite_Bed
+    coins_change: 18
+    xp_change: 2
+    hours: 6
   - text: |
       The early morning streets carry a busy air. Horse-drawn carriages take the morning stock of herbs and plants to the inner city. And in a thin street, a small coffee shop is just about to open.
 
@@ -47,7 +49,20 @@ results:
 
       You help the avian open up for the day, dusting down wooden tables and setting out signs.
 
-      "Thank you for coming in so early," Ammy
-    coins_change: 8
-    xp_change: 2
-    hours: 6
+      "Thank you for coming in so early," Ammy said with an almost ashamed look, "Wednesdays like these are always a bit too much in the mornings, so having you come in early really helps a lot."
+
+      Customers start to flow in, on cue. The two quickly settle into a rhythm, with Ammy taking orders and making the more complex drinks, and {name} making the simple coffees and taking on cleaning.
+
+      There was still a line ten to fifteen strong, far after morning turned to noon. {name} noticed Ammy's concerned scowl when she pulled herself from the front desk, and the way she moved with a rushed imprecision.
+
+      {name} also pushed [himself|herself] to move faster, hoping to clear the line before too long.
+
+      They both worked harder than they have the past few days, making cups, taking orders, and cleaning without too much error, and taking care to make it right when they did. Finally, the line died down to a managable size close to dinner time.
+
+      "Thank you so much for your help today," she said, wiping down a particularly spill-laden table. "I would've been swamped if you weren't here."
+
+      She handed you a sizable chunk of change, and saw you off.
+      -# Written by Infinite_Bed
+    coins_change: 22
+    xp_change: 3
+    hours: 8
