@@ -1,0 +1,9 @@
+name: "Marty Milkman"
+introduction: "The Mardo Stack is looking for new papermakers to join their team.You'll be turning wood pulp into new stacks of paper, ready to be written on."
+proficiency: 
+results:
+  - text: |
+      {name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.
+    coins_change: 24
+    xp_change: 16
+    hours: 8

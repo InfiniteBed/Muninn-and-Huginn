@@ -1,0 +1,68 @@
+name: "Ammy's Coffee"
+introduction: "Ammy has been looking for another coffee brewer for a while now."
+proficiency: brewing
+results:
+- text: |
+    {name} walked the small distance to the coffee shop, walking under the small awning and entering the quaint shop. Immediately, the strong smell of Montilian coffee is present throughout the shop. A few patrons are here, even so early in the morning. Some are relaxing, enjoying their coffee, and others seem to be scribing papers or making very important meetings. {name} approaches the counter, towards the small blue-plumed Aarakocra placing a steaming mug on the pickup counter.
+
+    "Oh, wonderful, you came!" She lifted the counter door, and stood aside to let [him|her] in.
+
+    She showed [him|her] around behind the counter, explaining the various grinders, presses, and machines. To start, she simply showed how to make a standard coffee; something she called the *Amstein Press.*
+
+    "That's the cup most will order. Maybe fifty... sixty percent of your orders. So you're already halfway there!"
+
+    For the next few hours, {name} and the blue-jay Aarakocra worked together, with her taking orders. She allowed you to look over her shoulder as she made the more difficult drinks—which wasn't very difficult, considering her height.
+
+    {name} learned a lot today.
+
+    "I'll see you tomorrow, {name}!" She said [he|she] walked out the door.
+    -# Written by Infinite_Bed
+  coins_change: 18
+  xp_change: 2
+  hours: 6
+- text: |
+    {name} headed to the coffee shop just a few hours after its open, close to the café's morning rush of business. Ammy greeting [him|her] as [he|she] entered.
+
+    "Morning, {name}! Thanks for coming in today."
+
+    Like before, {name} helped her make some of the easier orders, while she taught [him|her] some more advanced techniques. One order stuck out to [him|her], something called *The Halberd*. {name} decided to ask her about it.
+
+    "The Halberd? It's one of our stronger drinks. My dad always said that its 'sharp like a spear'." Her face glows in a slightly sorrow rememberance for just a moment, before returning to neutral. "I don't think it's that strong, but I also drink one every day," she laughs, "so i'm probably numb to it now."
+
+    {name} had noticed her sipping on coffee in between orders. That *Halberd* was probably what she was drinking.
+
+    The rest of the day went much smoother than yesterday, with you filling orders faster, and even remembering some of the more complicated drinks as well. You decided to stay for a while longer, just to help her close down the shop for today.
+
+    "Thank you so much for your help today. Truthfully, I never really thought I needed help until I brought someone new on. I really do appreciate your help, againn" She led you outside the small coffee shop. "{name}... could you come in a bit earlier tomorrow to help me open up?"
+
+    You weren't particularly busy as a {pclass}, anyway, so you accepted. Her familiar smile lit up again once you did.
+
+    "Thank you so much, {name}. I'll see you then!"
+    -# Written by Infinite_Bed
+  coins_change: 18
+  xp_change: 2
+  hours: 6
+- text: |
+    The early morning streets carry a busy air. Horse-drawn carriages take the morning stock of herbs and plants to the inner city. And in a thin street, a small coffee shop is just about to open.
+
+    "Oh, awesome! I didn't think you'd be here so early!""
+
+    You help the avian open up for the day, dusting down wooden tables and setting out signs.
+
+    "Thank you for coming in so early," Ammy said with an almost ashamed look, "Wednesdays like these are always a bit too much in the mornings, so having you come in early really helps a lot."
+
+    Customers start to flow in, on cue. The two quickly settle into a rhythm, with Ammy taking orders and making the more complex drinks, and {name} making the simple coffees and taking on cleaning.
+
+    There was still a line ten to fifteen strong, far after morning turned to noon. {name} noticed Ammy's concerned scowl when she pulled herself from the front desk, and the way she moved with a rushed imprecision.
+
+    {name} also pushed [himself|herself] to move faster, hoping to clear the line before too long.
+
+    They both worked harder than they have the past few days, making cups, taking orders, and cleaning without too much error, and taking care to make it right when they did. Finally, the line died down to a managable size close to dinner time.
+
+    "Thank you so much for your help today," she said, wiping down a particularly spill-laden table. "I would've been swamped if you weren't here."
+
+    She handed you a sizable chunk of change, and saw you off.
+    -# Written by Infinite_Bed
+  coins_change: 22
+  xp_change: 3
+  hours: 8
