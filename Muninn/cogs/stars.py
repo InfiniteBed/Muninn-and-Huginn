@@ -70,7 +70,7 @@ class StarLeaderboard(commands.Cog):
     @commands.is_owner()
     async def star(self, ctx, user: discord.User, stars: int):
         """Adds stars to a user. (Bot owner only)"""
-        if stars < 1:
+        if stars == 0:
             await ctx.send("You must add at least 1 star.")
             return
 

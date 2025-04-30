@@ -13,6 +13,7 @@ RUN python -m pip install seaborn
 RUN pip install psycopg2
 RUN pip install regex
 RUN pip install ollama
+RUN pip install pyyaml
 
 # Create the directory for the bot and set it as the working directory
 WORKDIR /usr/src/bot
