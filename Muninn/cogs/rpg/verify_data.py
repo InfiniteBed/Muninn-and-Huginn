@@ -5,6 +5,7 @@ import yaml
 from icecream import ic
 import os
 import time
+import re
 
 class Verify(commands.Cog):
     def __init__(self, bot):
@@ -28,6 +29,20 @@ class Verify(commands.Cog):
             return
         if object not in values and object is not None:
             await ctx.send(F"`{file}`: Key `{key_name}` is not a valid value: `{object}`!")
+            
+    async def you_check(self, ctx, file, text, key_name):
+        disallowed_words = ["you", "your", "yourself"]
+        
+        direct_speech_pattern = r'"[^"]*"'
+        
+        text_without_speech = re.sub(direct_speech_pattern, '', text)
+        
+        # Check for disallowed words
+        for word in disallowed_words:
+            if re.search(rf'\b{word}\b', text_without_speech, re.IGNORECASE):
+                await ctx.send(f"`{file}`: Key `{key_name}` contains `{word}` outside of direct speech! Ensure all text is in third person format, and all gendered pronouns of the character are bracketed.")
+                return False
+        return True
             
     async def item_test(self, ctx, file, item_name, type):
         if not await self.data_manager.find_data(type, item_name):
@@ -139,11 +154,13 @@ class Verify(commands.Cog):
             
             await self.type_test(ctx, file_name, data=job, key_name='name', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=job, key_name='introduction', type=str, required_field=True)
+            await self.you_check(ctx, file_name, text=job['introduction'], key_name='introduction')
             await self.type_test(ctx, file_name, data=job, key_name='proficiency', type=str, required_field=True)
             await self.type_test(ctx, file_name, data=job, key_name='results', type=list, required_field=True)
             
             for result in job['results']:
                 await self.type_test(ctx, file_name, data=result, key_name='text', type=str, required_field=True)
+                await self.you_check(ctx, file_name, text=result['text'], key_name='text')
                 await self.type_test(ctx, file_name, data=result, key_name='coins_change', type=int, required_field=True)
                 await self.type_test(ctx, file_name, data=result, key_name='xp_change', type=int, required_field=True)
                 await self.type_test(ctx, file_name, data=result, key_name='hours', type=int, required_field=True)
