@@ -1,5 +1,5 @@
 name: "Mardo Stack"
-introduction: "The Mardo Stack is looking for new papermakers to join their team.You'll be turning wood pulp into new stacks of paper, ready to be written on."
+introduction: "The Mardo Stack is looking for new papermakers to join their team. {name} will be turning wood pulp into new stacks of paper, ready to be written on."
 proficiency: "author"
 results:
   - text: |
@@ -18,7 +18,7 @@ results:
       "How long have you worked here for?" [He|She] asked.
       
       "Not long," the Satyr responded, "Just a few months."
-      
+       
       {name} left it at that, and continued [his|her] work.
       
       Aside from small talk with [his|her] coworkers, there was nothing else of note for {name}'s workday.

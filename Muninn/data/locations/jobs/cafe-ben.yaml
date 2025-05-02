@@ -11,7 +11,7 @@ results:
 
     "That's the cup most will order. Maybe fifty... sixty percent of your orders. So you're already halfway there!"
 
-    For the next few hours, {name} and the blue-jay Aarakocra worked together, with her taking orders. She allowed you to look over her shoulder as she made the more difficult drinks—which wasn't very difficult, considering her height.
+    For the next few hours, {name} and the blue-jay Aarakocra worked together, with her taking orders. She allowed {name} to look over her shoulder as she made the more difficult drinks—which wasn't very difficult, considering her height.
 
     {name} learned a lot today.
 
@@ -31,11 +31,11 @@ results:
 
     {name} had noticed her sipping on coffee in between orders. That *Halberd* was probably what she was drinking.
 
-    The rest of the day went much smoother than yesterday, with you filling orders faster, and even remembering some of the more complicated drinks as well. You decided to stay for a while longer, just to help her close down the shop for today.
+    The rest of the day went much smoother than yesterday, with {name} filling orders faster, and even remembering some of the more complicated drinks as well. [He|She] decided to stay for a while longer, just to help her close down the shop for today.
 
-    "Thank you so much for your help today. Truthfully, I never really thought I needed help until I brought someone new on. I really do appreciate your help, againn" She led you outside the small coffee shop. "{name}... could you come in a bit earlier tomorrow to help me open up?"
+    "Thank you so much for your help today. Truthfully, I never really thought I needed help until I brought someone new on. I really do appreciate your help, again." She led {name} outside the small coffee shop. "{name}... could you come in a bit earlier tomorrow to help me open up?"
 
-    You weren't particularly busy as a {pclass}, anyway, so you accepted. Her familiar smile lit up again once you did.
+    [He|She] wasn't particularly busy as a {pclass}, anyway, so [he|she] accepted. Her familiar smile lit up again once [he|she] did.
 
     "Thank you so much, {name}. I'll see you then!"
     -# Written by Infinite_Bed
@@ -47,7 +47,7 @@ results:
 
     "Oh, awesome! I didn't think you'd be here so early!""
 
-    You help the avian open up for the day, dusting down wooden tables and setting out signs.
+    {name} helps the avian open up for the day, dusting down wooden tables and setting out signs.
 
     "Thank you for coming in so early," Ammy said with an almost ashamed look, "Wednesdays like these are always a bit too much in the mornings, so having you come in early really helps a lot."
 
@@ -61,7 +61,7 @@ results:
 
     "Thank you so much for your help today," she said, wiping down a particularly spill-laden table. "I would've been swamped if you weren't here."
 
-    She handed you a sizable chunk of change, and saw you off.
+    She handed {name} a sizable chunk of change, and saw [him|her] off.
     -# Written by Infinite_Bed
   coins_change: 22
   xp_change: 3
