@@ -30,14 +30,12 @@ class Go(commands.Cog):
         stats_manager = self.stats_manager
         random_job = []
         
-        ic(all_jobs, random_job, user_jobs)
-        
         ## Construct Job Embeds
         ### Get random job, return none if all jobs have been gotten
         if len(all_jobs) == len(user_jobs):
             random_job = None
         else:
-            available_jobs = [job for job in all_jobs if job['name'] not in user_jobs]
+            available_jobs = [job for job in all_jobs if job.get('name') not in user_jobs]
             random_job = random.choice(available_jobs)
                 
         available_jobs_data = []
@@ -48,7 +46,10 @@ class Go(commands.Cog):
                 job = await self.data_manager.find_data("jobs", job)
                 available_jobs_data.append(job)
                 
+            ic(available_jobs_data[0]['name'])
+                
             for job_data in available_jobs_data:
+                ic(job_data)
                 available_jobs_str += (f"{job_data['name']}: *{job_data['introduction']}*")
         
         job_overview_embed = discord.Embed(title='Job Menu',
@@ -479,9 +480,17 @@ class Go(commands.Cog):
         class ExploreDropdown(Select):
             def __init__(self, parent_cog):
                 self.parent_cog = parent_cog
+                sorted_locations = sorted(gather_locations, key=lambda loc: loc.get('visit_cost', 0))
+                
                 options = []
-                for index, location in enumerate(gather_locations):
-                    options.append(SelectOption(label=location['name'], description=location['description'][:100], value=str(index)))
+                for index, location in enumerate(sorted_locations):
+                    
+                    if location.get('visit_cost'):
+                        name = f"{location['name']} [{location['visit_cost']} 🪙] "
+                    else: 
+                        name = f"{location['name']} [FREE]"
+                    
+                    options.append(SelectOption(label=name, description=location['description'][:100], value=str(index)))
 
                 super().__init__(placeholder="Select a location to explore...", options=options, min_values=1, max_values=1)
 

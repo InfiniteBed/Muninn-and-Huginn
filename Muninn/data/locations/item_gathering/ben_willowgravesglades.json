@@ -2,7 +2,7 @@
     "name": "Willowgrave's Glades",
     "type": "gathering",
     "description": "An expansive plot of land owned by an extremely wealthy aristocrat. For the \"measly\" price of a day's wage, anyone may enter and harvest the materials within as they please.",
-    "base_hrs": 2.0 ,
+    "base_hrs": 2.0,
     "visit_cost": 8,
     "skill_test": 1,
     "money_reward_base": 0,

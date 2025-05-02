@@ -1,6 +1,6 @@
 import sqlite3
 PROFESSIONS = [
-    "baking", "brewing", "carpentry", "cleaning", "coachman", "cooking", "cupbearing",
+    "baking", "brewing", "carting", "carpentry", "cleaning", "coachman", "cooking", "cupbearing",
     "farming", "fishing", "floristry", "gardening", "guarding", "glassblowing", "healing",
     "husbandry", "innkeeping", "knighthood", "leadership", "masonry", "metalworking",
     "painting", "pottery", "royalty", "sculpting", "smithing", "spinning", "stablekeeping",

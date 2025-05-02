@@ -1,9 +1,9 @@
 name: "Marty Milkman"
-introduction: "The Mardo Stack is looking for new papermakers to join their team.You'll be turning wood pulp into new stacks of paper, ready to be written on."
-proficiency: 
+introduction: Marty the Milkman has had a hard time with getting his deliveries done on time and is running way behind schedule every day, so he put up flyers requesting for another milkman to help him.
+proficiency: carting
 results:
   - text: |
-      {name} worked hard, grinding wood pulp into a slurry, and then pressing it into sheets of paper. It was hard work, but {name} was able to keep up with the pace.
-    coins_change: 24
-    xp_change: 16
-    hours: 8
+      One day while working for Marty the Milkman, {name} was delivering some bottle of milk when one of the bottles slipped out of [his|her] hands and splashed all over Mrs. Martin’s new dress. {name} apologized to her and offered to get her dress cleaned before the next day.
+    coins_change: 9
+    xp_change: 1
+    hours: 4
