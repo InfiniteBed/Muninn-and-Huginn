@@ -59,6 +59,9 @@ class AutoPins(commands.Cog):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             for guild in self.bot.guilds:
+                if guild.id == 1298762959614640148:
+                    continue
+                
                 cursor.execute("SELECT message_id, channel_id FROM pinned_messages WHERE guild_id = ?", (guild.id,))
                 pinned_entries = cursor.fetchall()
                 if not pinned_entries:
