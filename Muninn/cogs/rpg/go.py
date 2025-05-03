@@ -144,6 +144,28 @@ class Go(commands.Cog):
             return discord.Embed(description="This job has already been applied to a slot!",
                                   color=discord.Color.red())
 
+        class NavigationButtons(View):
+            def __init__(self, ctx, gather_embed, parent_cog):
+                self.gather_embed = gather_embed
+                self.parent_cog = parent_cog
+                super().__init__(timeout=None)
+
+            @discord.ui.button(label="Explore", style=discord.ButtonStyle.grey, emoji="🌲")
+            async def explore_button(self, interaction: discord.Interaction, button: Button):
+                explore_view = VendorDropdownView(self.parent_cog)
+                await interaction.response.edit_message(embed=self.gather_embed, view=explore_view)
+
+            @discord.ui.button(label="Market", style=discord.ButtonStyle.grey, emoji="🛍️")
+            async def expedition_button(self, interaction: discord.Interaction, button: Button):
+                market_overview_embed, view = await self.parent_cog.go_market.market_overview_embed(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats, message)
+                await interaction.response.edit_message(embed=market_overview_embed, view=view)
+
+            @discord.ui.button(label="Jobs", style=discord.ButtonStyle.grey, emoji="🛠️")
+            async def job_button(self, interaction: discord.Interaction, button: Button):
+                job_view = JobView(ctx, nav_buttons, self.parent_cog)
+                await interaction.response.edit_message(embed=job_overview_embed, view=job_view)
+
+        nav_buttons = NavigationButtons(ctx, gather_embed, self)
         class TimeSelectionView(View):
             def __init__(self, ctx, location, hours, parent_cog, job):
                 self.main_embed = main_embed
@@ -181,7 +203,7 @@ class Go(commands.Cog):
 
             @discord.ui.button(label="Back", style=discord.ButtonStyle.red)
             async def home_button(self, interaction: discord.Interaction, button: Button):
-                await interaction.response.edit_message(embed=self.main_embed, view=self)
+                await interaction.response.edit_message(embed=self.main_embed, view=nav_buttons)
 
             def disable_buttons(self, hours):
                 if hours <= 1:
@@ -481,6 +503,7 @@ class Go(commands.Cog):
             def __init__(self, parent_cog):
                 self.parent_cog = parent_cog
                 sorted_locations = sorted(gather_locations, key=lambda loc: loc.get('visit_cost', 0))
+                self.sorted_locations = sorted_locations
                 
                 options = []
                 for index, location in enumerate(sorted_locations):
@@ -501,8 +524,8 @@ class Go(commands.Cog):
                 
                 index = int(self.values[0])
 
-                embed = location_details_embed(gather_locations[index])
-                location = gather_locations[index]
+                embed = location_details_embed(self.sorted_locations[index])
+                location = self.sorted_locations[index]
 
                 detail_view = ExploreDetailView(ctx, location, 1, self.parent_cog, job=None)
                 await interaction.response.edit_message(embed=embed, view=detail_view)
@@ -512,28 +535,6 @@ class Go(commands.Cog):
                 super().__init__(timeout=60)
                 self.add_item(ExploreDropdown(parent_cog))
 
-        class NavigationButtons(View):
-            def __init__(self, ctx, gather_embed, parent_cog):
-                self.gather_embed = gather_embed
-                self.parent_cog = parent_cog
-                super().__init__(timeout=None)
-
-            @discord.ui.button(label="Explore", style=discord.ButtonStyle.grey, emoji="🌲")
-            async def explore_button(self, interaction: discord.Interaction, button: Button):
-                explore_view = VendorDropdownView(self.parent_cog)
-                await interaction.response.edit_message(embed=self.gather_embed, view=explore_view)
-
-            @discord.ui.button(label="Market", style=discord.ButtonStyle.grey, emoji="🛍️")
-            async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                market_overview_embed, view = await self.parent_cog.go_market.market_overview_embed(ctx, self.parent_cog.bot.get_cog("GoMarket"), user_stats, message)
-                await interaction.response.edit_message(embed=market_overview_embed, view=view)
-
-            @discord.ui.button(label="Jobs", style=discord.ButtonStyle.grey, emoji="🛠️")
-            async def job_button(self, interaction: discord.Interaction, button: Button):
-                job_view = JobView(ctx, nav_buttons, self.parent_cog)
-                await interaction.response.edit_message(embed=job_overview_embed, view=job_view)
-
-        nav_buttons = NavigationButtons(ctx, gather_embed, self)
         message = await ctx.send(embed=main_embed, view=nav_buttons)
 async def setup(bot):
     await bot.add_cog(Go(bot))
