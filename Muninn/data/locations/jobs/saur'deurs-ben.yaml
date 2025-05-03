@@ -1,13 +1,12 @@
 name: "Dr. Saur'deurs' Neglect"
 introduction: >
-  Dr. Aur'deur has been looking for a maid for quite a while now, and he thinks
-  you will be the perfect fit.
+  Dr. Aur'deur has been looking for a maid for quite a while now, and he thinks {name} will be the perfect fit.
 proficiency: "author"
 results:
   - text: >
       “I didn't doubt you would accept.”
 
-      Dr. Aur'deur walked {name} down the sparsely populated, gold-tainted halls. Everything appeared supersized. The halls, the doors, the painting on the walls all seemed to scoff at you, and your indigence.
+      Dr. Aur'deur walked {name} down the sparsely populated, gold-tainted halls. Everything appeared supersized. The halls, the doors, the painting on the walls all seemed to scoff at {name} and [his|her] indigence.
 
       He led the {pclass} down the hall, taking a sharply turning into an already-open room.
       This wasn't as tidy a room as the rest. In fact, a considerable layer of dust covered the room.
@@ -16,21 +15,21 @@ results:
 
       “She did not excel anyway.” He made no effort to conceal the slight. "Get dressed, and follow the list. I will be away during your working hours. Once I return and approve of your work, you may leave for the day."
 
-      He handed you a quaint, pressed black [suit|dress]—{name}'s cleaning uniform. He then scratched a small list onto a pad, tore it off, and handed it to you. "Get to work. I will return at five."
+      He handed {name} a quaint, pressed black [suit|dress]—{name}'s cleaning uniform. He then scratched a small list onto a pad, tore it off, and handed it to {name}. "Get to work. I will return at five."
 
-      He closed the door behind him, leaving you alone in the dusty bedroom.
+      He closed the door behind him, leaving {name} alone in the dusty bedroom.
 
-      You took another look at the [suit|dress]. It was a stereotypical [butler's|French maid's] uniform. [The suit was perfectly pressed and folded. The coattails hung lower than most suits, and he was sure that it was a size too large.|The dress was adorned with white frills, an apron, and a matching cap, with ruffles on the cap to boot.] It wasn't indecent or improper, but it still looked completely ridiculous.
+      {name} took another look at the [suit|dress]. It was a stereotypical [butler's|French maid's] uniform. [The suit was perfectly pressed and folded. The coattails hung lower than most suits, and he was sure that it was a size too large.|The dress was adorned with white frills, an apron, and a matching cap, with ruffles on the cap to boot.] It wasn't indecent or improper, but it still looked completely ridiculous.
 
-      Nonetheless, you were getting paid, so you wore it anyway. The list he gave you was just a few items long; mostly dusting and cleaning a few public areas. At most, it would take just a few hours.
+      Nonetheless, {name} was getting paid, so [he|she] wore it anyway. The list he gave [him|her] was just a few items long; mostly dusting and cleaning a few public areas. At most, it would take just a few hours.
 
-      {name} set to work, grudgingly working around the [coattails that constantly got in your way|frilly cap that kept falling off]. It took quite a lot longer than [he|she] anticipated, partly due to [his|her] wardrobe malfunctions, but also from the time it took to clean all these rooms. Many homes could fill the spaces that some of these rooms could have taken up, and she was expected to dust it all, floor to ceiling. In all, it took [him|her] six hours to finish the list.
+      {name} set to work, grudgingly working around the [coattails that constantly got in his way|frilly cap that kept falling off]. It took quite a lot longer than [he|she] anticipated, partly due to [his|her] wardrobe malfunctions, but also from the time it took to clean all these rooms. Many homes could fill the spaces that some of these rooms could have taken up, and she was expected to dust it all, floor to ceiling. In all, it took [him|her] six hours to finish the list.
 
       The moment he set down the duster, the front latched open, and Dr. Aur'deur entered. {name} looked up at the clock. It was exactly six o'clock.
 
       His eyes swept the room. He did not swipe a finger across the furniture to check for dust, nor did he closely examine the floorboards or the shelves. He just took one look at the room. "Well done." He reached into his chest pocket and pulled out five pristine coins. "You may change out of your uniform and leave. I expect you back in two days."
 
-      You were thankful for the doctor's approval. You were unsure you could handle any more dusting.
+      {name} was thankful for the doctor's approval. [He|She] was unsure [he|she] could handle any more dusting.
 
       {name} changed out of the uniform and started toward the front door. The doctor added one final thing.
 

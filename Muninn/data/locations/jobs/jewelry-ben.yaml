@@ -4,7 +4,7 @@ introduction: >
 proficiency: "guarding"
 results:
   - text: |
-      Suspicion flashed across her features as you—a {pclass} that clearly was not here to purchase—approached the counter. But as [he|she] held up the *"Help Wanted"* ad, her suspicion quickly molded to relief.
+      Suspicion flashed across her features as {name}—a {pclass} that clearly was not here to purchase—approached the counter. But as [he|she] held up the *"Help Wanted"* ad, her suspicion quickly molded to relief.
       
       "Oh, thank Praia..." The small elf stepped out from behind the counter.
       
@@ -12,7 +12,7 @@ results:
       
       It seemed to be an easy enough job. Simply stay outside the store and look tough for the night. For a {race} like [him|her], that was an easy enough job.
 
-      And easy enough it was. The entire night, nothing of note happened. Sure, {name} may have presumably scared off some unwanted customers, but no direct confrontations were made. As daybreak hit, you saw the elf approaching, shuffling with her keys. Her eyes lit up as she saw [him|her] out front. "Ah! I-I completely forgot!" She unlocked the door to her store, and allowed you in. "Thank you so much for your work."
+      And easy enough it was. The entire night, nothing of note happened. Sure, {name} may have presumably scared off some unwanted customers, but no direct confrontations were made. As daybreak hit, {name} saw the elf approaching, shuffling with her keys. Her eyes lit up as she saw [him|her] out front. "Ah! I-I completely forgot!" She unlocked the door to her store, and allowed [him|her] in. "Thank you so much for your work."
 
       She stepped behind the counter, counted out quite the number of coins, and handed them to the {pclass}.
 
