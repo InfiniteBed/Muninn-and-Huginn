@@ -1,0 +1,231 @@
+name: Pushing the Envelope
+description:
+  male: The letterman's guild is running low on workers. {name} may be able to offer
+    a helping hand.
+  female: The letterman's guild is running low on workers. {name} may be able to offer
+    a helping hand.
+cost: 0
+hours: 6
+ability_test: Strength
+difficulty: easy
+results:
+  major fail:
+    text:
+      male:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ he knew it was a major mistake."
+      - He nearly collided into a halfling letterman running out the door with a satchel
+        full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - His attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set him to work carrying box after box
+        from the incoming pile over to the sorters. {name} turned to the elf to ask
+        for help, but he was gone as soon as {name} began helping.
+      - "{name} groaned every time a pile of letters was dropped on top of the existing\
+        \ pile, erasing his hard-earned progress. He bit down the panic as he witnessed\
+        \ the pile grow and grow the more he worked. He worked faster and rushed more,\
+        \ but it still wasn\u2019t enough. He knew he desperately needed some help,\
+        \ but the elf was busy managing the letter runners. {name} was practically\
+        \ drowning in letters by the end of the day. He was sure he noticed the letter\
+        \ sorters shoot him some concerned or frustrated looks."
+      - "By the end of the evening rush, there was still a massive pile remaining.\
+        \ An incredulous look was all over the elf\u2019s face."
+      - "\"You barely helped at all! I can\u2019t pay you for such\u2026 unsatisfactory\
+        \ work. Please leave.\u201D"
+      - The memory of half-drowning in letters will haunt him.
+      female:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ she knew it was a major mistake."
+      - She nearly collided into a halfling letterman running out the door with a
+        satchel full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - Her attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set her to work carrying box after box
+        from the incoming pile over to the sorters. {name} turned to the elf to ask
+        for help, but he was gone as soon as {name} began helping.
+      - "{name} groaned every time a pile of letters was dropped on top of the existing\
+        \ pile, erasing her hard-earned progress. She bit down the panic as she witnessed\
+        \ the pile grow and grow the more she worked. She worked faster and rushed\
+        \ more, but it still wasn\u2019t enough. She knew she desperately needed some\
+        \ help, but the elf was busy managing the letter runners. {name} was practically\
+        \ drowning in letters by the end of the day. She was sure she noticed the\
+        \ letter sorters shoot her some concerned or frustrated looks."
+      - "By the end of the evening rush, there was still a massive pile remaining.\
+        \ An incredulous look was all over the elf\u2019s face."
+      - "\"You barely helped at all! I can\u2019t pay you for such\u2026 unsatisfactory\
+        \ work. Please leave.\u201D"
+      - The memory of half-drowning in letters will haunt her.
+    coins: 0
+    contributor: Ben
+  fail:
+    text:
+      male:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ he knew it was a mistake."
+      - He nearly collided into a halfling letterman running out the door with a satchel
+        full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - His attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set him to work carrying box after box
+        from the incoming pile over to the sorters. {name} sighed every time a pile
+        of letters was dropped on top of the existing pile, erasing his hard-earned
+        progress.
+      - '"Keep moving!" The elf commanded.'
+      - "{name} bit down the panic as he witnessed the pile grow and grow the more\
+        \ he worked. He worked faster and rushed more, but it still wasn\u2019t enough.\
+        \ Eventually, the elf noticed his struggle and stepped in to offer another\
+        \ hand."
+      - By the end of the evening rush, they both were still shuttling letters. From
+        the inbound pile to the letter sorters. Eventually, as the pile began to shrink,
+        he called {name} aside.
+      - "\"You were slow\u2026 but at least you helped. Somewhat. Here is your payment.\u201D\
+        \ He handed {name} a small pile of money, and showed him out the door."
+      - "{name} is absolutely exhausted, and he wishes he could\u2019ve helped more,\
+        \ but at least he got a little coin out of it."
+      female:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ she knew it was a mistake."
+      - She nearly collided into a halfling letterman running out the door with a
+        satchel full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - Her attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set her to work carrying box after box
+        from the incoming pile over to the sorters. {name} sighed every time a pile
+        of letters was dropped on top of the existing pile, erasing her hard-earned
+        progress.
+      - '"Keep moving!" The elf commanded.'
+      - "{name} bit down the panic as she witnessed the pile grow and grow the more\
+        \ she worked. She worked faster and rushed more, but it still wasn\u2019t\
+        \ enough. Eventually, the elf noticed her struggle and stepped in to offer\
+        \ another hand."
+      - By the end of the evening rush, they both were still shuttling letters. From
+        the inbound pile to the letter sorters. Eventually, as the pile began to shrink,
+        he called {name} aside.
+      - "\"You were slow\u2026 but at least you helped. Somewhat. Here is your payment.\u201D\
+        \ He handed {name} a small pile of money, and showed her out the door."
+      - "{name} is absolutely exhausted, and she wishes she could\u2019ve helped more,\
+        \ but at least she got a little coin out of it."
+    coins: 8
+    contributor: Ben
+  success:
+    text:
+      male:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ he knew it was a mistake."
+      - He nearly collided into a halfling letterman running out the door. Everyone
+        inside was in a rush, collecting, sorting, organizing, and sending out letters.
+        Everyone seemed to sigh in relief at {name}'s arrival.
+      - His attention was diverted to a tall elf barking orders to overwhelmed workers
+        and still carrying bins.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - He set {name} to work carrying boxes from the incoming pile to the sorters.
+        {name} groaned every time a pile of letters was dropped on top of the existing
+        pile, erasing his hard-earned progress. The work was grueling and relentless.
+        Only until the late evening was {name} allowed reprieve. Another worker was
+        finally able to take over, so {name} took a break.
+      - "\"You were slow,\" the elf said, \"Nonetheless, you helped us. Here is your\
+        \ payment.\u201D He handed {name} a decently sized money bag."
+      - '{name} is absolutely exhausted, but he feels well-rewarded by the coin.'
+      female:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ she knew it was a mistake."
+      - She nearly collided into a halfling letterman running out the door. Everyone
+        inside was in a rush, collecting, sorting, organizing, and sending out letters.
+        Everyone seemed to sigh in relief at {name}'s arrival.
+      - Her attention was diverted to a tall elf barking orders to overwhelmed workers
+        and still carrying bins.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - He set {name} to work carrying boxes from the incoming pile to the sorters.
+        {name} groaned every time a pile of letters was dropped on top of the existing
+        pile, erasing her hard-earned progress. The work was grueling and relentless.
+        Only until the late evening was {name} allowed reprieve. Another worker was
+        finally able to take over, so {name} took a break.
+      - "\"You were slow,\" the elf said, \"Nonetheless, you helped us. Here is your\
+        \ payment.\u201D He handed {name} a decently sized money bag."
+      - '{name} is absolutely exhausted, but she feels well-rewarded by the coin.'
+    coins: 25
+    contributor: Ben
+  major success:
+    text:
+      male:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ he knew they needed some help."
+      - He nearly collided into a halfling letterman running out the door with a satchel
+        full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - His attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set him to work carrying box after box
+        from the incoming pile over to the sorters. {name} sighed every time a pile
+        of letters was dropped on top of the existing pile, erasing his hard-earned
+        progress.
+      - '"Keep moving!" The elf commanded.'
+      - "The work was relentless, but {name} knew it wasn\u2019t impossible. Around\
+        \ noon the pile began to shrink, allowing another worker to take over. After\
+        \ a quick lunch break, the elf quickly showed how to properly sort mail, which\
+        \ {name} started immediately. It was less physically strenuous work, but it\
+        \ was far more mentally strenuous work. Interpreting and understanding the\
+        \ scribbles on each letter was difficult work, but {name} didn\u2019t find\
+        \ a letter he couldn\u2019t sort. {name} was certain he caught a few of the\
+        \ sorters pushing the more difficult letters his way, even."
+      - "By evening, the work hours ended, and people started to head home. The elf\
+        \ pulled {name} aside to give him his pay. \u201CWell done.\u201D He handed\
+        \ {name} a pretty hefty money bag, and showed him out the door."
+      - '{name} is tired, but he feels well-rewarded by the coin, and satisfied he
+        was able to help.'
+      female:
+      - "The moment {name} stepped into the Post Collective\u2018s head building,\
+        \ she knew they needed some help."
+      - She nearly collided into a halfling letterman running out the door with a
+        satchel full of letters.
+      - Inside was a reflection of the former letterman. Everyone was in a rush, collecting,
+        sorting, organizing, and sending out letters. Everyone seemed to sigh in relief
+        at {name}'s arrival.
+      - Her attention was diverted to a tall elf carrying bin after bin to the mail
+        carriers from the still-growing pile of incoming letters. Simultaneously barking
+        orders to overwhelmed workers and still carrying bins, he called out to {name}.
+      - "\u201CTraveller! Over here!\u201D He called as a demand, and not a request."
+      - When {name} snapped to his side, he set her to work carrying box after box
+        from the incoming pile over to the sorters. {name} sighed every time a pile
+        of letters was dropped on top of the existing pile, erasing her hard-earned
+        progress.
+      - '"Keep moving!" The elf commanded.'
+      - "The work was relentless, but {name} knew it wasn\u2019t impossible. Around\
+        \ noon the pile began to shrink, allowing another worker to take over. After\
+        \ a quick lunch break, the elf quickly showed how to properly sort mail, which\
+        \ {name} started immediately. It was less physically strenuous work, but it\
+        \ was far more mentally strenuous work. Interpreting and understanding the\
+        \ scribbles on each letter was difficult work, but {name} didn\u2019t find\
+        \ a letter she couldn\u2019t sort. {name} was certain she caught a few of\
+        \ the sorters pushing the more difficult letters her way, even."
+      - "By evening, the work hours ended, and people started to head home. The elf\
+        \ pulled {name} aside to give her her pay. \u201CWell done.\u201D He handed\
+        \ {name} a pretty hefty money bag, and showed her out the door."
+      - '{name} is tired, but she feels well-rewarded by the coin, and satisfied she
+        was able to help.'
+    coins: 45
+    contributor: Ben

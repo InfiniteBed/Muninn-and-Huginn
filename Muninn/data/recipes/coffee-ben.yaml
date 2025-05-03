@@ -1,0 +1,6 @@
+name: Coffee
+type: single_use
+skill: brewing
+recipe:
+- name: Coffee Bean
+  amount: 15

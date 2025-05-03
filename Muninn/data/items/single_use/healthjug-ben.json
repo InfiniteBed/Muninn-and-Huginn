@@ -1,7 +1,0 @@
-{
-    "name": "Health Jug",
-    "description": "NEEDS DESCRIPTION",
-    "type": "consumable",
-    "base_heal": 10,
-    "base_price": 20
-}

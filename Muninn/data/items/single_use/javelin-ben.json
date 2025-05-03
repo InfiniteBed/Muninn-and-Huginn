@@ -1,8 +1,0 @@
-{
-    "name": "The Javelin",
-    "description": "Another one of Ammy's special brews, this one is prepared with twice the amount of coffee beans. It has a strong flavor and a kick of caffeine that will keep you going for hours.",
-    "type": "consumable",
-    "skill": "brewing",
-    "base_heal": 18,
-    "base_price": 24
-}

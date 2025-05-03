@@ -1,9 +1,0 @@
-{
-    "name": "Steel Helmet",
-    "type": "equipment",
-    "description": "A knight's helmet. Protects the head from particularly vicious blows.",
-    "slot": "head",
-    "shop": true,
-    "base_defense": 2,
-    "base_price": 25
-}

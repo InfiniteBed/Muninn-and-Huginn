@@ -1,0 +1,7 @@
+name: Cooked Drumstick
+description: "A nice, crispy, golden-brown chicken leg, ready to be eaten. It\u2019\
+  s a bit greasy and flavourless, but it\u2019s still delicious."
+type: consumable
+skill: cooking
+base_heal: 10
+base_price: 19

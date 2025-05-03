@@ -1,8 +1,0 @@
-{
-    "name": "Cooked Chicken Breast",
-    "description": "A nice, crispy, golden-brown chicken breast, ready to be eaten. The white meat is juicy and flavorful.",
-    "type": "consumable",
-    "skill": "cooking",
-    "base_heal": 15,
-    "base_price": 24
-}

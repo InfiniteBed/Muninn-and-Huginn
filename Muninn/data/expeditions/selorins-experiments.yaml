@@ -1,0 +1,412 @@
+name: Selorin's Experiments
+description:
+  male: Unlike the rest of the leaflets on the expedition board, this one was written
+    in exceptionally scratchy handwriting. "HELP NEEDED!!! I need testers for my newest
+    ~~masterp~~ invention. ~~She~~ My newest speed machines needs someone to test!!
+    Come to the town gates! My building is the yellow roof!"
+  female: Unlike the rest of the leaflets on the expedition board, this one was written
+    in exceptionally scratchy handwriting. "HELP NEEDED!!! I need testers for my newest
+    ~~masterp~~ invention. ~~She~~ My newest speed machines needs someone to test!!
+    Come to the town gates! My building is the yellow roof!"
+cost: 0
+hours: 4
+ability_test: Dexterity
+difficulty: medium
+results:
+  major fail:
+    text:
+      male:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ he could make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment he stepped in, he began running him through the half-dozen controls
+        at a breakneck speed. He only understood about half of what he said, his speech
+        sprinkled with every figure of speech and artificer-jargon he could imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ him to take off."
+      - The moment he stepped on the right, the carriage roared and lurched forward.
+        Out of panic, he pressed the pedal more, which sent him straight into a box
+        of metal parts. {name} managed to swerve out of the way just in time, right
+        into the wall bordering the city. The car made a loud *crunch* as it collided
+        with the wall.
+      - He managed to extract himself out of the car and see the damage. The entire
+        front of the car crumpled into itself, bits of metal and piping sticking out
+        in odd places. He could see the hobgoblin clenching and unclenching his fist,
+        with a very pained face.
+      - He made {name} pay for a good sum of the damage he caused. His neck hurts
+        a lot, too.
+      female:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ she can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment she stepped in, he began running her through the half-dozen controls
+        at a breakneck speed. She only understood about half of what he said, his
+        speech sprinkled with every figure of speech and artificer-jargon she could
+        imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ her to take off."
+      - The moment she stepped on the right, the carriage roared and lurched forward.
+        Out of panic, she pressed the pedal more, which sent her straight into a box
+        of metal parts. She managed to swerve out of the way just in time, right into
+        the wall bordering the city. The car made a loud *crunch* as it collided with
+        the wall.
+      - She managed to extract herself out of the car and see the damage. The entire
+        front of the car crumpled into itself, bits of metal and piping sticking out
+        in odd places. She could see the hobgoblin clenching and unclenching his fist,
+        with a very pained face.
+      - The hobgoblin made {name} pay for a good sum of the damage she caused. Her
+        neck hurts a lot, too.
+    coins: -35
+    health: -4
+    contributor: Ben
+  fail:
+    text:
+      male:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap was strewn around the property. Among the metal junk,\
+        \ {name} can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D The hobgoblin stood up straight from\
+        \ his tinkering, up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment {name} stepped in, the hobgoblin began running him through the
+        half-dozen controls at a breakneck speed. He only understood about half of
+        what he said, his speech sprinkled with every figure of speech and artificer-jargon
+        {name} could imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ him to take off."
+      - The moment he stepped on the right pedal, the carriage roared and lurched
+        forward. Out of panic, he pressed the pedal more, which sent him straight
+        into a box of metal parts. The crunch the carriage made sounded expensive,
+        and the damage made to the box of parts equally so.
+      - "\u201COn second thought... maybe I should get another person. Sorry.\u201D"
+      - You left empty-handed. Your neck hurts a little, too.
+      female:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ she can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment she stepped in, he began running her through the half-dozen controls
+        at a breakneck speed. You only understood about half of what he said, his
+        speech sprinkled with every figure of speech and artificer-jargon {name} could
+        imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ her to take off."
+      - The moment she stepped on the right, the carriage roared and lurched forward.
+        Out of panic, she pressed the pedal more, which sent her straight into a box
+        of metal parts. The crunch the carriage made sounded expensive, and the damage
+        to the box of parts equally so.
+      - "\u201COn second thought... maybe I should get another person. Sorry.\u201D"
+      - You left empty-handed. Your neck hurts a little, too.
+    coins: 0
+    health: -2
+    contributor: Ben
+  success:
+    text:
+      male:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ he can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment {name} stepped in, the hobgoblin began running her through the
+        half-dozen controls at a breakneck speed. You only understood about half of
+        what he said, his speech sprinkled with every figure of speech and artificer-jargon
+        he could imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ her to take off."
+      - '{name} tapped on the pedal. With a roar, the carriage surged forward ten
+        feet, continuing to roll for longer. Remembering his lecture, he planted her
+        foot on the left pedal, violently jerking her forward as the vehicle came
+        to an immediate stop.'
+      - "Finally understanding the controls of this machine, {name} pushed on the\
+        \ right pedal even lighter. With a rising purr the carriage moved forward.\
+        \ The machine matched the strength he pushed on the pedal with the sound of\
+        \ the machine and the motion of the wheels. Before long, {name} was jerkily\
+        \ cruising through the cobble streets, eyes pointed forward in extreme focus.\
+        \ She tested the wheel in front of her, noting how the direction changed as\
+        \ he swung the wheel left and right. In her moment of testing, he crashed\
+        \ headlong into a barrel, spewing flour and sugar all over herself, the car,\
+        \ and the street. The collision set off {name}'s instincts, sending the car\
+        \ surging forward in a getaway. She hoped the damage he caused wasn\u2019\
+        t too expensive. Before long, he was right back to where he started, with\
+        \ the hobgoblin eagerly waiting with quite wide eyes."
+      - "\u201CI\u2019m not sure if I want to ask\u2026 but you made it!\u201D He\
+        \ gave her a hearty pat on the shoulder as he left the carriage. \u201CThanks\
+        \ for giving this a shot. It seems my invention\u2019s ready to show off!\u201D\
+        \ He beamed with pride."
+      - "He caught himself. \u201CPayment, right!\u201D He dug into his pockets, and\
+        \ placed a generous collection of coins into her hands. \u201CI\u2019ll be\
+        \ here if you need me. Knock if you don\u2019t see me out here.\u201D"
+      - '{name} felt hopeful for the advancements of the future.'
+      female:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ she can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment {name} stepped in, the hobgoblin began running him through the
+        half-dozen controls at a breakneck speed. You only understood about half of
+        what he said, his speech sprinkled with every figure of speech and artificer-jargon
+        she could imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ him to take off."
+      - '{name} tapped on the pedal. With a roar, the carriage surged forward ten
+        feet, continuing to roll for longer. Remembering his lecture, she planted
+        him foot on the left pedal, violently jerking him forward as the vehicle came
+        to an immediate stop.'
+      - "Finally understanding the controls of this machine, {name} pushed on the\
+        \ right pedal even lighter. With a rising purr the carriage moved forward.\
+        \ The machine matched the strength she pushed on the pedal with the sound\
+        \ of the machine and the motion of the wheels. Before long, {name} was jerkily\
+        \ cruising through the cobble streets, eyes pointed forward in extreme focus.\
+        \ She tested the wheel in front of him, noting how the direction changed as\
+        \ she swung the wheel left and right. In his moment of testing, she crashed\
+        \ headlong into a barrel, spewing flour and sugar all over herself, the car,\
+        \ and the street. The collision set off {name}'s instincts, sending the car\
+        \ surging forward in a getaway. She hoped the damage she caused wasn\u2019\
+        t too expensive. Before long, she was right back to where she started, with\
+        \ the hobgoblin eagerly waiting with quite wide eyes."
+      - "\u201CI\u2019m not sure if I want to ask\u2026 but you made it!\u201D He\
+        \ gave him a hearty pat on the shoulder as she left the carriage. \u201CThanks\
+        \ for giving this a shot. It seems my invention\u2019s ready to show off!\u201D\
+        \ He beamed with pride."
+      - "He caught himself. \u201CPayment, right!\u201D He dug into his pockets, and\
+        \ placed a generous collection of coins into his hands. \u201CI\u2019ll be\
+        \ here if you need me. Knock if you don\u2019t see me out here.\u201D"
+      - '{name} felt hopeful for the advancements of the future.'
+    coins: 35
+    contributor: Ben
+  major success:
+    text:
+      male:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ {name} can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment he stepped in, he began running {name} through the half-dozen controls
+        at a breakneck speed. You only understood about half of what he said, his
+        speech sprinkled with every figure of speech and artificer-jargon he could
+        imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ him to take off."
+      - '{name} tapped on the pedal. With a roar, the carriage surged forward ten
+        feet, continuing to roll for longer. Remembering his lecture, he planted his
+        foot on the left pedal, violently jerking him forward as the vehicle came
+        to an immediate stop.'
+      - Finally understanding the controls of this machine, {name} pushed on the right
+        pedal even lighter. With a rising purr the carriage moved forward. The machine
+        matched the strength he pushed on the pedal with the sound of the machine
+        and the motion of the wheels. Before long, {name} was jerkily cruising through
+        the cobble streets, eyes pointed forward in extreme focus. She tested the
+        wheel in front of him, noting how the the direction changed as he swung the
+        wheel left and right. She used it to dodge barrels and unwitting bystanders,
+        cringing at how they cursed at him when he got too close. Before long, he
+        was right back to where he started, with the hobgoblin eagerly waiting with
+        a mile-wide grin.
+      - "\u201CYou didn't crash! You\u2019re better at this than I thought!\u201D\
+        \ He gave him a hearty pat on the shoulder as he left the carriage. \u201C\
+        Thanks for giving this a shot. It seems my invention\u2019s ready to show\
+        \ off!\u201D He beamed with pride. \u201COh, the name\u2019s Solandria Lenos.\
+        \ I\u2019m an Artificer\u2014though I believe you\u2019ve noticed that.\u201D\
+        \ "
+      - "He caught himself. \u201CPayment, right!\u201D He dug into his pockets, and\
+        \ placed a generous collection of coins into your pocket. \u201CI\u2019ll\
+        \ be here if you need me. Knock if you don\u2019t see me out here.\u201D"
+      - '{name} felt hopeful for the advancements of the future, and excited to have
+        a new tinkerer friend.'
+      female:
+      - "The town gates took almost all morning to get to. Thankfully, the \u201C\
+        yellow roof\u201D was not incredibly hard to get to."
+      - "The building fit the leaflet\u2019s author. All kinds of metal, junk, and\
+        \ miscellaneous scrap is strewn around the property. Among the metal junk,\
+        \ {name} can make out a blue-jacketed hobgoblin hunched over some machine."
+      - The thing was large, and barely resembled an open-top carriage. Yet, it had
+        no horses in front, was made entirely of metals, and had a strange jut out
+        the front, where more scraps of metal lay in a hollow.
+      - "\u201COh good! *Someone* came.\u201D He stood up straight from his tinkering,\
+        \ up to his full height of six and a half feet."
+      - "\u201CThanks for droppin\u2019 by! I needed a good tester\u2014someone that\
+        \ actually fit in the darn thing. You look\u2026 good enough.\u201C He stepped\
+        \ to the side, opening the half-size door on the misshapen carriage."
+      - The moment she stepped in, he began running {name} through the half-dozen
+        controls at a breakneck speed. You only understood about half of what he said,
+        his speech sprinkled with every figure of speech and artificer-jargon she
+        could imagine.
+      - Once his spiel was done, he placed a small, jagged key into the slot, and
+        gave it a twist.
+      - As he did, the hunk of metal at the front sputtered to life, sending the whole
+        carriage into an idle rumble.
+      - '{name} asked the hobgoblin if this machine was safe.'
+      - "\u201CSafe enough! I took a few drives in it. I didn\u2019t fit, but I still\
+        \ made it out ok.\u201D"
+      - "His words weren\u2019t aspiring much hope. {name} knew hobgoblins to be a\
+        \ particularly tough-skinned species."
+      - "\u201CThis street goes in a loop around the city walls.\u201D He pointed\
+        \ off into the distant road that ever so slightly curved right. \u201CIt\u2019\
+        s busy this time around, so try to be slow.\u201D He stepped away, fully expecting\
+        \ her to take off."
+      - '{name} tapped on the pedal. With a roar, the carriage surged forward ten
+        feet, continuing to roll for longer. Remembering his lecture, she planted
+        her foot on the left pedal, violently jerking her forward as the vehicle came
+        to an immediate stop.'
+      - Finally understanding the controls of this machine, {name} pushed on the right
+        pedal even lighter. With a rising purr the carriage moved forward. The machine
+        matched the strength she pushed on the pedal with the sound of the machine
+        and the motion of the wheels. Before long, {name} was jerkily cruising through
+        the cobble streets, eyes pointed forward in extreme focus. She tested the
+        wheel in front of her, noting how the the direction changed as she swung the
+        wheel left and right. She used it to dodge barrels and unwitting bystanders,
+        cringing at how they cursed at her when she got too close. Before long, she
+        was right back to where she started, with the hobgoblin eagerly waiting with
+        a mile-wide grin.
+      - "\u201CYou didn't crash! You\u2019re better at this than I thought!\u201D\
+        \ He gave her a hearty pat on the shoulder as she left the carriage. \u201C\
+        Thanks for giving this a shot. It seems my invention\u2019s ready to show\
+        \ off!\u201D He beamed with pride. \u201COh, the name\u2019s Solandria Lenos.\
+        \ I\u2019m an Artificer\u2014though I believe you\u2019ve noticed that.\u201D\
+        \ "
+      - "He caught himself. \u201CPayment, right!\u201D He dug into his pockets, and\
+        \ placed a generous collection of coins into your pocket. \u201CI\u2019ll\
+        \ be here if you need me. Knock if you don\u2019t see me out here.\u201D"
+      - '{name} felt hopeful for the advancements of the future, and excited to have
+        a new tinkerer friend.'
+    coins: 55
+    contributor: Ben

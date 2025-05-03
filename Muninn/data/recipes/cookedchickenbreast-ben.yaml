@@ -1,0 +1,6 @@
+name: Cooked Chicken Breast
+type: single_use
+skill: cooking
+recipe:
+- name: Raw Chicken Breast
+  amount: 1

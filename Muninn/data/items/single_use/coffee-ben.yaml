@@ -1,0 +1,7 @@
+name: Coffee
+description: "A steaming, black cup of Joseph, ready to be drunk by those who\u2014\
+  for some reason\u2014like their coffee bitter and flavourless."
+type: consumable
+skill: brewing
+base_heal: 9
+base_price: 16
