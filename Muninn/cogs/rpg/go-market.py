@@ -239,33 +239,36 @@ class GoMarket(commands.Cog):
         return embed, view
 
     def page_embed(self, page, items, name, user_data):
-        page_beginning_index = (5 * (page-1))
-        eval_item_index = page_beginning_index
+        total_pages = math.ceil(len(items)/10)
+        
+        # Calculate start index for current page
+        start_index = (page - 1) * 10
         description = f"{user_data['profile_name']} has **{user_data['coins']} coins**.\n"
         
-        for i in range(5):
+        for i in range(10):
             if ((i)*page) > (len(items)-1):
                 break
-            if eval_item_index >= len(items):
+            if start_index >= len(items):
                 break
             
             ic(len(items), i, (i+1)*page)
             
-            item = items[eval_item_index]
+            item = items[i]
             if item.get('prefix'):
                 prefix = f"*{item['prefix']}* "
             else:
                 prefix = ""
-            description += f"{eval_item_index}. {prefix}{item['name']} - `{item['base_price']}` coins\n" 
-            eval_item_index += 1
+            description += f"{i}. {prefix}{item['name']} - `{item['base_price']}` coins\n" 
 
         embed = discord.Embed(title=f"*{name}* - Page {page}", description=description, color=0xFEBA17)
+        embed.set_footer(text=f"Items {start_index+1}-{min(start_index+10, len(items))} of {len(items)}")
         
         return embed
     
     def market_comb(self, ctx, market, market_cog, page, user_data, message):
         user, name, description, items, username = self.market_analyze(market)
-        total_pages = math.ceil(len(items)/5)
+        start_index = (page - 1) * 10
+        total_pages = math.ceil(len(items)/10)
 
         embed = self.page_embed(page, items, name, user_data)
         
@@ -277,29 +280,54 @@ class GoMarket(commands.Cog):
                 self.page = page
                 self.ctx = ctx
             
-            @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label=f"{start_index+1}", style=discord.ButtonStyle.grey)
             async def first_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+0], market_cog, market, user_data, message)
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
-            @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label=f"{start_index+2}", style=discord.ButtonStyle.grey)
             async def second_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+1], market_cog, market, user_data, message)
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+1], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
-            @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label=f"{start_index+3}", style=discord.ButtonStyle.grey)
             async def third_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+2], market_cog, market, user_data, message)
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+2], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
-            @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label=f"{start_index+4}", style=discord.ButtonStyle.grey)
             async def fourth_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+3], market_cog, market, user_data, message)
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+3], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
-            @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.grey)
+            @discord.ui.button(label=f"{start_index+5}", style=discord.ButtonStyle.grey)
             async def fifth_button(self, interaction: discord.Interaction, button: Button):
-                embed, view = await self.market_cog.item_buy(ctx, items[((self.page-1)*5)+4], market_cog, market, user_data, message)
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+4], market_cog, market, user_data, message)
+                await interaction.response.edit_message(embed=embed, view=view)
+        
+            @discord.ui.button(label=f"{start_index+6}", style=discord.ButtonStyle.grey)
+            async def sixth_button(self, interaction: discord.Interaction, button: Button):
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+5], market_cog, market, user_data, message)
+                await interaction.response.edit_message(embed=embed, view=view)
+        
+            @discord.ui.button(label=f"{start_index+7}", style=discord.ButtonStyle.grey)
+            async def seventh_button(self, interaction: discord.Interaction, button: Button):
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+6], market_cog, market, user_data, message)
+                await interaction.response.edit_message(embed=embed, view=view)
+        
+            @discord.ui.button(label=f"{start_index+8}", style=discord.ButtonStyle.grey)
+            async def eighth_button(self, interaction: discord.Interaction, button: Button):
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+7], market_cog, market, user_data, message)
+                await interaction.response.edit_message(embed=embed, view=view)
+        
+            @discord.ui.button(label=f"{start_index+9}", style=discord.ButtonStyle.grey)
+            async def ninth_button(self, interaction: discord.Interaction, button: Button):
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+8], market_cog, market, user_data, message)
+                await interaction.response.edit_message(embed=embed, view=view)
+        
+            @discord.ui.button(label=f"{start_index+10}", style=discord.ButtonStyle.grey)
+            async def tenth_button(self, interaction: discord.Interaction, button: Button):
+                embed, view = await self.market_cog.item_buy(ctx, items[start_index+9], market_cog, market, user_data, message)
                 await interaction.response.edit_message(embed=embed, view=view)
         
             @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
@@ -319,6 +347,24 @@ class GoMarket(commands.Cog):
         
         view = MarketView(ctx, market_cog, items, page)
         
+        # Enable/disable buttons based on available items
+        buttons = [
+            view.first_button,
+            view.second_button,
+            view.third_button,
+            view.fourth_button,
+            view.fifth_button,
+            view.sixth_button,
+            view.seventh_button,
+            view.eighth_button,
+            view.ninth_button,
+            view.tenth_button,
+        ]
+        
+        for index, button in enumerate(buttons):
+            item_index = start_index + index
+            button.disabled = False if item_index < len(items) else True
+            
         if page == 1:
             view.prev_button.disabled = True
         if page == total_pages:
@@ -331,10 +377,9 @@ class GoMarket(commands.Cog):
 
         embed = discord.Embed(
             title="Eustrox Market",
-            description="Upon entering the market, it was immediately clear that it was bigger that perceived from the outside. Rows of stalls lined the worn cobbled streets, winding and twisting in all directions. The smell of freshly baked bread wafted through the air, sparking hunger in all passersby. A calm breeze ambled along the stalls, pushing hanging goods to dance and sing.\n\nThe vendors themselves were all as pleasant as the market's atmosphere. After some friendly small talk, the vendors mention that they set up their stalls every day for any traveler that may pass through, as the roads converge there before a mountain pass.\n\nEventually, a stop is made at one particular vendor...",
+            description="Upon entering the market, it was immediately clear that it was bigger that perceived from the outside. Rows of stalls lined the worn cobbled streets, winding and twisting in all directions. The smell of freshly baked bread wafted through the air, sparking hunger in all passersby. A calm breeze ambled along the stalls, pushing hanging goods to dance and sing.\n\nThe vendors themselves were all as pleasant as the market's atmosphere. After some friendly small talk, the vendors mention that they set up their stalls every day for any traveler that may pass through, as the roads converge there before a mountain pass.\n\nEventually, a stop is made at one particular vendor...\n-# Written by Luci",
             color=0xFFCF50
         )
-        embed.set_footer(text="written by Luci")
         
         options = []
 

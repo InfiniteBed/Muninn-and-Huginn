@@ -7,6 +7,7 @@ import json
 from icecream import ic
 import os
 import math
+import yaml
 
 
 class Home(commands.Cog):
@@ -205,56 +206,104 @@ class Home(commands.Cog):
         chest_view = ChestView()
             
         def build_page_embed(user_stats, page, recipes, ctx):
-            page_beginning_index = (5 * (page-1)) - 1
-            total_pages = math.ceil(len(recipes)/5)
-            eval_item_index = page_beginning_index
+            if not recipes:  # Handle empty recipe list
+                embed = discord.Embed(
+                    title=f"{user_stats['profile_name']}'s Tinker Book",
+                    description="No recipes available.",
+                    color=0x1777FE
+                )
+                view = ChestView()  # Use the basic view with just return button
+                return embed, view
+
+            total_pages = math.ceil(len(recipes)/10)
+            page = max(1, min(page, total_pages))  # Ensure page is within bounds
+            
+            # Calculate start index for current page
+            start_index = (page - 1) * 10
             description = ""
             
-            for i in range(5):
-                if ((i+1)*page) > (len(recipes)):
-                    continue
-                
-                recipe = recipes[eval_item_index]
+            # Display recipes for current page
+            for i in range(10):
+                recipe_index = start_index + i
+                if recipe_index >= len(recipes):
+                    break
+                    
+                recipe = recipes[recipe_index]
                 locked = recipe.get('locked')
+                
                                 
                 if locked:
-                    description += f"~~{eval_item_index+2}. {recipe['name']}:~~ `Requires {recipe['required_skill'].title()} {recipe['skill_level']}`\n"
+                    description += f"~~{recipe_index+1}. {recipe['name']}:~~ `Requires {recipe['required_skill'].title()} {recipe['skill_level']}`\n"
                 elif not locked:
-                    description += f"{eval_item_index+2}. {recipe['name']}\n"
-                 
-                eval_item_index += 1
+                    description += f"{recipe_index+1}. {recipe['name']}\n"
 
-            embed = discord.Embed(title=f"{user_stats['profile_name']}'s Tinker Book - Page {page}", description=description, color=0x1777FE)
+            embed = discord.Embed(title=f"{user_stats['profile_name']}'s Tinker Book - Page {page}/{total_pages}", description=description, color=0x1777FE)
+            embed.set_footer(text=f"Items {start_index+1}-{min(len(recipes), start_index+10)} of {len(recipes)}")
             
             class CraftView(View):
                 def __init__(self):
                     super().__init__()
                     self.page = page
                 
-                @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.grey)
+                @discord.ui.button(label=f"{start_index+1}", style=discord.ButtonStyle.grey)
                 async def first_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)-1], recipes, ctx)
-                    await interaction.response.edit_message(embed=embed, view=view)
+                    if start_index < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
             
-                @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.grey)
+                @discord.ui.button(label=f"{start_index+2}", style=discord.ButtonStyle.grey)
                 async def second_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)], recipes, ctx)
-                    await interaction.response.edit_message(embed=embed, view=view)
+                    if start_index + 1 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+1], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
             
-                @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.grey)
+                @discord.ui.button(label=f"{start_index+3}", style=discord.ButtonStyle.grey)
                 async def third_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+1], recipes, ctx)
-                    await interaction.response.edit_message(embed=embed, view=view)
+                    if start_index + 2 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+2], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
             
-                @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.grey)
+                @discord.ui.button(label=f"{start_index+4}", style=discord.ButtonStyle.grey)
                 async def fourth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+2], recipes, ctx)
-                    await interaction.response.edit_message(embed=embed, view=view)
+                    if start_index + 3 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+3], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
             
-                @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.grey)
+                @discord.ui.button(label=f"{start_index+5}", style=discord.ButtonStyle.grey)
                 async def fifth_button(self, interaction: discord.Interaction, button: Button):
-                    embed, view = await build_recipe_embed(user_stats, recipes[((self.page-1)*5)+3], recipes, ctx)
-                    await interaction.response.edit_message(embed=embed, view=view)
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{start_index+6}", style=discord.ButtonStyle.grey)
+                async def sixth_button(self, interaction: discord.Interaction, button: Button):
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{start_index+7}", style=discord.ButtonStyle.grey)
+                async def seventh_button(self, interaction: discord.Interaction, button: Button):
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{start_index+8}", style=discord.ButtonStyle.grey)
+                async def eighth_button(self, interaction: discord.Interaction, button: Button):
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{start_index+9}", style=discord.ButtonStyle.grey)
+                async def ninth_button(self, interaction: discord.Interaction, button: Button):
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{start_index+10}", style=discord.ButtonStyle.grey)
+                async def tenth_button(self, interaction: discord.Interaction, button: Button):
+                    if start_index + 4 < len(recipes):
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
                 async def prev_button(self, interaction: discord.Interaction, button: Button):
@@ -272,28 +321,30 @@ class Home(commands.Cog):
             
             view = CraftView()
             
-            start_index = (page - 1) * 5
+            # Enable/disable buttons based on available recipes
             buttons = [
                 view.first_button,
                 view.second_button,
                 view.third_button,
                 view.fourth_button,
                 view.fifth_button,
+                view.sixth_button,
+                view.seventh_button,
+                view.eighth_button,
+                view.ninth_button,
+                view.tenth_button,
             ]
 
             for i, button in enumerate(buttons):
-                index = start_index - 1 + i  # start at -1, 0, 1, 2, 3
-                if 0 <= index < len(recipes):
-                    button.disabled = recipes[index].get('locked')
+                recipe_index = start_index + i
+                if recipe_index < len(recipes):
+                    button.disabled = recipes[recipe_index].get('locked', False)
                 else:
-                    button.disabled = True  # Disable button if recipe doesn't exist
-
+                    button.disabled = True
             
-            ic(recipes[((page-1)*5)+1])
-            
-            if page == 1:
+            if page <= 1:
                 view.prev_button.disabled = True
-            if page == total_pages:
+            if page >= total_pages:
                 view.next_button.disabled = True
         
             return embed, view
@@ -303,11 +354,11 @@ class Home(commands.Cog):
         
         for dirpath, _, filenames in os.walk(datapath):
             for file in filenames:
-                if file.endswith(".json"):
+                if file.endswith(".json") or file.endswith(".yaml"):
                     file_path = os.path.join(dirpath, file)
                     with open(file_path, 'r') as f:
                         try:
-                            data = json.load(f)
+                            data = yaml.safe_load(f)
                             if await skill_unlocks(data, interaction.author.id):
                                 unifieddata.append(data)
                                 print("Added recipe!")
@@ -323,7 +374,7 @@ class Home(commands.Cog):
         craft_embed = discord.Embed(title=embed.title,
                               color=embed.color,
                               description=("-# *The leather-bound book contained well-worn pages, so used that tearing was threatened with every sheet of paper that was turned. The recipes carefully etched into the sheet were faded with time and use, but still as understandable.*\n\n-# **To use the tinker book, simply select the number of the item desired. If the required materials are in the chest (which can found in !home), then the item will be crafted.**\n\n-# Items, such at armor and weapons,  can be used in battles to increase the chance of winning by adding to the base defense and attacks scores. Armor, weapons, as well as miscellaneous items can also be sold in the market.\n\n"+embed.description))
-        
+        craft_embed.set_footer(text=embed.footer.text)
         
         class HomeView(View):
             def __init__(self, interaction, user_id, user_stats):
