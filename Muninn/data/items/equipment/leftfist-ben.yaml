@@ -6,5 +6,5 @@ base_price: 999
 actions:
 - name: Punch
   description: Take a swing at your enemy, gangsta style.
-  damage: 8
+  damage: 2
   defense: -2

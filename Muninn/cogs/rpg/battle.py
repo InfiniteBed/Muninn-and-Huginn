@@ -216,8 +216,8 @@ class Battle(commands.Cog):
                 description=f"{player2.mention} wins!\n{player2.mention} stole {stolen_coins} coins from {player1.mention}!",
                 color=discord.Color.green()
             )
-            victory_embed.add_field(name=f"{player1.display_name}'s Final Health", value=f"{player1_stats['health']} HP", inline=True)
-            victory_embed.add_field(name=f"{player2.display_name}'s Final Health", value=f"{player2_stats['health']} HP", inline=True)
+            victory_embed.add_field(name=f"{player1.display_name}'s Final Health", value=f"{max(0, player1_stats['health'])} HP", inline=True)
+            victory_embed.add_field(name=f"{player2.display_name}'s Final Health", value=f"{max(0, player2_stats['health'])} HP", inline=True)
             await thread.send(embed=victory_embed)
 
         elif player2_stats['health'] <= 0:
