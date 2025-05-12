@@ -1,6 +1,5 @@
 name: "Dr. Saur'deurs' Neglect"
-introduction: >
-  Dr. Aur'deur has been looking for a maid for quite a while now, and he thinks {name} will be the perfect fit.
+introduction: Dr. Saur'deurs has been looking for a [maid|butler] for quite a while now, and he thinks {name} will be the perfect fit.
 proficiency: "author"
 results:
   - text: >

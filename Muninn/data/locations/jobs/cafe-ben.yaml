@@ -1,5 +1,5 @@
-name: "Ammy's Coffee"
-introduction: "Ammy has been looking for another coffee brewer for a while now."
+name: Ammy's Coffee
+introduction: Ammy has been looking for another coffee brewer for a while now.
 proficiency: brewing
 results:
 - text: |

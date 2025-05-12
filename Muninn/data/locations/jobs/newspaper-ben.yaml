@@ -1,5 +1,5 @@
 name: "Mardo Stack"
-introduction: "The Mardo Stack is looking for new papermakers to join their team. {name} will be turning wood pulp into new stacks of paper, ready to be written on."
+introduction: The Mardo Stack is looking for new papermakers to join their team. {name} will be turning wood pulp into new stacks of paper, ready to be written on.
 proficiency: "author"
 results:
   - text: |
@@ -26,10 +26,9 @@ results:
     xp_change: 16
     hours: 8
   - text: |
-  
       {name} found [himself|herself] working with the Satyr again.
   
-      You're new right? You started here just a few days ago?\"
+      You're new right? You started here just a few days ago?"
       
       "That's right." {name} confirmed.
       
@@ -38,6 +37,19 @@ results:
       "I am a traveller, actually. Just staying here for the time being though, while I get some things straightened out."
       
       He nodded quietly, and didn't say much more.
+    coins_change: 24
+    xp_change: 16
+    hours: 8
+  - text: |
+      As [he|she] entered, {name} noticed the pressroom was in a hurry, more than it has the past few days. [He|She] put [his|her] apron on with agency, and got into place.
+
+      "Wednesday publishing," the Satyr explained without [him|her] asking, "every Wednesday, the market bridge on the east side restocks *everytihng*. We get a lot of sales from just selling newspapers at that market, apparently."
+
+      He uses his whole strength to pull down the sheet press. As he lifts it up, the strength of the spring almost lifts him off his feet.
+
+      "I heard we have some folks that buy up papers just to sell outside the city."
+
+      With the help of some extra workers, [he|she] and the Satyr press nearly double the amount of papers in a single day.
     coins_change: 24
     xp_change: 16
     hours: 8
