@@ -14,6 +14,7 @@ RUN pip install psycopg2
 RUN pip install regex
 RUN pip install ollama
 RUN pip install pyyaml
+RUN pip install mplcairo
 
 # Create the directory for the bot and set it as the working directory
 WORKDIR /usr/src/bot

@@ -17,7 +17,9 @@ class AtResponse(commands.Cog):
         
         print(message.content)
         
-        if self.bot.user.mentioned_in(message):
+        # Check if bot is mentioned but ignore @everyone mentions
+        is_mentioned = (self.bot.user.mentioned_in(message) and not message.mention_everyone) or "<@&1301425229213470762>" in message.content
+        if is_mentioned:
             await message.channel.send(str.format(random.choice(responses), user=message.author.display_name))
 
 async def setup(bot):

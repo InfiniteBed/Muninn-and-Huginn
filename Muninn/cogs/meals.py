@@ -76,3 +76,4 @@ class LeaderboardsCog(commands.Cog):
 # Setup function to add the cog to the bot
 async def setup(bot):
     await bot.add_cog(LeaderboardsCog(bot))
+    

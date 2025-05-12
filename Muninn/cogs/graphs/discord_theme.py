@@ -11,14 +11,21 @@ class DiscordTheme(commands.Cog):
         """Apply a unified Discord-like theme to all graphs."""
         plt.style.use("dark_background")
         
-        # Load the custom font
-        prop = font_manager.FontProperties(fname="/usr/src/bot/fonts/Uni Sans Heavy.otf")
-
-        font_path = '/usr/src/bot/fonts/Uni Sans Heavy.otf'
-        font_name = font_manager.FontProperties(fname=font_path).get_name()
-        plt.rcParams['font.family'] = [font_name]
-
-        # Apply font properties to specific plot elements
+        # Load the fonts
+        uni_sans_path = '/usr/src/bot/fonts/Uni Sans Heavy.otf'
+        emoji_font_path = '/usr/src/bot/fonts/NotoColorEmoji-Regular.ttf'
+        
+        # Register the fonts with matplotlib
+        font_manager.fontManager.addfont(uni_sans_path)
+        font_manager.fontManager.addfont(emoji_font_path)
+        
+        # Create font properties
+        prop = font_manager.FontProperties(fname=uni_sans_path)
+        
+        # Set up font families with fallback
+        plt.rcParams['font.family'] = ['Uni Sans Heavy', 'Noto Color Emoji']
+        
+        # Theme colors and styles
         plt.rcParams["text.color"] = "#DCDDDE"  # Light gray text
         plt.rcParams["axes.facecolor"] = "#2C2F33"  # Dark mode background
         plt.rcParams["axes.edgecolor"] = "#99AAB5"  # Subtle borders
@@ -26,11 +33,10 @@ class DiscordTheme(commands.Cog):
         plt.rcParams["xtick.color"] = "#DCDDDE"
         plt.rcParams["ytick.color"] = "#DCDDDE"
         plt.rcParams["grid.color"] = "#555555"  # Subtle grid lines
-        plt.rcParams["figure.facecolor"] = "#5762E3"
+        plt.rcParams["figure.facecolor"] = "#2C2F33"
         plt.rcParams["savefig.facecolor"] = "#2C2F33"
 
-        # Ensure font is applied to axes and titles directly
-        plt.rcParams["axes.titleweight"] = "bold"
+        # Font sizes
         plt.rcParams["axes.titlesize"] = 14
         plt.rcParams["axes.labelsize"] = 12
         plt.rcParams["xtick.labelsize"] = 10
