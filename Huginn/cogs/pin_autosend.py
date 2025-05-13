@@ -20,11 +20,8 @@ def get_time(hour, minute=0):
     return la_timezone.localize(datetime.datetime(now.year, now.month, now.day, hour, minute))
 
 times = [
-    get_time(6).timetz(),
     get_time(9).timetz(),
-    get_time(12).timetz(),
     get_time(15).timetz(),
-    get_time(18).timetz(),
     get_time(21).timetz(),
     get_time(0).timetz(),
 ]
