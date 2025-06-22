@@ -1,0 +1,557 @@
+command:
+- shut up
+- sit down
+- chill out
+- be quiet
+- whatever
+- do better
+- you've got no authority
+- its all downhill
+- stay in school
+- focus up
+- youre making me old
+comparison:
+- youre built like
+- you actually smell like
+- you remind me of
+- youre just a massive
+- why do you sound like
+- you just wanna be
+- why do you look like
+- stop trying to be
+- youre way worse than
+- actually youre way better than
+- you're actually like
+- you sound like
+- this sounds like
+- i could use you as
+- im telling
+- its time to Ctrl-Alt-Delete
+- youre actually uglier than
+- youre worse than
+- youre way worse than
+intro:
+- um actually
+- but uhh
+- bro
+- dude
+- man
+- legit
+- actually
+- fr
+- serioiusly
+- legitimately
+- ok buddy
+- AAAAAAAAAAAAH
+- woooooow
+- no joke
+- my guy
+- thats it
+- 'no'
+prompts:
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: God knows all, and he knows who will not be saved. Why does he call us to
+    win souls?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: Was Jesus omnipresent while he was incarnate?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: How would you survive a zombie apocalypse?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Who would you bring onto a deserted island?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: You can fill a suitcase with anything that fits into a suitcase. What would
+    you bring onto a deserted island?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: You have a billion dollars. What company do you buy?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What is your game plan during a zombie apocalypse?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you were stuck in a time loop, what day would you want it to be?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: How would you break out of a time loop?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you were in a time loop, who would you try to convince and how?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you could time travel (but not change anything), what would you observe?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you got shot at McDonald's, who would you call first? (assume the police
+    has already been called)
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you could choose one board game to live out, which would you most likely
+    survive?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: If you could choose one video game to live out, which would you most likely
+    survive?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What does your ideal day look like?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: How would you survive the robotic rule over humanity?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: What was the original language before the tower of Babel?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If your life was a story, what genre would it be?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: Heaven has a definite size. How large is it?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you could be any animal, what would you choose and why?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: What did the angels of the Bible look like?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: Did Jesus use the slang and jargon of his day?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: You're sent 200 years into the past. How do you survive?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If money wasn't an issue, what job would you have?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you had the chance, where would you travel?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What do you think of the beach?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What is your perfect vacation?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: If you could choose any power, what would you choose and how would you use
+    it?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Do you think you would be the hero or the villain of the story?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What hobby would you try if skill wasn't an issue?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: Are sound waves affected by gravity?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Favorite instrument?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Favorite way to travel?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Favorite ice cream?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Least favorite condiment?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Least favorite day of the week?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Would you rather be a pirate, cowboy, or samurai?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Best weather in your opinion?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What's the point of stars..?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Top three pet peeves?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Biggest red flag in other people?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: If you can be any animal for a day, which one?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Does speaking in tongues exist today?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could live in any historical era, which one would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite childhood memory?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could master any skill instantly, what would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite type of weather and why?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could have dinner with any historical figure, who would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is the most adventurous thing you've ever done?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could live anywhere in the world, where would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite holiday tradition?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could invent something, what would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite book or movie and why?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could swap lives with anyone for a day, who would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your dream job?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could only eat one food for the rest of your life, what would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite way to relax?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could visit any planet, which one would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite type of music?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite memory with friends?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: If you could change one thing about the world, what would it be?
+- contributor: OpenAI
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite way to spend a weekend?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What is the best animal for a pet?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What are your thoughts on Seaworld and its policy with its animals?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What's a movie you regret watching?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What's a movie you will always love no matter how many times you watch it?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Would you rather only eat meat for the rest of your life or forever be vegan?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What are your thoughts on pineapple on pizza?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What was your favorite kid's movie/show growing up?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Which classmate from high school will you never not like?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: What was your very first memory?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: Worst color combination hands down?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever planned/hosted any parties?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever considered getting an/another ear piercing?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: When is ostracization acceptable?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: what is your best unecessary/irrelevant piece of knowledge that no one cares
+    about, but we’ll all pretend we do bc it’s courteous or whatever
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: if we all went on a trip together, where would we go?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: How would you feel about getting a giftcard for the place you work?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever missed a flight?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever made up a secret language or code?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever fallen out of your bed in the middle of the night?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever seen a shooting star?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever broken a bone?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Ever been zip lining?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Thoughts on owning a pet ferret?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: How often do you rewatch shows/movies you've watched before?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite movie to rewatch?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What is your favorite series to binge?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: What is the furthest you've ever traveled?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Would you drive a jet ski?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Have you ever successfully pulled an all-nighter?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Do you think you'll ever get to ride a helicopter?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Do you want to go scuba diving some day?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Ever consider going vegan?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Ever eaten squid?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Ever eaten a bug?
+- contributor: Luci
+  downvoted_by: []
+  downvotes: 0
+  text: Do you follow the 5-second rule?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: STUDY, STOP SLACKING DAWG!!!!
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: whats your next big project?
+- contributor: Ben
+  downvoted_by: []
+  downvotes: 0
+  text: Which horseman of the apocalypse would you be?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: would you rather go on a week long vacation to Hawaii or a week long vacation
+    to the Bermuda?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: would you rather go on a week long airplane ride or a week long boat ride?
+- contributor: Sammy
+  downvoted_by: []
+  downvotes: 0
+  text: What is the first thing you're doing when you get to heaven (other than meeting
+    Christ)?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: Why are you gay?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: Why are you gae?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: what’s the cringiest thing you have ever heard?
+- contributor: Sammy
+  downvoted_by: []
+  downvotes: 0
+  text: What movie has the best soundtrack in your opinion?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: thoughts on tattoos? (gasp! so taboo!!)
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: HYPOTHETICALLY! if consuming alcohol wasn’t a sin, would you try it?
+- contributor: Joriel
+  downvoted_by: []
+  downvotes: 0
+  text: would you rather be with the one who loves you or the one you love? (meaning
+    you do not love the one who loves you and vice versa)
+- contributor: Sammy
+  downvoted_by: []
+  downvotes: 0
+  text: What is the most underrated movie in your opinion?
+- contributor: Sammy
+  downvoted_by: []
+  downvotes: 0
+  text: What movie has the best soundtrack in your opinion?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: what is the last movie series that you have watched in timeline order?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: Yo chat, am I cooked? Where would the church hold services if a zombie apocalypse was to break out?
+- contributor: Preston
+  downvoted_by: []
+  downvotes: 0
+  text: Yo chat, are we cooked? If ww3 was to happen what countries would it be against?
+target:
+- infinite_bed
+- luci
+- sammy
+- andy
+- a golf ball
+- ron's car
+- papyrus
+- a simp
+- cooked ham
+- roast cheese
+- your mom
+- somethin else
+- dante
+- a refrigerator
+- muninn
+- uhhhhhhhhhhhhh idk
+- joseph
+- tooth fairy
+- trash
+- floss
+- miles
+- shrek
+- carl from jimmy newtron
+- unseasoned chicken
+unique:
+- no one in the audience laughed… get off the stage bro
+- did i ask???
+- you really thought you ate with that… huh
+- shut up, you’re actually just as boring as a class in home ec about napkins
+- wait, hold on, i think i heard something… did anyone say anything?
+- just do better.
+- oh please, ur so ugly mirrors shatter
+- SHUT UP
+- Imagine being too slow to shut me up?
+- i will send you to Jesus

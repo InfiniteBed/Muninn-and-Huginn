@@ -15,6 +15,31 @@ class Help(commands.Cog):
                     "submit": {"description": "`!submit` - Submit emojis to be voted on."}
                 }
             },
+            "Faith & Devotion": {
+                "shorthands": ["faith", "devotion"],
+                "commands": {
+                    "submit_devotion": {"description": "`!submit_devotion` - Submit your daily devotion response (Bible reading/prayer time)."},
+                    "devotion": {"description": "`!devotion` - Manually send the daily devotion accountability check-in."},
+                    "devotion_stats": {"description": "`!devotion_stats [days]` - View server devotion statistics for the last X days (max 30)."},
+                    "my_devotions": {"description": "`!my_devotions [days]` - View your personal devotion history for the last X days (max 30)."},
+                    "devotion_setup": {"description": "`!devotion_setup` - View and configure devotion settings (Admin only)."},
+                    "devotion_help": {"description": "`!devotion_help` - Detailed help for the devotion accountability system."}
+                }
+            },
+            "Server Configuration": {
+                "shorthands": ["config", "settings"],
+                "commands": {
+                    "config": {
+                        "description": "`!config` - Server configuration commands (Admin only).",
+                        "subcommands": {
+                            "list": "`!config list` - Show all current server settings.",
+                            "get": "`!config get <key>` - Get a specific configuration value.",
+                            "delete": "`!config delete <key>` - Delete a configuration value.",
+                            "devotion_channel": "`!config devotion_channel <#channel>` - Set the devotion channel."
+                        }
+                    }
+                }
+            },
             "RPG Commands": {
                 "shorthands": ["rpg"],
                 "commands": {
