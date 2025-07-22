@@ -1,5 +1,5 @@
 name: Health Jug
-description: NEEDS DESCRIPTION
+description: A sturdy jug filled with a healing potion that restores 10 health points when consumed.
 type: consumable
 base_heal: 10
 base_price: 20
