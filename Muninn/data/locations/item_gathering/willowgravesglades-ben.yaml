@@ -24,8 +24,4 @@ item_pool:
   chance_to_appear: 0.7
   std_amount: 10
   std_deviation: 5
-- name: Thyme
-  type: crafting
-  chance_to_appear: 0.4
-  std_amount: 10
-  std_deviation: 5
+# Removed duplicate entry for "Thyme" to avoid unintended behavior.
