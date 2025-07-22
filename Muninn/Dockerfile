@@ -1,7 +1,12 @@
 FROM python:3
 
+# Install system dependencies including FFmpeg
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install discord.py library
-RUN pip install discord.py
+RUN pip install --upgrade --force-reinstall git+https://github.com/Rapptz/discord.py.git
 RUN pip install watchdog
 RUN pip install -U discord-py-interactions
 RUN pip install requests
@@ -15,6 +20,8 @@ RUN pip install regex
 RUN pip install ollama
 RUN pip install pyyaml
 RUN pip install mplcairo
+RUN pip install yt-dlp==2025.6.25
+RUN pip install PyNaCl
 
 # Create the directory for the bot and set it as the working directory
 WORKDIR /usr/src/bot

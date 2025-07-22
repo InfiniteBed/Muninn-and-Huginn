@@ -240,8 +240,10 @@ prompts:
   downvotes: 0
   text: If you could master any skill instantly, what would it be?
 - contributor: OpenAI
-  downvoted_by: []
-  downvotes: 0
+  downvoted_by:
+  - 867261583871836161
+  - 1298719046480560148
+  downvotes: 2
   text: What is your favorite type of weather and why?
 - contributor: OpenAI
   downvoted_by: []
@@ -433,8 +435,9 @@ prompts:
   downvotes: 0
   text: Ever consider going vegan?
 - contributor: Luci
-  downvoted_by: []
-  downvotes: 0
+  downvoted_by:
+  - 801588002995699762
+  downvotes: 1
   text: Ever eaten squid?
 - contributor: Luci
   downvoted_by: []
@@ -514,7 +517,8 @@ prompts:
 - contributor: Preston
   downvoted_by: []
   downvotes: 0
-  text: Yo chat, am I cooked? Where would the church hold services if a zombie apocalypse was to break out?
+  text: Yo chat, am I cooked? Where would the church hold services if a zombie apocalypse
+    was to break out?
 - contributor: Preston
   downvoted_by: []
   downvotes: 0

@@ -68,6 +68,26 @@ class Help(commands.Cog):
                     "add_item": {"description": "`!add_item <group> <set_name> <title> <body> <solutions>` - Add an item to a memorization set."},
                     "practice": {"description": "`!practice [group]` - Start practicing a memorization set."}
                 }
+            },
+            "Music Commands": {
+                "shorthands": ["music", "audio"],
+                "commands": {
+                    "play": {"description": "`!play <song/url>` - Play a song, YouTube playlist, or add to queue. Aliases: `!p`"},
+                    "pause": {"description": "`!pause` - Pause the current song."},
+                    "resume": {"description": "`!resume` - Resume the paused song."},
+                    "skip": {"description": "`!skip` - Skip the current song. Aliases: `!s`"},
+                    "queue": {"description": "`!queue` - Show the current queue. Aliases: `!q`"},
+                    "nowplaying": {"description": "`!nowplaying` - Show current song info. Aliases: `!np`"},
+                    "songinfo": {"description": "`!songinfo` - Show detailed song information with metadata. Aliases: `!song`, `!info`"},
+                    "volume": {"description": "`!volume [0-100]` - Change or show volume. Aliases: `!vol`"},
+                    "loop": {"description": "`!loop` - Toggle loop mode for current song."},
+                    "automesh": {"description": "`!automesh` - Toggle automesh mode (cycles songs by person). Aliases: `!am`"},
+                    "autoducking": {"description": "`!autoducking` - Toggle auto ducking (lowers volume when someone speaks). Aliases: `!duck`"},
+                    "clear": {"description": "`!clear` - Clear the queue."},
+                    "stop": {"description": "`!stop` - Stop music and disconnect."},
+                    "reconnect": {"description": "`!reconnect` - Force reconnect to voice channel."},
+                    "musichelp": {"description": "`!musichelp` - Show detailed music commands help. Aliases: `!mhelp`"}
+                }
             }
         }
 

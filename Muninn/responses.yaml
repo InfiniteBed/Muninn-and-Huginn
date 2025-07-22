@@ -148,12 +148,140 @@ message_rewards:
   '7600': 'do you not have a job or something {nick}?
 
     "7,600: *{message}*"'
-  '800': 'Behold! {nick}''s 800th message!
+  '7800': 'seriously {nick}, what is this? a speedrun?
 
-    "*{message}*"'
-  '900': 'Everyone make sure to congratulate {nick} on sending 900 messages! 🙌
+    "7,800: *{message}*"'
+  '8000': '8,000 messages {nick}... I think you need an intervention.
 
-    "*{message}*"'
+    "8,000: *{message}*"'
+  '8200': 'At this point I''m just concerned for your wellbeing {nick}.
+
+    "8,200: *{message}*"'
+  '8400': 'Did someone challenge you to a typing contest {nick}?
+
+    "8,400: *{message}*"'
+  '8600': 'Your phone bill must be INSANE {nick}.
+
+    "8,600: *{message}*"'
+  '8800': 'I''m running out of creative ways to tell you to touch grass {nick}.
+
+    "8,800: *{message}*"'
+  '9000': 'IT''S OVER 9000!!! (messages) {nick}
+
+    "9,000: *{message}*"'
+  '9200': 'Do your thumbs have abs yet {nick}?
+
+    "9,200: *{message}*"'
+  '9400': 'I bet you dream in Discord notifications {nick}.
+
+    "9,400: *{message}*"'
+  '9600': 'At 9,600 messages, you''ve basically written a novel {nick}.
+
+    "9,600: *{message}*"'
+  '9800': 'Almost at 10k {nick}... what have you done with your life?
+
+    "9,800: *{message}*"'
+  '10000': '10,000 messages {nick}. That''s... actually impressive in a concerning way.
+
+    "*{message}*"
+
+    Maybe consider a hobby that doesn''t involve a keyboard?'
+  '10500': 'Okay we''re in uncharted territory now {nick}...
+
+    "10,500: *{message}*"'
+  '11000': '11,000 messages {nick}. Are you getting paid for this?
+
+    "11,000: *{message}*"'
+  '11500': 'I stopped being impressed around 8,000 {nick}.
+
+    "11,500: *{message}*"'
+  '12000': '12,000 messages {nick}. Congrats, I guess.
+
+    "12,000: *{message}*"'
+  '12500': 'Your commitment to wasting time is unmatched {nick}.
+
+    "12,500: *{message}*"'
+  '13000': '13,000 messages {nick}. Unlucky number for your productivity.
+
+    "13,000: *{message}*"'
+  '13500': 'Sleep is for quitters, right {nick}?
+
+    "13,500: *{message}*"'
+  '14000': '14,000 messages {nick}. At least you''re consistent.
+
+    "14,000: *{message}*"'
+  '14500': 'Do you even read what you type anymore {nick}?
+
+    "14,500: *{message}*"'
+  '15000': '15,000 messages {nick}. I don''t even know what to say anymore.
+
+    "*{message}*"
+
+    This is beyond help.'
+  '15500': '{nick} still going? Impressive dedication to pointlessness.
+
+    "15,500: *{message}*"'
+  '16000': '16,000 messages {nick}. Your parents must be so proud.
+
+    "16,000: *{message}*"'
+  '16500': 'Are you documenting your entire life in here {nick}?
+
+    "16,500: *{message}*"'
+  '17000': '17,000. Just... why {nick}?
+
+    "17,000: *{message}*"'
+  '17500': 'I''ve given up trying to understand you {nick}.
+
+    "17,500: *{message}*"'
+  '18000': '18,000 messages {nick}. This is performance art at this point.
+
+    "18,000: *{message}*"'
+  '18500': 'Do you get carpal tunnel insurance {nick}?
+
+    "18,500: *{message}*"'
+  '19000': '19,000. Almost at 20k. Why am I even counting anymore {nick}?
+
+    "19,000: *{message}*"'
+  '19500': 'Your keyboard manufacturer should sponsor you {nick}.
+
+    "19,500: *{message}*"'
+  '20000': '20,000 messages {nick}. Twenty thousand. That''s a small novel.
+
+    "*{message}*"
+
+    Seek help.'
+  '20500': 'We''re in the endgame now {nick}. Or are we?
+
+    "20,500: *{message}*"'
+  '21000': '21,000. I stopped being surprised a long time ago {nick}.
+
+    "21,000: *{message}*"'
+  '21500': 'Your dedication to mediocrity is unparalleled {nick}.
+
+    "21,500: *{message}*"'
+  '22000': '22,000 messages {nick}. This is just sad now.
+
+    "22,000: *{message}*"'
+  '22500': 'I wonder if you dream about Discord {nick}.
+
+    "22,500: *{message}*"'
+  '23000': '23,000. Getting close to something, {nick}. Not sure what.
+
+    "23,000: *{message}*"'
+  '23500': 'Your life choices concern me {nick}.
+
+    "23,500: *{message}*"'
+  '24000': '24,000 messages {nick}. One more thousand to go.
+
+    "24,000: *{message}*"'
+  '24500': 'So close to 25k {nick}. So far from a meaningful existence.
+
+    "24,500: *{message}*"'
+  '25000': '25,000 messages {nick}. 
+
+    "*{message}*"
+
+    Congratulations. You''ve achieved absolutely nothing.'
 thank_you_responses:
   excessive:
   - Okay buddy chill
