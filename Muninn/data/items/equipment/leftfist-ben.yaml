@@ -1,0 +1,10 @@
+name: Left Fist
+type: equipment
+description: Your left fist.
+slot: hand
+base_price: 999
+actions:
+- name: Punch
+  description: Take a swing at your enemy, gangsta style.
+  damage: 2
+  defense: -2

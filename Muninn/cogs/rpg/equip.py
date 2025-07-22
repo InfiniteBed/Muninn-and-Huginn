@@ -1,71 +1,167 @@
-from discord.ext import commands
+import sqlite3
+import json
+import math
+import os
+
+from icecream import ic
+
 import discord
+from discord import app_commands
+from discord.ext import commands
+from discord.ui import View, Button
 
 class Equip(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.search = bot.get_cog('Search') # For User Find
-        self.utils = bot.get_cog('Utils') # For Player's Icon
-        self.stats_manager = self.bot.get_cog("StatsManager") # For Player Info
-            # fetch_user_stats(user)
-        self.list_manager = self.bot.get_cog("ListManager") # For Item and Expedition Info
-            # get_expedition(expedition: str)
-            # get_item(item: str)
+        self.user_manager = self.bot.get_cog("StatsManager")
+        self.data_manager = self.bot.get_cog("DataManager") 
+        self.item_manager = self.bot.get_cog("ItemRandomizer") 
 
-    async def ask_slot(self, ctx, item):
-        ### Establish which slots are available to equip based on the item's slot value
-        ### If hands, ask which hand to equip it to.
-        ### Then, Swap item slot and inventory locations
-        user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
+    @commands.hybrid_command(name="equip", description="Equip a weapon or armor piece to your character.")
+    async def equip(self, interaction):
         
-        
-    @commands.command()
-    async def equip(self, ctx, item_index: int):
-        user_stats = await self.stats_manager.fetch_user_stats(ctx.author)
-        item_index = item_index-1
-        item = user_stats['inventory'][item_index]
-
-        # Search the player’s inventory for the requested item
-        # If the item is not found, send an error message and return
-        if not item or not user_stats['inventory'][item_index]:
-            await ctx.send("Item not found!")
-            return
-
-        # Verify the item is equippable (like a weapon, armor, etc.)
-        # If it’s not, send an error message and return
-        if item['slot'] == 'consumable':
-            await ctx.send("Item is not equippable!")
-
-        # Ask the player which slot they want to equip the item in (if there are multiple valid slots)
-        # This could be weapon, armor, accessory, etc.
-        item_slot = item['slot']
-        wanted_slot = [item_slot]
-
-        if item_slot == 'hand':
-            await ctx.send('What hand will you equip the item to?')
-
-            def check(message):
-                return message.author == ctx.author and message.channel == ctx.channel
+        async def equip(interaction, user_stats, item_slot, item):
+            await self.user_manager.equip_from_inventory(interaction, interaction.user.id, user_stats, item_slot, item)
             
-            while True:
-                response = await self.bot.wait_for('message', check=check)
-                if 'left' in response.content.lower():
-                    print('Left')
-                    wanted_slot = 'hand_left'
-                    break
-                elif 'right' in response.content.lower():
-                    print('Right')
-                    wanted_slot = 'hand_right'
-                    break
-                else:
-                    await ctx.send("Please specify 'left' or 'right'.")
+            success_embed = discord.Embed(title=f"{user_stats['profile_name']} placed the equipment at his {item_slot}!",
+                                          color=discord.Color.green()) 
+            
+            return success_embed
+        
+        async def equip_item_handy(user_stats, item, items):
+            if item['slot'] != 'hand':
+                embed = await equip(interaction, user_stats, item['slot'], item)
+                return embed, None
+            else:
+                embed = discord.Embed(title=f"Which hand will {user_stats['profile_name']} use to hold the item?", color=0xFE1755)
+                
+                class Handiness(View):
+                    def __init__(self):
+                        super().__init__()
+                    
+                    @discord.ui.button(label="Left Hand", style=discord.ButtonStyle.green)
+                    async def left(self, interaction: discord.Interaction, button: Button):
+                        embed = await equip(interaction, user_stats, 'hand_left', item)
+                        await interaction.response.edit_message(embed=embed, view=None)
+                        
+                    @discord.ui.button(label="Right Hand", style=discord.ButtonStyle.green)
+                    async def right(self, interaction: discord.Interaction, button: Button):
+                        embed = await equip(interaction, user_stats, 'hand_right', item)
+                        await interaction.response.edit_message(embed=embed, view=None)
+                        
+                    @discord.ui.button(label="Return", style=discord.ButtonStyle.red)
+                    async def back(self, interaction: discord.Interaction, button: Button):
+                        embed, view = await build_page_embed(user_stats, 1, items)
+                        await interaction.response.edit_message(embed=embed, view=view)
+                        
+                view = Handiness()
+                
+                return embed, view
+                
+                
+        async def build_page_embed(user_stats, page, items):
+            page_beginning_index = (5 * (page-1))
+            total_pages = math.ceil(len(items)/5)
+            eval_item_index = page_beginning_index
+            description = ""
+            page_item_count = 1
+            
+            for i in range(5):
+                if ((i+1)*page) > (len(items)):
+                    continue
+                item = items[eval_item_index]
+                
+                item_data = await self.data_manager.find_data(item['type'], item['name'])
+                prefix = item.get('prefix', '')  # Get the prefix if available
+                ic(description, item['description'])
+                description += (f"**{(i+1)*page}. *{prefix}* {item['name']}** - {item['description']}\n")
+                
+                eval_item_index += 1
+                page_item_count += 1
+                
+            ic(page_item_count)
 
-        # Move the new item from inventory to the equipped slot
-        await self.stats_manager.equip(ctx, wanted_slot, item)
+            embed = discord.Embed(title=f"{user_stats['profile_name']}'s Equippable Items - Page {page}", description=description, color=0xFE1736)
+            
+            class MarketView(View):
+                def __init__(self):
+                    super().__init__()
+                    self.page = page
+                
+                @discord.ui.button(label=f"{((page-1)*5)+1}", style=discord.ButtonStyle.blurple)
+                async def first_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await equip_item_handy(user_stats, items[((self.page-1)*5)+0], items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{((page-1)*5)+2}", style=discord.ButtonStyle.blurple)
+                async def second_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await equip_item_handy(user_stats, items[((self.page-1)*5)+1], items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{((page-1)*5)+3}", style=discord.ButtonStyle.blurple)
+                async def third_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await equip_item_handy(user_stats, items[((self.page-1)*5)+2], items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{((page-1)*5)+4}", style=discord.ButtonStyle.blurple)
+                async def fourth_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await equip_item_handy(user_stats, items[((self.page-1)*5)+3], items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"{((page-1)*5)+5}", style=discord.ButtonStyle.blurple)
+                async def fifth_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await equip_item_handy(user_stats, items[((self.page-1)*5)+4], items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
+                async def prev_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await self.build_page_embed(user_stats, page-1, items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+            
+                @discord.ui.button(label=f"Next", style=discord.ButtonStyle.grey)
+                async def next_button(self, interaction: discord.Interaction, button: Button):
+                    embed, view = await self.build_page_embed(user_stats, page+1, items)
+                    await interaction.response.edit_message(embed=embed, view=view)
+                    
+            view = MarketView()
+            
+            buttons = [
+                view.first_button,
+                view.second_button,
+                view.third_button,
+                view.fourth_button,
+                view.fifth_button
+            ]
 
-        # Apply the item’s bonuses or effects to the player’s stats
-
-        # Send a confirmation message that the item was successfully equipped
+            # Disable the last `i` buttons
+            for btn in buttons[-(page_item_count):]:
+                btn.disabled = True
+            
+            if page == 1:
+                view.prev_button.disabled = True
+            if page == total_pages:
+                view.next_button.disabled = True
+        
+            return embed, view
+        
+        datapath = './data/recipes'
+        
+        user_stats = await self.user_manager.fetch_user_stats(interaction.author)
+        sanitized = []
+        for item in user_stats['inventory']:
+            if item['type'] == 'equipment':
+                sanitized.append(item)
+                print('Added item to sanitized list') 
+        embed, view = await build_page_embed(user_stats, 1, sanitized)
+        await interaction.send(embed=embed, view=view)        
+        
+        
+        ## Load all data, place into "subfolder" structure;
+        ## Check user's proficiency level in the certain area if required\
+        
+                
+        ## Display 
+        
 
 async def setup(bot):
     await bot.add_cog(Equip(bot))

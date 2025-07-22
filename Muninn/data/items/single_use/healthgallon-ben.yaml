@@ -1,0 +1,5 @@
+name: Health Gallon
+description: A large container of health-restoring liquid. Restores 10 health points when consumed.
+type: consumable
+base_heal: 10
+base_price: 40

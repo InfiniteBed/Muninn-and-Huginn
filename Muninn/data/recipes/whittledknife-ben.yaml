@@ -1,0 +1,6 @@
+name: Whittled Knife
+type: equipment
+skill: woodworking
+recipe:
+- name: Branch
+  amount: 1

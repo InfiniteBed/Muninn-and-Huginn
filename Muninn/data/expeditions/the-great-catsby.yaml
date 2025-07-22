@@ -1,0 +1,59 @@
+name: The Great Catsby
+description:
+  male: Duchess Trailter's eight cats all ran away while she was out picking prunes.
+    Help her find them, and she might give {name} a small reward.
+  female: Duchess Trailter's eight cats all ran away while she was out picking prunes.
+    Help her find them, and she might give {name} a small reward.
+cost: 0
+location: Castle Town Mardo
+hours: 3
+ability_test: Dexterity
+difficulty: easy
+results:
+  major fail:
+    text:
+      male:
+      - '{name} wasn''t able to find a single cat.'
+      - In fact, Duchess Trailter is convinced {name} only scared her cat off more.
+      female:
+      - '{name} wasn''t able to find a single cat.'
+      - In fact, Duchess Trailter is convinced {name} only scared her cat off more.
+    coins: 0
+    contributor: Ben
+  fail:
+    text:
+      male:
+      - '{name} wasn''t able to find a single cat.'
+      - The Duchess being rich and old, she still rewarded {name}'s efforts with a
+        small amount of coin.
+      female:
+      - '{name} wasn''t able to find a single cat.'
+      - The Duchess being rich and old, she still rewarded {name}'s efforts with a
+        small amount of coin.
+    coins: 5
+    contributor: Ben
+  success:
+    text:
+      male:
+      - '{name} was able to find all of Duchess Trailter''s cats, albeit not without
+        a few scratches.'
+      - She's well-pleased with {name}'s efforts.
+      female:
+      - '{name} was able to find all of Duchess Trailter''s cats, albeit not without
+        a few scratches.'
+      - She's well-pleased with {name}'s efforts.
+    coins: 20
+    health: -2
+    contributor: Ben
+  major success:
+    text:
+      male:
+      - '{name} was able to find all Trailter''s cats, and {name} even brought back
+        a few more strays for her to take care of.'
+      - She rewards {name}'s efforts greatly.
+      female:
+      - '{name} was able to find all Trailter''s cats, and {name} even brought back
+        a few more strays for her to take care of.'
+      - She rewards {name}'s efforts greatly.
+    coins: 30
+    contributor: Ben

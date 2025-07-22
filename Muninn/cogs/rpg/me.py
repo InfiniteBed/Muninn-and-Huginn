@@ -1,4 +1,5 @@
 import discord  # type: ignore
+from discord import app_commands
 from discord.ext import commands  # type: ignore
 from discord.ui import View, Button
 import sqlite3
@@ -6,6 +7,8 @@ from datetime import datetime, timedelta
 import json
 import random
 from dateutil import parser  # Add this import
+from icecream import ic
+import re
 
 class Status(commands.Cog):
     def __init__(self, bot):
@@ -14,19 +17,26 @@ class Status(commands.Cog):
         self.utils = bot.get_cog('Utils')
         self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = bot.get_cog("StatsManager")
-        self.list_manager = bot.get_cog("ListManager")  # Add direct reference to ListManager
+        self.data_manager = self.bot.get_cog("DataManager")
+        
+    def format_gendered(self, text, gender):
+        pattern = re.compile(r'\[([^\[\]]+?)\]')
+        gender_index = 0 if gender.lower() == 'm' else 1
 
-    @commands.command(name="status", aliases=["me"])
-    async def status(self, ctx, user: str = None):
+        def replace(match):
+            options = match.group(1).split('|')
+            return options[gender_index]
+
+        return pattern.sub(replace, text)
+
+    @commands.hybrid_command(name="me", aliases=["status"], description="View your own or another user's status.")
+    @app_commands.describe(user="The user to check status of")
+    async def status(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
-        else:
-            user = await self.search.find_user(user, ctx.guild)
-            if not user:
-                await ctx.send("No profile found.")
-                return
 
         user_stats = await self.stats_manager.fetch_user_stats(user)
+        
         if not user_stats:
             error_embed = discord.Embed(
                 title="Error",
@@ -47,33 +57,32 @@ class Status(commands.Cog):
         main_embed.add_field(name="Expedition", value="Active" if user_stats['activity'] else "Idle", inline=True)
 
         # Expedition page embed
-        expedition_embed = discord.Embed(title="Expedition Details", color=embed_color)
+        expedition_embed = discord.Embed(title="Activity Details", color=embed_color)
         expedition_completed = False
+        activity_data = False
         expedition_name = None
         if user_stats['activity'] and user_stats['activity'] != "{}":
-            activity_data = eval(user_stats['activity'])
-            expedition_name = activity_data.get('expedition_name')
-            start_time_str = activity_data.get('start_time')
-            expedition_details = activity_data.get('expedition_details', {})
-            start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
+            activity_data = json.loads(user_stats['activity'])
+            expedition_name = activity_data['name']
+            end_time = datetime.strptime(str(activity_data['end_time']), "%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()
-            california_time = await self.timezone_converter.convert_time(start_time_str)
+            california_time = await self.timezone_converter.convert_time(str(end_time))
             # Adjust parsing to handle timezone abbreviations
             california_time = parser.parse(california_time)  # Use dateutil.parser to parse the time
             formatted_start_time = california_time.strftime("%b. %d at %I:%M %p")
-            time_remaining = start_time - current_time
+            time_remaining = end_time - current_time
             rounded_time_remaining = timedelta(seconds=round(time_remaining.total_seconds()))
             formatted_time_remaining = str(rounded_time_remaining).split(".")[0]
 
-            expedition_embed.add_field(name="Expedition Name", value=expedition_name, inline=True)
+            expedition_embed.add_field(name="Activity Name", value=expedition_name, inline=True)
             expedition_embed.add_field(name="End Time", value=formatted_start_time, inline=False)
-            expedition_embed.add_field(name="Time Remaining", value=formatted_time_remaining if start_time > current_time else "Complete!", inline=True)
+            expedition_embed.add_field(name="Time Remaining", value=formatted_time_remaining if end_time > current_time else "Complete!", inline=True)
             expedition_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
 
-            if start_time <= current_time:
+            if end_time <= current_time:
                 expedition_completed = True
         else:
-            expedition_embed.add_field(name="Expedition", value="No active expedition.", inline=False)
+            expedition_embed.add_field(name="Activity", value="The world awaits your next actions...", inline=False)
             expedition_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
 
         # Info page embed
@@ -85,6 +94,21 @@ class Status(commands.Cog):
         info_embed.add_field(name="Ability Scores", value=user_stats['scores_display'], inline=True)
         info_embed.add_field(name="Bio", value=user_stats['bio'], inline=True)
 
+        # Profession page embed
+        professions_clean = ["📚 Author", "🥖 Baking", "☕️ Brewing", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]
+
+        professions_str = ""
+        query = f"SELECT * FROM proficiencies WHERE user_id = ?"
+        conn = sqlite3.connect('discord.db')
+        c = conn.cursor()
+        result = c.execute(query, (user.id,)).fetchall()[0]
+        conn.close()
+        
+        for index, profession_name in enumerate(professions_clean):
+            professions_str += f"{profession_name}: `{result[index+1]}`\n"
+            
+        professions_embed = discord.Embed(title="Character Professions", color=embed_color, description=professions_str)
+        professions_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
         # Helper function to format equipped items
         def format_item(item):
             """Format an item with its prefix, name, and actions."""
@@ -129,6 +153,9 @@ class Status(commands.Cog):
         # Ensure each item in the inventory is a dictionary
         parsed_inventory = []
         for item in user_inventory:
+            ic(item)
+            if item['type'] == 'crafting':
+                continue
             if isinstance(item, str):
                 try:
                     parsed_inventory.append(json.loads(item))  # Parse string items as JSON
@@ -151,12 +178,13 @@ class Status(commands.Cog):
             if page_items:
                 inventory_list = []
                 for index, item in enumerate(page_items, start=1):
-                    item_data = await self.list_manager.get_item_data(item['name'])
+                    item_data = await self.data_manager.find_data(item['type'], item['name'])
                     description = item_data['description']
                     prefix = item.get('prefix', '')  # Get the prefix if available
                     heal_info = f" (Heals: {item.get('base_heal')} HP)" if item.get('base_heal') else ""
                     inventory_list.append(f"**{index + start_index}. *{prefix}* {item['name']}** - {description}{heal_info}".strip())
                 inventory_embed.description = "\n".join(inventory_list)
+                inventory_embed.set_footer(text="Use !equip to outfit your character")
             else:
                 inventory_embed.description = "Your inventory is empty."
             return inventory_embed, page_items
@@ -239,11 +267,13 @@ class Status(commands.Cog):
                         self.remove_item(child)
 
                 for index, item in enumerate(self.current_items):
+                    if item['type'] == 'equipment':
+                        continue
                     row = index // 5
                     if row >= 4:
                         break
                     custom_id = f"use_item_{index}"
-                    button = CustomButton(label=f"Use {item['name']}", style=discord.ButtonStyle.success, row=row, custom_id=custom_id)
+                    button = CustomButton(label=f"Consume {item['prefix']} {item['name']}", style=discord.ButtonStyle.blurple, row=row, custom_id=custom_id)
                     button.callback = self.create_button_callback(index)
                     self.add_item(button)
 
@@ -266,10 +296,7 @@ class Status(commands.Cog):
                 if not await self.ensure_correct_user(interaction):
                     return
 
-                # Acknowledge the interaction to prevent "This interaction failed" errors
-                await interaction.response.defer()
-
-                if item.get("slot") == "consumable":
+                if item.get("type") == "single_use":
                     # Fetch the user's current stats
                     user_stats = await self.navigation_view.parent_cog.stats_manager.fetch_user_stats(self.profile_user)
                     current_health = user_stats['health']
@@ -277,13 +304,12 @@ class Status(commands.Cog):
 
                     # Check if the user's health is already at maximum
                     if current_health >= max_health:
-                        # Send a red embed indicating the user cannot heal
                         max_health_embed = discord.Embed(
                             title="Cannot Use Item",
                             description=f"Your health is already at maximum (**{current_health}/{max_health}**).",
                             color=discord.Color.red()
                         )
-                        await interaction.followup.send(embed=max_health_embed, ephemeral=True)
+                        await interaction.response.send_message(embed=max_health_embed, ephemeral=True)
                         return
 
                     # Apply the healing effect
@@ -300,7 +326,7 @@ class Status(commands.Cog):
                         description=f"You used **{item['name']}** and healed for **{heal_amount} HP**.\nYour current health is now **{updated_health}**.",
                         color=discord.Color.green()
                     )
-                    await interaction.followup.send(embed=heal_embed, ephemeral=True)
+                    await interaction.response.send_message(embed=heal_embed, ephemeral=True)
 
                     # Remove the used item from the inventory
                     self.current_items.remove(item)
@@ -321,14 +347,21 @@ class Status(commands.Cog):
                     else:
                         self.current_items = []
 
+                if item.get("type") == "equipment":
+                    if item.get("slot") == "hand":
+                        return
+
+                    await self.navigation_view.parent_cog.stats_manager.equip_from_inventory(ctx, ctx.author, item['slot'], item)
+
                 # Redirect to the main page after using the item
                 await interaction.message.edit(embed=self.navigation_view.main_embed, view=self.navigation_view)
 
         # Button view for top-level navigation
         class NavigationView(View):
-            def __init__(self, profile_user, expedition_completed, expedition_name=None, parent_cog=None, main_embed=None):
+            def __init__(self, profile_user, expedition_completed, activity_data, parent_cog=None, main_embed=None):
                 super().__init__(timeout=180)
                 self.profile_user = profile_user
+                self.activity_data = activity_data
                 self.expedition_completed = expedition_completed
                 self.expedition_name = expedition_name
                 self.parent_cog = parent_cog  # Reference to the parent cog
@@ -344,104 +377,142 @@ class Status(commands.Cog):
                         else:
                             child.style = discord.ButtonStyle.secondary  # Reset other buttons
 
-            @discord.ui.button(label="Main", style=discord.ButtonStyle.primary)
+            @discord.ui.button(label="Main", style=discord.ButtonStyle.primary, row=0)
             async def main_button(self, interaction: discord.Interaction, button: Button):
                 self.current_menu = "Main"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=self.main_embed, view=self)
 
-            @discord.ui.button(label="Expedition", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Activity", style=discord.ButtonStyle.secondary, row=0)
             async def expedition_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Expedition"
+                self.current_menu = "Activity"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=expedition_embed, view=self)
 
-            @discord.ui.button(label="Info", style=discord.ButtonStyle.secondary)
-            async def info_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Info"
-                self.update_button_styles()
-                await interaction.response.edit_message(embed=info_embed, view=self)
-
-            @discord.ui.button(label="Equipped Items", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Gear", style=discord.ButtonStyle.secondary, row=0)
             async def equipped_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Equipped Items"
+                self.current_menu = "Gear"
                 self.update_button_styles()
                 await interaction.response.edit_message(embed=equipped_embed, view=self)
 
-            @discord.ui.button(label="Inventory", style=discord.ButtonStyle.secondary)
+            @discord.ui.button(label="Pack", style=discord.ButtonStyle.secondary, row=0)
             async def inventory_button(self, interaction: discord.Interaction, button: Button):
-                self.current_menu = "Inventory"
+                self.current_menu = "Pack"
                 self.update_button_styles()
                 inventory_view = InventoryView(self.profile_user, self)
                 await inventory_view.initialize_inventory()
                 await interaction.response.edit_message(embed=inventory_view.current_embed, view=inventory_view)
 
+            @discord.ui.button(label="Character Info", style=discord.ButtonStyle.secondary, row=1)
+            async def info_button(self, interaction: discord.Interaction, button: Button):
+                self.current_menu = "Character Info"
+                self.update_button_styles()
+                await interaction.response.edit_message(embed=info_embed, view=self)
+
+            @discord.ui.button(label="Professions", style=discord.ButtonStyle.secondary, row=1)
+            async def professions_button(self, interaction: discord.Interaction, button: Button):
+                self.current_menu = "Professions"
+                self.update_button_styles()
+                await interaction.response.edit_message(embed=professions_embed, view=self)
+
             # Add a button for expedition results if the expedition is completed
             if expedition_completed:
-                @discord.ui.button(label="Expedition Results", style=discord.ButtonStyle.success)
+                @discord.ui.button(label="Activity Results", style=discord.ButtonStyle.success, row=3)
                 async def expedition_results_button(self, interaction: discord.Interaction, button: Button):
-                    if not self.parent_cog:
-                        return
+                
+                    await self.parent_cog.process_activity(ctx, user, activity_data)
+                        
+                    if activity_data['type'] == 'gathering':
+                        embed = discord.Embed(title=f"Gathering in {activity_data['name']} Complete!", color=discord.Color.orange())
+                        considered_items = []
+                        got_items_str = ""
+                        got_item = False
+                        
+                        for item in activity_data['item_results']:
+                            got_item = True
+                            if item not in considered_items:
+                                got_items_str += f"**`{activity_data['item_results'].count(item)}`** {item['name']}\n" 
+                                considered_items.append(item)
 
-                    # Calculate expedition results
-                    result, roll_for_result, name, pronoun, pronoun_possessive, formatted_text = await self.parent_cog.calculate_expedition_results(
-                        self.profile_user, self.expedition_name
-                    )
-
-                    # Determine embed color based on result type
-                    color_map = {
-                        "major success": discord.Color.green(),
-                        "success": discord.Color.dark_green(),
-                        "fail": discord.Color.dark_red(),
-                        "major fail": discord.Color.red()
-                    }
-                    embed_color = color_map.get(roll_for_result, discord.Color.blue())
-
-                    # Prepare the results embeds
-                    embeds = []
-                    current_description = ""
-                    for paragraph in formatted_text:
-                        if len(current_description) + len(paragraph) + 2 > 4096:  # Split if adding the paragraph exceeds 4096 characters
-                            embed = discord.Embed(
-                                title="Expedition Results",
-                                description=current_description,
-                                color=embed_color
-                            )
-                            embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
-                            embeds.append(embed)
-                            current_description = paragraph
+                        if not got_item:
+                            embed.add_field(name=f"{user_stats['profile_name']} did not find any items!", value="Better luck next time...")
+                            embed.set_footer(text=f"Maybe {user_stats['profile_name']} should try exploring for longer...")
                         else:
-                            current_description += f"\n\n{paragraph}"
+                            embed.add_field(name="Got Items:", value=got_items_str)
 
-                    # Add the last embed if there's remaining content
-                    if current_description:
-                        embed = discord.Embed(
-                            title="Expedition Results",
-                            description=current_description,
-                            color=embed_color
-                        )
-                        embed.set_thumbnail(url="attachment://image.png" if self.profile_user.avatar else self.profile_user.avatar.url)
-                        embeds.append(embed)
+                        await interaction.response.send_message(embed=embed)
 
-                    # Add outcome, coins, and damage to the first embed
-                    if embeds:
-                        embeds[0].add_field(name="Outcome", value=roll_for_result.replace("_", " ").title(), inline=False)
-                        embeds[0].add_field(name="Coins Earned", value=f"{result.get('coins', 0)} coins", inline=True)
-                        embeds[0].add_field(name="Damage Taken", value=f"{result.get('health', 0)} health", inline=True)
+                    if activity_data.get('type') == 'job_search':
+                        if activity_data['got_job']:
+                            await self.parent_cog.stats_manager.add_available_job(ctx, interaction.user, activity_data['job_name'])
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} found a job!", 
+                                                  color=discord.Color.green())
+                            embed.add_field(name=activity_data['job_name'], value=activity_data['introduction'])
+                            embed.add_field(name="Congratulations, now you can go work a job!", value="You're able to work up to three jobs at once. Open the `!go` menu, and click `Apply` to place a job into your three job slots. Then, begin working with the `Work` button.")
+                            await interaction.response.send_message(embed=embed)
+                        else:
+                            embed = discord.Embed(title=f"{user_stats['profile_name']} wasn't able to find a job!", 
+                                                  description=f"{user_stats['profile_name']} searched far and wide, but was unable to find a job.\nMaybe {user_stats['pronoun']} should try searching for longer...", 
+                                                  color=discord.Color.red())
+                            await interaction.response.send_message(embed=embed)
+                    
+                    if activity_data.get('type') == 'job':
+                        await self.parent_cog.stats_manager.job_progress_increase(ctx.author.id, activity_data)
+                        description = ""
+                        proficiency = activity_data.get('proficiency')
+                        current_xp = await self.parent_cog.stats_manager.get_proficiency(interaction.user, proficiency)
+                        story_progress_int = await self.parent_cog.stats_manager.get_job_progress(ctx.author.id, activity_data)
+                        is_promotion = activity_data.get('is_promotion')
+                        new_xp = activity_data.get('xp_change') + current_xp
+                        
+                        username = user_stats['profile_name']
+                        pclass = user_stats['class']
+                        race = user_stats['race']
+                        
+                        ic(is_promotion)
+                                                                                        
+                        if is_promotion:
+                            description += f"**{user_stats['profile_name']} got a raise to {activity_data['promotion_title']}!**\n\n"
+                        if activity_data.get('xp_change'):
+                            description += f"Increased **{activity_data['proficiency'].title()}** proficiency by `{activity_data['xp_change']}`.\n\n"
 
-                    # Remove all buttons after showing results
-                    self.clear_items()
+                        if activity_data.get('result'):
+                            result = str.format(activity_data.get('result'), name=username, pclass=pclass, race=race)
+                            result = self.parent_cog.format_gendered(result, user_stats['gender_letter'])
+                            
+                        embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
+                                              description=description, 
+                                              color=discord.Color.green())
+                        
+                        class SeeExpeditionResults(View):
+                            def __init__(self):
+                                super().__init__(timeout=None)
+                            
+                            @discord.ui.button(label="See Expedition Results", style=discord.ButtonStyle.blurple)
+                            async def accept_button(self, interaction: discord.Interaction, button: Button):
+                                await interaction.response.edit_message(view=None)
+                                
+                                if len(result) <= 2000:
+                                    await ctx.send(result)
+                                    return
 
-                    # Send the embeds sequentially
-                    try:
-                        for embed in embeds:
-                            if interaction.response.is_done():
-                                await interaction.followup.send(embed=embed)
-                            else:
-                                await interaction.response.send_message(embed=embed)
-                    except discord.errors.NotFound:
-                        print("[ERROR] Interaction webhook expired or invalid. Unable to send expedition results.")
+                                lines = result.split('\n')
+                                chunk = ""
+                                for line in lines:
+                                    if len(chunk) + len(line) + 1 > 2000:
+                                        await ctx.send(chunk)
+                                        chunk = line + "\n"
+                                    else:
+                                        chunk += line + "\n"
 
+                                if chunk:
+                                    await ctx.send(chunk)
+                            
+
+                        view = SeeExpeditionResults()
+                        
+                        await interaction.response.edit_message(embed=embed, view=view)
+                        
                     # Delete the expedition from the database
                     await self.parent_cog.delete_expedition_from_database(self.profile_user.id)
 
@@ -452,61 +523,8 @@ class Status(commands.Cog):
                     return False
                 return True
 
-        navigation_view = NavigationView(user, expedition_completed, expedition_name=expedition_name, parent_cog=self, main_embed=main_embed)
+        navigation_view = NavigationView(user, expedition_completed, activity_data, parent_cog=self, main_embed=main_embed)
         await ctx.send(file=file, embed=main_embed, view=navigation_view)
-
-    async def calculate_expedition_results(self, user, expedition_name):
-        expedition = await self.list_manager.get_expedition(expedition_name)
-        print (expedition_name)
-        print (expedition)
-        if "error" in expedition:
-            print(f"[ERROR] Expedition not found: {expedition_name}")
-            return {"error": "Expedition not found"}
-
-        user_stats = await self.stats_manager.fetch_user_stats(user)
-        name = user_stats['profile_name']
-        pronoun = user_stats['pronoun']
-        pronoun_possessive = user_stats['pronoun_possessive']
-        gender = "male" if pronoun.lower() in ["he", "him"] else "female"
-
-        ability_test = expedition['ability_test']
-        ability_scores = user_stats['ability_scores']
-
-        roll_for_result = self.simulate_ability_check(ability_test, ability_scores)
-
-        results = expedition.get('results', {})
-        result = results.get(roll_for_result, {
-            'text': {'male': ['No result text available.'], 'female': ['No result text available.']},
-            'coins': 0,
-            'health': 0
-        })
-
-        # Apply stat changes
-        await self.stats_manager.modify_user_stat(user, 'coins', result.get('coins', 0))
-        await self.stats_manager.modify_user_stat(user, 'health', -result.get('health', 0))
-
-        # Format the result text based on gender
-        formatted_text = [
-            paragraph.format(name=name, pronoun=pronoun, pronoun_possessive=pronoun_possessive)
-            for paragraph in result['text'].get(gender, ['No result text available.'])
-        ]
-
-        return result, roll_for_result, name, pronoun, pronoun_possessive, formatted_text
-
-    def simulate_ability_check(self, ability, user_ability_scores):
-        if ability in user_ability_scores:
-            score = user_ability_scores[ability]
-            roll = random.randint(1, 20)
-            total = roll + score
-            if total >= 25:
-                return 'major success'
-            elif total >= 18:
-                return 'success'
-            elif total >= 12:
-                return 'fail'
-            else:
-                return 'major fail'
-        return 'fail'
 
     async def update_inventory_in_database(self, user_id, updated_inventory):
         """Update the user's inventory in the inventory table."""
@@ -534,6 +552,24 @@ class Status(commands.Cog):
             print(f"[ERROR] Failed to delete expedition from database: {e}")
         finally:
             conn.close()
+        
+    async def process_activity(self, ctx, user, activity_data):
+        conn = sqlite3.connect('discord.db')
+        cursor = conn.cursor()
+        
+        if activity_data.get('xp_change'):
+            await self.stats_manager.proficency_increase(user, activity_data.get('proficiency'), activity_data.get('xp_change'))
+
+        if activity_data.get('item_results'):
+            for item in activity_data['item_results']:
+                ic(item)
+                self.stats_manager.add_to_user_inventory(user.id, item)
+        
+        if activity_data.get('coins_change'):
+            await self.stats_manager.modify_user_stat(user, "coins", activity_data['coins_change'])
+
+        if activity_data.get('health_change'):
+            await self.stats_manager.modify_user_stat(user, "health", activity_data['health_change'])
 
 async def setup(bot):
     await bot.add_cog(Status(bot))

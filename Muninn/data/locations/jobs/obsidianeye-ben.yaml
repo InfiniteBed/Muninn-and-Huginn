@@ -1,0 +1,61 @@
+name: Obsidian Eye
+introduction: The public health council seems to be in dire need of yet another paper-pusher.
+proficiency: "vigilance"
+results:
+  - text: |
+      The office seemed to be entirely consisting of paper-pushing and letter-sending. The one who interviewed {name} gave [him|her] some scant introductions to the job, and promptly left. The whole day was spent summarizing letters from regions around Arinoden. The pay was quite meager for this kind of work. [He|She] debates even returning the next day.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      Today's work was more of the same. {name} spent the entirety of the workday compiling letters and constructing reports about the regions' overall health. Even worse, [his|her] coworkers offer little talk. Any attempts to engage were quickly quenched.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      More papers were compiled today. {name} begin to note some of the northern regions are submitting fewer letters than the southern and eastern.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      This job would be dreadfully boring, were it not for the letters [he|she] was able to read. Noting the small differences between how diplomats composed letters was the only thing keeping {name} interested.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      Someone *finally* talked to [him|her].
+
+      “Everything going well, {name}?” It was [his|her] employer, a lady who {name} recently discovered is named *Is’sthra*.
+
+      “Yes, it is.” [He|She] resisted complaining. This elf would probably not be so happy with murmuring on the job.
+
+      “Good. Keep up your work. You’ve done an excellent job with your reports.” She curtly walked away, not expecting [his|her] response.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      [His|Her] boss’s encouragement was a small uplift, but it didn’t make the job any less boring.
+
+      Nothing interesting happened.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      Nothing interesting happened.
+
+      Within {name}'s' pile of letters, one was written from the neighboring kingdom. [He|She] quickly placed it into the discard pile.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      Nothing interesting happened.
+
+      That letter is still sitting in the discard pile.
+    coins_change: 20
+    xp_change: 6
+    hours: 8
+  - text: |
+      The letter's gone from the discard pile. No one else's discard pile was emptied.
+    coins_change: 20
+    xp_change: 6
+    hours: 8

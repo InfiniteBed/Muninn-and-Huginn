@@ -1,0 +1,109 @@
+name: Ammy's Coffee
+introduction: Ammy has been looking for another coffee brewer for a while now.
+proficiency: brewing
+results:
+- text: |
+    {name} walked the small distance to the coffee shop, walking under the small awning and entering the quaint shop. Immediately, the strong smell of Montilian coffee is present throughout the shop. A few patrons are here, even so early in the morning. Some are relaxing, enjoying their coffee, and others seem to be scribing papers or making very important meetings. {name} approaches the counter, towards the small blue-plumed Aarakocra placing a steaming mug on the pickup counter.
+
+    "Oh, wonderful, you came!" She lifted the counter door, and stood aside to let [him|her] in.
+
+    She showed [him|her] around behind the counter, explaining the various grinders, presses, and machines. To start, she simply showed how to make a standard coffee; something she called the *Amstein Press.*
+
+    "That's the cup most will order. Maybe fifty... sixty percent of your orders. So you're already halfway there!"
+
+    For the next few hours, {name} and the blue-jay Aarakocra worked together, with her taking orders. She allowed {name} to look over her shoulder as she made the more difficult drinks—which wasn't very difficult, considering her height.
+
+    {name} learned a lot today.
+
+    "I'll see you tomorrow, {name}!" She said [he|she] walked out the door.
+    -# Written by Infinite_Bed
+  coins_change: 18
+  xp_change: 2
+  hours: 6
+- text: |
+    {name} headed to the coffee shop just a few hours after its open, close to the café's morning rush of business. Ammy greeting [him|her] as [he|she] entered.
+
+    "Morning, {name}! Thanks for coming in today."
+
+    Like before, {name} helped her make some of the easier orders, while she taught [him|her] some more advanced techniques. One order stuck out to [him|her], something called *The Halberd*. {name} decided to ask her about it.
+
+    "The Halberd? It's one of our stronger drinks. My dad always said that its 'sharp like a spear'." Her face glows in a slightly sorrow rememberance for just a moment, before returning to neutral. "I don't think it's that strong, but I also drink one every day," she laughs, "so i'm probably numb to it now."
+
+    {name} had noticed her sipping on coffee in between orders. That *Halberd* was probably what she was drinking.
+
+    The rest of the day went much smoother than yesterday, with {name} filling orders faster, and even remembering some of the more complicated drinks as well. [He|She] decided to stay for a while longer, just to help her close down the shop for today.
+
+    "Thank you so much for your help today. Truthfully, I never really thought I needed help until I brought someone new on. I really do appreciate your help, again." She led {name} outside the small coffee shop. "{name}... could you come in a bit earlier tomorrow to help me open up?"
+
+    [He|She] wasn't particularly busy as a {pclass}, anyway, so [he|she] accepted. Her familiar smile lit up again once [he|she] did.
+
+    "Thank you so much, {name}. I'll see you then!"
+    -# Written by Infinite_Bed
+  coins_change: 18
+  xp_change: 2
+  hours: 6
+- text: |
+    The early morning streets carry a busy air. Horse-drawn carriages take the morning stock of herbs and plants to the inner city. And in a thin street, a small coffee shop is just about to open.
+
+    "Oh, awesome! I didn't think you'd be here so early!""
+
+    {name} helps the avian open up for the day, dusting down wooden tables and setting out signs.
+
+    "Thank you for coming in so early," Ammy said with an almost ashamed look, "Wednesdays like these are always a bit too much in the mornings, so having you come in early really helps a lot."
+
+    Customers start to flow in, on cue. The two quickly settle into a rhythm, with Ammy taking orders and making the more complex drinks, and {name} making the simple coffees and taking on cleaning.
+
+    There was still a line ten to fifteen strong, far after morning turned to noon. {name} noticed Ammy's concerned scowl when she pulled herself from the front desk, and the way she moved with a rushed imprecision.
+
+    {name} also pushed [himself|herself] to move faster, hoping to clear the line before too long.
+
+    They both worked harder than they have the past few days, making cups, taking orders, and cleaning without too much error, and taking care to make it right when they did. Finally, the line died down to a managable size close to dinner time.
+
+    "Thank you so much for your help today," she said, wiping down a particularly spill-laden table. "I would've been swamped if you weren't here."
+
+    She handed {name} a sizable chunk of change, and saw [him|her] off.
+    -# Written by Infinite_Bed
+  coins_change: 22
+  xp_change: 3
+  hours: 8
+- text: |
+    {name} asked Ammy why Wednesdays were so busy.
+
+    "It's the market," she replied, as if it were a practiced response. She turned away, still speaking as she wiped down the counter,  "The market on the Woodmire Bridge is where most of the business comes from. When they restock every fourth of the week, there's a crowd up and down the road." She looks up for a moment, clearly picturing the crowd. 
+
+    "The Market," {name} echoed, "I think I've seen it on the way here. It's stays busy."
+
+    "It sure does. I'm sure ninety percent of my profits come from that market just existing. Gramma—my grandmother, Ammy..." {name} could tell she wanted to rabbit-trail. She stayed on track, though. "Ammy Senior," she corrected, "she built this shop herself. Her and Grampa. Then it was handed down to me, eventually." She turns back for just a moment and flashes a smile. "She was real smart. Knew exactly where to put the café to get the most business." She half-laughs. "And business do I get. Sometimes I wonder if she did *too* good of a job."
+
+    She wrung the rag out, and folded it neatly on the counter. She stretched, arm-wings outward, then up. The down feathers, normally hidden under her arms while she worked, fully revealed themselves in the form of her bright blue wings. Just as quickly, it was gone.
+
+    "Not too busy today, thankfully. I've noticed that there's always a dip in customers the day after they restock."
+
+    {name} nodded. [He|She]'d noticed it too. "So what does that market sell?" You asked, mostly out of curiosity, but partially to keep the conversation flowing.
+
+    "Oh, all kinds of things. Anywhere from meat to wool to wood. You really can find anything there." Her eyes darted to the door for a moment, making sure she wasn't keeping a customer waiting. "They've got some novelties, too. Idols, charms... I keep overhearing customers saying that there's someone selling dragon scales." She rolls her eyes. Her tone indicated clearly she didn't ascribe to the Draconianism. "Doesn't ever really make sense to me. Worshipping something that destroys." Her eyes flick up to you. "But—That's up to you, of course. I'm not going to get mad over what someone else thinks."
+
+    {name} shrugs, and shoots a disarming smile. "No offense taken."
+  coins_change: 22
+  xp_change: 3
+  hours: 8
+- text: |
+    Just in the fifth day, {name} already established a routine. The moment [he|she] enters the coffee shop and gets behind the counter, [he|she] puts on his apron. The embroidered name on the top matches Ammy’s, something she did put together just a day after {name} joined her. The third apron on the hooks sits unused, clean, and unembroidered.
+
+    "I can only hope someone else can help out," she told {name} after he asked about it, "Wednesdays are always challenging, even for the two of us." She grimaces in remembrance. "When it was just me, I just had to accept that I wouldn't be able to get through all the customers in time. A lot of people would walk in, see the line, and walk right out. It's hard to see customers, and those days are always really tough, but I get through them every week! You were still a very big help to me. My dad was always so insistent on keeping the business in the family... but when you have one brother leave to go adventuring, and another joins the guard, you don't really have many options for help." 
+
+    She stopped to take a customer's order, waiting until he left the counter before resuming conversation. "So I was left to take care of the shop when my dad passed. I still talk to my brothers, but they have no interest in the shop. That's younger brothers for you. *Only caring about themselves.*
+
+    "No offense if you're a younger sibling, though," she smiled through the frustrated remembrance of her brothers, "I know they have their own lives."
+
+    Name tells Ammy of her own frustrations with [his|her] siblings. Each story [he|she] tells, there's a note of sympathy, like she's saying 'that sounds familiar' with every stifled laugh.
+
+    "Tell me about it. Sometimes it felt like I was parenting my brothers just as much as my mom and dad. Maybe more." The slight sigh told {name} she had to take care of her siblings quiet a lot over the years. "I hope I don't put them in a bad light. They're awesome brothers, and I know they wouldn't hesitate to protect me."
+
+    "Let me guess," {name} says with a slight smile, "they're both taller than you."
+
+    Ammy scoffs and rolls her eyes, more exaggerated than serious. "Don't get me started."
+    -# Written by Infinite_Bed
+  coins_change: 18
+  xp_change: 2
+  hours: 6

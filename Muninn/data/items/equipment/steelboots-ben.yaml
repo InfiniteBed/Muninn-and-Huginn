@@ -1,0 +1,7 @@
+name: Steel Boots
+type: equipment
+description: A sturdy pair of steel boots. Protects the feet from hard blows and sharp
+  objects.
+slot: feet
+base_defense: 2
+base_price: 25

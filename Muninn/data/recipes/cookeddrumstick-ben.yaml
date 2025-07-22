@@ -1,0 +1,6 @@
+name: Cooked Drumstick
+type: single_use
+skill: cooking
+recipe:
+- name: Raw Drumstick
+  amount: 1

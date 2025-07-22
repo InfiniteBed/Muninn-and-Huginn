@@ -1,0 +1,7 @@
+name: Steel Greaves
+type: equipment
+description: A knight's leg armor. Protects the legs from hard blows and sharp
+  point.
+slot: lower
+base_defense: 2
+base_price: 25

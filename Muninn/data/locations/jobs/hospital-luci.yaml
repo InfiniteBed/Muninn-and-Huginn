@@ -1,0 +1,69 @@
+name: Healing
+introduction: Dr. Hector's Hospital has been short-staffed for a while. So many people befell an illness at around the same time. Surely, it couldn't be too hard to help?
+proficiency: "healing"
+results:
+  - text: |
+      Arriving on time, the closest thing to an orientation that {name} got was a rattled list of tasks that needed to be completed, along with a clip board and pair of gloves. It seemed precarious at best. 
+
+      The shift was spent running around completely menial tasks, such as fetching blankets or holding tools for any nurse who made eye contact with {name} - none of which actually exchanged names. 
+
+      When it was time to leave, {name} made sure nothing would immediately explode once [he|she] walked out the doors before swiftly clocking out and making [his|her] escape. 
+
+      Overall, the day went by quick.
+    coins_change: 25
+    xp_change: 3
+    hours: 8
+  - text: |
+      The nurses were already running around by the time {name} got there. [He|She] signed in while keeping an eye on the situation. Most of the patients hadn't even woken up yet, but a few were in critical condition. 
+
+      It would probably be best to stay out of the way. 
+
+      {name} went around as patients slowly woke up with the commotion to calm them down, reassure them, and check on their needs. Most patients just needed water for their pills. Children needed help with the pill bottles or needed to be coaxed into taking their pills. 
+
+      As for the rest of the hospital, crisis was averted, and the staff calmed down significantly. {name} signed out as quietly as [he|she] arrived.
+    coins_change: 30
+    xp_change: 5
+    hours: 8
+  - text: |
+      It seemed calmer in the hospital than it had the previous day. As {name} clocked in and started checking on patients, a cacophony of alarms went off a few doors down. [His|Her] focus quickly shifted to calming down the patients while figuring out what had happened. 
+
+      "Is everything all right?" an elderly women asked, the tremble in her voice matched her shaking hands as {name} tried to give her a glass of water for her medicine. 
+
+      "I'm sure the doctors have it under control," [he|she] answered. It sounded like [he|she] was trying to convince [himself|herself] as much as [he|she] was reassuring the women. 
+
+      The children were the hardest to calm down. No child should have to spend their days sick in a crowded hospital, and their cries echoed along with the blaring alarms. 
+
+      Finally, two nurses rushed past {name}, discussing the situation. A patient - an elderly man- had fallen into critical condition from a new illness, and they weren't sure he could recover. 
+
+      It was sickening to leave that evening.
+    coins_change: 35
+    xp_change: 6
+    hours: 8
+  - text: |
+      The hospital had a melancholy atmosphere the next morning. No one had to tell {name} what happened. 
+
+      However, Dr. Hector announced a meeting, and the other volunteers and the nurses filled into the break room. It was cramped, but everyone could hear the doctor when he spoke. 
+
+      The disease was spreading. It had taken one adult and two children since the previous night. Gasps erupted from the crowd of nurses and volunteers. Masks were provided and strict instructions on isolation were explained. 
+
+      The children were separated first. Now they lay alone in a room, practically marked for death without the proper treatment. {name} wasn't allowed to entertain them anymore, too much of risk for both of them. 
+
+      "Could I have a book, please?" one child miserably whispered. {name} wordlessly nodded and snuck a book to them. 
+
+      The treatment was pushed into the testing phase without going through animal testing. It had to work - the outbreak was getting to hard to control.
+    coins_change: 40
+    xp_change: 8
+    hours: 8
+  - text: |
+      The treatment started to work. It was slow, and there were complications, but progress was being made. 
+
+      Some adults volunteered to test the treatment; told the doctors they weren't scared of the side affects. 
+
+      Then a child started the treatment. They sat up in bed for the first time in weeks. 
+
+      One of the nurses pulled {name} aside in the midst of the quiet, hopeful celebrating. "Thank you for all your help this week. No one expects you to stay. " 
+
+      {name} looked back to the children's room, where they gazed expectantly with books ready to be read. {name} looked back to the nurse. "Someone has to read to the children," [he|she] answered, finally feeling like everything in the hospital would turn out okay.
+    coins_change: 50
+    xp_change: 9
+    hours: 8

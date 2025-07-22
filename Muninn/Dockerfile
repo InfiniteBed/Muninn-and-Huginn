@@ -13,7 +13,6 @@ RUN pip install requests
 RUN pip install pillow
 RUN pip install fuzzywuzzy
 RUN pip install matplotlib
-RUN pip install emoji
 RUN python -m pip install seaborn
 RUN pip install psycopg2
 RUN pip install regex
