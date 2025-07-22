@@ -6,6 +6,7 @@ import os
 from datetime import datetime, timedelta
 import seaborn as sns
 import pytz
+from cogs.graphs.discord_theme import DiscordTheme  # Import the new Discord theme cog
 
 # Function to convert timestamp to California time
 def convert_to_california_time(timestamp: datetime) -> datetime:
@@ -18,30 +19,13 @@ def convert_to_california_time(timestamp: datetime) -> datetime:
     return california_time
 
 class GraphUserActivityMonth(commands.Cog):
-
-    # Set global Discord-style theme
-    def apply_discord_theme(self):
-        """Apply a unified Discord-like theme to all graphs."""
-        plt.style.use("dark_background")
-        sns.set_palette(["#5762E3", "#57F287", "#ED4245"])  # Discord's blurple, green, and red
-
-        plt.rcParams["text.color"] = "#DCDDDE"  # Light gray text
-        plt.rcParams["axes.facecolor"] = "#2C2F33"  # Dark mode background
-        plt.rcParams["axes.edgecolor"] = "#99AAB5"  # Subtle borders
-        plt.rcParams["axes.labelcolor"] = "#DCDDDE"
-        plt.rcParams["xtick.color"] = "#DCDDDE"
-        plt.rcParams["ytick.color"] = "#DCDDDE"
-        plt.rcParams["grid.color"] = "#555555"  # Subtle grid lines
-        plt.rcParams["figure.facecolor"] = "#5762E3"
-        plt.rcParams["savefig.facecolor"] = "#2C2F33"
-    
     def __init__(self, bot):
         self.bot = bot
         self.search = bot.get_cog('Search')
 
     @commands.command(name="g_user_activity_month")
     async def generate_graph(self, ctx, user: str = None):
-        self.apply_discord_theme()  # Apply global styling
+        prop = DiscordTheme.apply_discord_theme()  # Apply global Discord theme and capture prop
         """Generate a bar chart of user activity over the past week."""
         
         if user is None:

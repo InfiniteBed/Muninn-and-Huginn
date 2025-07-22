@@ -1,0 +1,174 @@
+message_rewards:
+  '100': '😳 Wow {nick}! You sent 100 messages in the server!
+
+    "*{message}*"'
+  '1000': '## Woah!!!
+
+    **{nick} sent 1,000 messages!**
+
+    "*{message}*"'
+  '1200': 'how embarrassing! you can’t shut up! wear the badge with both pride and
+    shame for sending 1,200 messages.
+
+    "*{message}*"'
+  '1400': 'Only 1,400 messages, {nick}? Those are rookie numbers, keep going!
+
+    "*{message}*"'
+  '1600': '1,600 messages {nick}? Don''t your hands hurt from texting so much?
+
+    "*{message}*"'
+  '1800': 'Congrats on 1,800 messages, {nick}! You should probably go outside now...
+
+    "*{message}*"'
+  '200': '🎖️ Congratulations {nick}! You sent 200 messages in the server!
+
+    "*{message}*"'
+  '2000': '# 2,000 messages!?!?
+
+    Wow {nick}!!!!
+
+    "*{message}*"'
+  '2200': 'Hey, {nick}, 2,200 messages! You''re making @Infinite_Bed run out of reward
+    messages!   Don''t stop, of course
+
+    "*{message}*"'
+  '2400': 'Thanks for keeping me employed with your 2,400 messages, {nick}!
+
+    "*{message}*"'
+  '2600': '{nick} ur fingers wont grow biceps so why try??? 2,600 messages???
+
+    "*{message}*"'
+  '2800': '{nick} yap much?
+
+    "*{message}*"
+
+    2,800 messages.'
+  '300': 'Congratulations on 300 messages! Here''s a cupcake 🧁
+
+    "*{message}*"'
+  '3000': '{nick} give up.
+
+    "*{message}*"
+
+    3,000 messages.'
+  '3200': '{nick} you should spend time talking to the Lord instead of this...
+
+    "*{message}*"'
+  '3400': '{nick} five big booms for 3,400 messages!
+
+    BOOM
+
+    BOOM
+
+    BOOM
+
+    BOOM
+
+    BOOM.
+
+    "*{message}*"'
+  '3600': '{nick} BOOMBASTIC for 3,600 messages!”
+
+    "*{message}*"'
+  '3800': '{nick} u have a lot of opinions... 3,800 messages.”
+
+    "*{message}*"'
+  '400': 'Wow, 400 messages, {nick}! Keep the convo going!!
+
+    "*{message}*"'
+  '4000': '{nick} do you… have any hobbies? 4,000 messages!?”
+
+    "*{message}*"'
+  '4200': '{nick} whether you spammed or are chronically on your phone, you get a
+    reward for 4,200 messages:”
+
+    "*{message}*"'
+  '4400': '{nick} SHUT UP! no one in the chat cares that you said”
+
+    "*{message}*"'
+  '4600': '{nick} i hope both sides of your pillow are cold because you deserve it
+    for reaching 4,600 messages”
+
+    "*{message}*"'
+  '4800': '{nick} Hey, it could be worse! You could be at 4,800 messages! Oh wait...
+    you are...
+
+    "*{message}*"'
+  '500': 'Gadzooks! 500 messages already, {nick}!? Keep going!
+
+    "*{message}*"'
+  '5000': '{nick} 5,000 messages!!!!! Amazing!!!
+
+
+    Please go outside.
+
+    "*{message}*"'
+  '5200': '5,200 messages, {nick}? Aren''t you, like, in class or something?
+
+    "*{message}*"'
+  '5400': 'Uh hey so, maybe put your phone down {nick}??
+
+    "5,400: *{message}*"'
+  '5600': 'Alright bro, you need a job now {nick}.
+
+    "5,600:*{message}*"'
+  '5800': 'It''s funny you haven''t run out of things to say yet {nick}.
+
+    "5,800: *{message}*"'
+  '600': 'You made it to 600 messages, {nick}! Don''t stop.
+
+    "*{message}*"'
+  '6000': 'Alr, just put the fries in the bag {nick}.
+
+    "6,000: *{message}*"'
+  '6200': 'Are you trying to write an autobiography {nick}?
+
+    "6,200: *{message}*"'
+  '6400': 'your fingers are too jittery, slow down {nick}.
+
+    "6,400: *{message}*"'
+  '6600': 'I''m employed, what does this mean {nick}?
+
+    "6,600: *{message}*"'
+  '6800': 'Slow down, you''ll break your keyboard {nick}
+
+    "6,800: *{message}*"'
+  '700': 'Bravo! 700 messages from {nick}!
+
+    "*{message}*"'
+  '7000': 'SLOW DOWN {nick} DAWG
+
+    "7,000: *{message}*"'
+  '7200': 'These numbers are getting ridiculous {nick}...
+
+    "7,200: *{message}*"'
+  '7400': 'Another milestone already {nick}? Did you like, crash out or something?
+
+    "7,400: *{message}*"'
+  '7600': 'do you not have a job or something {nick}?
+
+    "7,600: *{message}*"'
+  '800': 'Behold! {nick}''s 800th message!
+
+    "*{message}*"'
+  '900': 'Everyone make sure to congratulate {nick} on sending 900 messages! 🙌
+
+    "*{message}*"'
+thank_you_responses:
+  excessive:
+  - Okay buddy chill
+  - uhhh ok
+  - It's getting kinda wierd {user}
+  - youre welcome???
+  - please stop
+  - k
+  - please stop thanking me {user}
+  - stop
+  - stop thanking me
+  - stop it
+  - stop it {user}
+  normal:
+  - You're welcome, {user}! 😊
+  - No problem, {user}! Happy to help! 👍
+  - Anytime, {user}! 😺
+  - Glad I could help, {user}! 😄

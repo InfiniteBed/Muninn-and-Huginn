@@ -5,20 +5,26 @@ from collections import defaultdict
 from discord.ext import commands # type: ignore
 import os
 import subprocess
-import json
+import yaml
 import random
 import re
 import asyncio
 from discord.utils import get # type: ignore
 import configparser  # Add this import for reading the token from a config file
 
-# Load message rewards from JSON file
-def load_json():
-    with open("responses.json", "r") as file:
-        data = json.load(file)
+# Load message rewards from YAML file
+def load_yaml():
+    try:
+        with open("responses.yaml", "r", encoding="utf-8") as file:
+            data = yaml.safe_load(file)
+    except FileNotFoundError:
+        # Fallback to JSON if YAML doesn't exist
+        import json
+        with open("responses.json", "r") as file:
+            data = json.load(file)
     return data["message_rewards"], data["thank_you_responses"]
 
-message_rewards, thank_you_data = load_json()
+message_rewards, thank_you_data = load_yaml()
 normal_thank_you_responses = thank_you_data["normal"]
 excessive_thank_you_responses = thank_you_data["excessive"]
 
@@ -46,7 +52,7 @@ bot.owner_id = 867261583871836161
 # Load bot token from config file
 config = configparser.ConfigParser()
 config.read("config.ini")
-BOT_TOKEN = config["Muninn"]["BotToken"]  # Updated to use the Muninn section
+BOT_TOKEN = config["Muninn"]["BotToken"]
 
 async def load_cogs():
     for foldername, subfolders, files in os.walk("./cogs"):

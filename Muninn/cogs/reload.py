@@ -7,7 +7,7 @@ class Reload(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     async def reload(self, ctx):
         message = await ctx.send("Reloading... [----------] 0%")
         
@@ -62,14 +62,5 @@ class Reload(commands.Cog):
                 await ctx.send(f"Failed to unload missing cog {cog}: {e}")
                 print(f"Failed to unload missing cog {cog}: {e}")
 
-        try:
-            synced = await self.bot.tree.sync()
-            print(f"Synced {len(synced)} commands globally.")
-        except Exception as e:
-            await ctx.send(f"Failed to sync slash commands: {e}")
-            print(f"Failed to sync slash commands: {e}")
-
-        await message.edit(content="Reload complete! [##########] 100%")
-        
 async def setup(bot):
     await bot.add_cog(Reload(bot))

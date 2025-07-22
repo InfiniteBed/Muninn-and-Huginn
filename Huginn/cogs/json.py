@@ -1,6 +1,6 @@
 import discord # type: ignore
 from discord.ext import commands # type: ignore
-import json
+import yaml
 
 class DataLoader(commands.Cog):
     def __init__(self, bot):
@@ -9,12 +9,18 @@ class DataLoader(commands.Cog):
         self.bot.data = self.data  # Store data in bot for other cogs to access
 
     def load_data(self):
-        """Loads the JSON data from a file."""
+        """Loads the YAML data from a file."""
         try:
-            with open("responses.json", "r", encoding="utf-8") as f:
-                return json.load(f)
+            with open("responses.yaml", "r", encoding="utf-8") as f:
+                return yaml.safe_load(f)
         except FileNotFoundError:
-            return {}  # Return an empty dictionary if file is missing
+            # Try JSON as fallback
+            try:
+                import json
+                with open("responses.json", "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except FileNotFoundError:
+                return {}  # Return an empty dictionary if both files are missing
 
     @commands.command(name="reload_data")
     async def reload_data(self, ctx):

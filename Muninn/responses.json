@@ -30,7 +30,19 @@
         "4600": "{nick} i hope both sides of your pillow are cold because you deserve it for reaching 4,600 messages”\n\"*{message}*\"",
         "4800": "{nick} Hey, it could be worse! You could be at 4,800 messages! Oh wait... you are...\n\"*{message}*\"",
         "5000": "{nick} 5,000 messages!!!!! Amazing!!!\n\nPlease go outside.\n\"*{message}*\"",
-        "5200": "5,200 messages, {nick}? Aren't you, like, in class or something?\n\"*{message}*\""
+        "5200": "5,200 messages, {nick}? Aren't you, like, in class or something?\n\"*{message}*\"",
+        "5400": "Uh hey so, maybe put your phone down {nick}??\n\"5,400: *{message}*\"",
+        "5600": "Alright bro, you need a job now {nick}.\n\"5,600:*{message}*\"",
+        "5800": "It's funny you haven't run out of things to say yet {nick}.\n\"5,800: *{message}*\"",
+        "6000": "Alr, just put the fries in the bag {nick}.\n\"6,000: *{message}*\"",
+        "6200": "Are you trying to write an autobiography {nick}?\n\"6,200: *{message}*\"",
+        "6400": "your fingers are too jittery, slow down {nick}.\n\"6,400: *{message}*\"",
+        "6600": "I'm employed, what does this mean {nick}?\n\"6,600: *{message}*\"",
+        "6800": "Slow down, you'll break your keyboard {nick}\n\"6,800: *{message}*\"",
+        "7000": "SLOW DOWN {nick} DAWG\n\"7,000: *{message}*\"",
+        "7200": "These numbers are getting ridiculous {nick}...\n\"7,200: *{message}*\"",
+        "7400": "Another milestone already {nick}? Did you like, crash out or something?\n\"7,400: *{message}*\"",
+        "7600": "do you not have a job or something {nick}?\n\"7,600: *{message}*\""
     },
     "thank_you_responses": {
         "normal": [

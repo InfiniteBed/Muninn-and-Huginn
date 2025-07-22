@@ -46,19 +46,20 @@ class StarLeaderboard(commands.Cog):
 
         # Create the embed
         embed = discord.Embed(title="⭐️ Contribution Star Leaderboard", color=discord.Color.blue())
-        
+
         # Build the leaderboard description with podium emojis
         leaderboard_text = ""
         for idx, (user_id, stars) in enumerate(leaderboard, 1):
             user = await self.bot.fetch_user(user_id)
+            user = await commands.MemberConverter().convert(ctx, str(user.id))
             if idx == 1:
-                leaderboard_text += f"🥇 {user.name} - **{stars}** stars\n"
+                leaderboard_text += f"🥇 {user.display_name} - **{stars}** stars\n"
             elif idx == 2:
-                leaderboard_text += f"🥈 {user.name} - **{stars}** stars\n"
+                leaderboard_text += f"🥈 {user.display_name} - **{stars}** stars\n"
             elif idx == 3:
-                leaderboard_text += f"🥉 {user.name} - **{stars}** stars\n"
+                leaderboard_text += f"🥉 {user.display_name} - **{stars}** stars\n"
             else:
-                leaderboard_text += f"{idx}. {user.name} - **{stars}** stars\n"
+                leaderboard_text += f"{idx}. {user.display_name} - **{stars}** stars\n"
         
         embed.description = leaderboard_text
         embed.set_footer(text='Want stars? Message !contribute to find out how! ')
@@ -70,7 +71,7 @@ class StarLeaderboard(commands.Cog):
     @commands.is_owner()
     async def star(self, ctx, user: discord.User, stars: int):
         """Adds stars to a user. (Bot owner only)"""
-        if stars < 1:
+        if stars == 0:
             await ctx.send("You must add at least 1 star.")
             return
 
