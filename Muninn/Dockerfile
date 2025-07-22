@@ -21,6 +21,7 @@ RUN pip install pyyaml
 RUN pip install mplcairo
 RUN pip install yt-dlp==2025.6.25
 RUN pip install PyNaCl
+RUN pip install icecream
 
 # Create the directory for the bot and set it as the working directory
 WORKDIR /usr/src/bot

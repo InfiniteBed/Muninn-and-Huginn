@@ -20,6 +20,11 @@ class ProfessionsLoader(commands.Cog):
 
         print(PROFESSIONS)
 
+        # Create proficiencies table if it doesn't exist
+        c.execute('''CREATE TABLE IF NOT EXISTS proficiencies (
+            user_id INTEGER PRIMARY KEY
+        )''')
+
         # Get existing columns
         c.execute("PRAGMA table_info(proficiencies)")
         existing_columns = {row[1] for row in c.fetchall()}
