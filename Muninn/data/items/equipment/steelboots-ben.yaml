@@ -1,7 +1,7 @@
 name: Steel Boots
 type: equipment
-description: A knight's chest piece. Protects the chest from hard blows and sharp
-  point.
-slot: upper
+description: A sturdy pair of steel boots. Protects the feet from hard blows and sharp
+  objects.
+slot: feet
 base_defense: 2
 base_price: 25
