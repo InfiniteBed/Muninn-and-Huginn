@@ -26,23 +26,10 @@ class Help(commands.Cog):
                     "devotion_help": {"description": "`!devotion_help` - Detailed help for the devotion accountability system."}
                 }
             },
-            "Server Configuration": {
-                "shorthands": ["config", "settings"],
-                "commands": {
-                    "config": {
-                        "description": "`!config` - Server configuration commands (Admin only).",
-                        "subcommands": {
-                            "list": "`!config list` - Show all current server settings.",
-                            "get": "`!config get <key>` - Get a specific configuration value.",
-                            "delete": "`!config delete <key>` - Delete a configuration value.",
-                            "devotion_channel": "`!config devotion_channel <#channel>` - Set the devotion channel."
-                        }
-                    }
-                }
-            },
             "RPG Commands": {
                 "shorthands": ["rpg"],
                 "commands": {
+                    "rpg_intro": {"description": "`!rpg_intro` - Learn about the RPG system and how to get started."},
                     "profile_setup": {
                         "description": "`!profile_setup` - Start the full profile setup process.",
                         "subcommands": {
@@ -56,17 +43,11 @@ class Help(commands.Cog):
                         }
                     },
                     "me": {"description": "`!me` - Show the status of your character."},
-                    "shop": {"description": "`!shop` - Visit the shop."},
-                    "board": {"description": "`!board` - Visit the expedition board, where you can take on expeditions for money."},
+                    "go": {"description": "`!go` - Go work, find a job, shop around, or gather items."},
+                    "home": {"description": "`!home` - Rest and relax, or make some new items."},
+                    "equip": {"description": "`!equip` - Equip a weapon or armor piece to your character."},
+                    "setbio": {"description": "`!setbio <bio>` - Set your character's biography (max 500 characters)."},
                     "battle": {"description": "`!battle (Player)` - Battle another player for cash."}
-                }
-            },
-            "Memorization Commands": {
-                "shorthands": ["memorization", "mem"],
-                "commands": {
-                    "create_set": {"description": "`!create_set <group> <set_name> <skip_non_essential> <memorization_types>` - Create a new memorization set."},
-                    "add_item": {"description": "`!add_item <group> <set_name> <title> <body> <solutions>` - Add an item to a memorization set."},
-                    "practice": {"description": "`!practice [group]` - Start practicing a memorization set."}
                 }
             },
             "Music Commands": {

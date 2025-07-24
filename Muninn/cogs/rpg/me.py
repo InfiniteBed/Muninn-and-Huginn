@@ -9,6 +9,7 @@ import random
 from dateutil import parser  # Add this import
 from icecream import ic
 import re
+import time
 
 class Status(commands.Cog):
     def __init__(self, bot):
@@ -18,6 +19,22 @@ class Status(commands.Cog):
         self.timezone_converter = bot.get_cog('TimezoneConverter')
         self.stats_manager = bot.get_cog("StatsManager")
         self.data_manager = self.bot.get_cog("DataManager")
+    
+    def create_discord_timestamp(self, dt, format_type="f"):
+        """
+        Convert a datetime object to Discord timestamp format.
+        
+        Format types:
+        t = Short Time (9:01 AM)
+        T = Long Time (9:01:00 AM)
+        d = Short Date (11/28/2018)
+        D = Long Date (November 28, 2018)
+        f = Short Date/Time (November 28, 2018 9:01 AM) - Default
+        F = Long Date/Time (Wednesday, November 28, 2018 9:01 AM)
+        R = Relative Time (3 years ago)
+        """
+        timestamp = int(dt.timestamp())
+        return f"<t:{timestamp}:{format_type}>"
         
     def format_gendered(self, text, gender):
         pattern = re.compile(r'\[([^\[\]]+?)\]')
@@ -66,17 +83,33 @@ class Status(commands.Cog):
             expedition_name = activity_data['name']
             end_time = datetime.strptime(str(activity_data['end_time']), "%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()
-            california_time = await self.timezone_converter.convert_time(str(end_time))
-            # Adjust parsing to handle timezone abbreviations
-            california_time = parser.parse(california_time)  # Use dateutil.parser to parse the time
-            formatted_start_time = california_time.strftime("%b. %d at %I:%M %p")
-            time_remaining = end_time - current_time
-            rounded_time_remaining = timedelta(seconds=round(time_remaining.total_seconds()))
-            formatted_time_remaining = str(rounded_time_remaining).split(".")[0]
-
+            
+            # Create Discord timestamps for better time display
+            end_time_discord = self.create_discord_timestamp(end_time, "f")  # Short Date/Time
+            end_time_relative = self.create_discord_timestamp(end_time, "R")  # Relative time (auto-updating)
+            
             expedition_embed.add_field(name="Activity Name", value=expedition_name, inline=True)
-            expedition_embed.add_field(name="End Time", value=formatted_start_time, inline=False)
-            expedition_embed.add_field(name="Time Remaining", value=formatted_time_remaining if end_time > current_time else "Complete!", inline=True)
+            
+            # Use Discord timestamps for both absolute and relative time
+            if end_time > current_time:
+                expedition_embed.add_field(
+                    name="End Time", 
+                    value=f"{end_time_discord}", 
+                    inline=False
+                )
+                expedition_embed.add_field(
+                    name="Time Remaining", 
+                    value=f"{end_time_relative}", 
+                    inline=True
+                )
+            else:
+                expedition_embed.add_field(
+                    name="Completed At", 
+                    value=f"{end_time_discord}", 
+                    inline=False
+                )
+                expedition_embed.add_field(name="Status", value="**Complete!**", inline=True)
+            
             expedition_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
 
             if end_time <= current_time:
@@ -93,6 +126,23 @@ class Status(commands.Cog):
         info_embed.add_field(name="Alignment", value=user_stats['alignment'], inline=True)
         info_embed.add_field(name="Ability Scores", value=user_stats['scores_display'], inline=True)
         info_embed.add_field(name="Bio", value=user_stats['bio'], inline=True)
+        
+        # Add Discord join timestamp
+        discord_join_timestamp = self.create_discord_timestamp(user.created_at, "F")  # Long Date/Time
+        info_embed.add_field(
+            name="Discord Member Since", 
+            value=f"{discord_join_timestamp}", 
+            inline=True
+        )
+        
+        # Add server join timestamp if available
+        if hasattr(user, 'joined_at') and user.joined_at:
+            server_join_timestamp = self.create_discord_timestamp(user.joined_at, "F")
+            info_embed.add_field(
+                name="Server Member Since", 
+                value=f"{server_join_timestamp}", 
+                inline=True
+            )
 
         # Profession page embed
         professions_clean = ["📚 Author", "🥖 Baking", "☕️ Brewing", "🪚 Carpentry", "🧹 Cleaning", "🛻 Coachman", "🍳 Cooking", "🍷 Cupbearing", "🌾 Farming", "🎣 Fishing", "💐 Floristry", "🪴 Gardening", "🛡️ Guarding", "🔮 Glassblowing", "🩹 Healing", "🐄 Husbandry", "🏨 Innkeeping", "⚔️ Knighthood", "🎖️ Leadership", "🧱 Masonry", "⚒️ Metalworking", "🎨 Painting", "🏺 Pottery", "👑 Royalty", "🗿 Sculpting", "🔧 Smithing", "🧵 Spinning", "🐎 Stablekeeping", "🧵 Tailoring", "📖 Teaching", "👁️ Vigilance"]

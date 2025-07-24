@@ -233,7 +233,7 @@ class Home(commands.Cog):
                 
                                 
                 if locked:
-                    description += f"~~{recipe_index+1}. {recipe['name']}:~~ `Requires {recipe['required_skill'].title()} {recipe['skill_level']}`\n"
+                    description += f"{recipe_index+1}. {recipe['name']} `Cannot Craft: Requires {recipe['required_skill'].title()} {recipe['skill_level']}`\n"
                 elif not locked:
                     description += f"{recipe_index+1}. {recipe['name']}\n"
 
@@ -278,31 +278,31 @@ class Home(commands.Cog):
                 @discord.ui.button(label=f"{start_index+6}", style=discord.ButtonStyle.grey)
                 async def sixth_button(self, interaction: discord.Interaction, button: Button):
                     if start_index + 4 < len(recipes):
-                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+5], recipes, ctx)
                         await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{start_index+7}", style=discord.ButtonStyle.grey)
                 async def seventh_button(self, interaction: discord.Interaction, button: Button):
                     if start_index + 4 < len(recipes):
-                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+6], recipes, ctx)
                         await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{start_index+8}", style=discord.ButtonStyle.grey)
                 async def eighth_button(self, interaction: discord.Interaction, button: Button):
                     if start_index + 4 < len(recipes):
-                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+7], recipes, ctx)
                         await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{start_index+9}", style=discord.ButtonStyle.grey)
                 async def ninth_button(self, interaction: discord.Interaction, button: Button):
                     if start_index + 4 < len(recipes):
-                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+8], recipes, ctx)
                         await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"{start_index+10}", style=discord.ButtonStyle.grey)
                 async def tenth_button(self, interaction: discord.Interaction, button: Button):
                     if start_index + 4 < len(recipes):
-                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+4], recipes, ctx)
+                        embed, view = await build_recipe_embed(user_stats, recipes[start_index+9], recipes, ctx)
                         await interaction.response.edit_message(embed=embed, view=view)
             
                 @discord.ui.button(label=f"Previous", style=discord.ButtonStyle.grey)
