@@ -341,11 +341,11 @@ class StatsManager(commands.Cog):
         #Check if inventotry is empty, then skip if empty.
         cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
+        ic(result)
 
         item = json.loads(result[0])[index]
 
-        ic(item)
-
+        conn.close()
         return item
     
     async def calculate_activity_results(self, interaction, activity):

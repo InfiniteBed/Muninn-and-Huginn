@@ -12,6 +12,7 @@ import yaml
 
 class Home(commands.Cog):
     def __init__(self, bot):
+        self.utils = bot.get_cog('Utils')
         self.user_manager = bot.get_cog("StatsManager")
         self.data_manager = bot.get_cog("DataManager")
         self.item_manager = bot.get_cog("ItemRandomizer")
@@ -27,13 +28,15 @@ class Home(commands.Cog):
         
         user_stats = await self.user_manager.fetch_user_stats(user)
 
+        embed_color, avatar_image, has_custom_image = await self.utils.get_avatar_color_and_image(user)
+        pfpfile = discord.File(f"/usr/src/bot/profile_images/{interaction.author.id}.png", filename="image.png") if has_custom_image else None
+
         home_embed = discord.Embed(
             title=f"{user.display_name}'s Home",
             description="Welcome to your home! Here you can check your crafting items and tinker to create new ones!",
-            color=discord.Color.blue()
+            color=embed_color
         )
-        home_embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
-        
+            
         # Inventory page embed
         user_inventory = user_stats['inventory']
         if not user_inventory:  # Handle empty or None inventory
@@ -104,19 +107,16 @@ class Home(commands.Cog):
                 item_name = item['name']
                 removed = 0
 
-                for index in range(len(user_stats['inventory'])):
+                for index in reversed(range(len(user_stats['inventory']))):
                     inv_item = user_stats['inventory'][index]
                     if inv_item['name'] == item_name:
                         item_data = self.user_manager.get_item_in_inventory(interaction.author.id, index)
-                        ic(item_data)
                         self.user_manager.remove_from_user_inventory(user_id, item_data)
                         removed += 1
                         if removed >= amount_to_remove:
                             break
 
             ##Then add to inventory
-            generated_item
-            
             self.user_manager.add_to_user_inventory(user_id, generated_item)
             
             ##Give Experience if Applicable
@@ -132,6 +132,7 @@ class Home(commands.Cog):
             embed = discord.Embed(title=f"Successfully crafted {recipe['name']}!",
                                   description=f"{prefix}{generated_item['name']} crafted.".strip(),
                                   color=0x7B12B4)
+            
             if proficiency:
                 embed.description += f"\n\nIncreased `{proficiency}` proficiency by `1`!"
             return embed
@@ -181,7 +182,7 @@ class Home(commands.Cog):
                 @discord.ui.button(label="Craft", style=discord.ButtonStyle.blurple)
                 async def craft_button(self, interaction: discord.Interaction, button: Button):
                     embed = await craft_item(recipe, interaction.user.id, ctx)
-                    await interaction.response.edit_message(embed=embed, view=None)
+                    await interaction.response.edit_message(embed=embed, view=None)  
             
                 @discord.ui.button(label=f"Cancel", style=discord.ButtonStyle.grey)
                 async def cancel_button(self, interaction: discord.Interaction, button: Button):

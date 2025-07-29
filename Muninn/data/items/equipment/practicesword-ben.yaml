@@ -1,0 +1,14 @@
+name: Practice Sword
+type: equipment
+description: A finely crafted wooden sword, designed for training and practice.
+  Its lightweight construction allows for swift movements, making it ideal for honing
+  one's skills without the risk of serious injury.
+slot: hand
+base_price: 25
+actions:
+- name: Practice Slash
+  description: A swift slash with the practice sword, perfect for training.
+  lines:
+  - "Focus on your form!"
+  damage: 5
+  defense: 0

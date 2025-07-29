@@ -106,7 +106,7 @@ class Go(commands.Cog):
             
         ## Construct Main Menu Embed
         main_embed = discord.Embed(title=f"**{user_stats['profile_name']}** stands just outside {user_stats['pronoun_possessive']} home.", 
-                                   color=0x00DD77, 
+                                   color=0x00DD77,
                                    description=f"{user_stats['pronoun'].title()} could go to work or find a job, explore for items or shop at the user-led market.")
 
         def location_details_embed(location, time_gathering = 1):

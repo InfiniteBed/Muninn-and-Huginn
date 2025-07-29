@@ -1,0 +1,8 @@
+name: Practice Sword
+type: equipment
+skill: woodworking
+required_skill: woodworking
+skill_level: 3
+recipe:
+- name: Branch
+  amount: 5

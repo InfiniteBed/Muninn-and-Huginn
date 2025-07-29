@@ -21,18 +21,6 @@ class Status(commands.Cog):
         self.data_manager = self.bot.get_cog("DataManager")
     
     def create_discord_timestamp(self, dt, format_type="f"):
-        """
-        Convert a datetime object to Discord timestamp format.
-        
-        Format types:
-        t = Short Time (9:01 AM)
-        T = Long Time (9:01:00 AM)
-        d = Short Date (11/28/2018)
-        D = Long Date (November 28, 2018)
-        f = Short Date/Time (November 28, 2018 9:01 AM) - Default
-        F = Long Date/Time (Wednesday, November 28, 2018 9:01 AM)
-        R = Relative Time (3 years ago)
-        """
         timestamp = int(dt.timestamp())
         return f"<t:{timestamp}:{format_type}>"
         
@@ -540,7 +528,7 @@ class Status(commands.Cog):
                             
                             @discord.ui.button(label="See Expedition Results", style=discord.ButtonStyle.blurple)
                             async def accept_button(self, interaction: discord.Interaction, button: Button):
-                                await interaction.response.edit_message(view=None)
+                                await interaction.response.edit_message(view=view)
                                 
                                 if len(result) <= 2000:
                                     await ctx.send(result)
