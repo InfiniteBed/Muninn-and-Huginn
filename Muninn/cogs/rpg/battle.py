@@ -3,7 +3,10 @@ from discord.ext import commands
 import asyncio
 import threading
 import json
+import random
+import time
 from icecream import ic
+import math
 
 class Battle(commands.Cog):
     def __init__(self, bot):
@@ -79,7 +82,6 @@ class Battle(commands.Cog):
         self.active_battles.add((player1, player2))
         player1_stats = await self.stats_manager.fetch_user_stats(player1)
         player2_stats = await self.stats_manager.fetch_user_stats(player2)
-
         async def battle_loop():
             while player1_stats['health'] > 0 and player2_stats['health'] > 0:
                 await self.prompt_actions(thread, player1, player2, player1_stats, player2_stats)
@@ -93,7 +95,12 @@ class Battle(commands.Cog):
         print("Prompting actions")
         async def get_player_info(player, player_stats):
             print(f"Fetching inventory for {player.display_name}")
-            action_embed = discord.Embed(title=f"{player.display_name}'s Actions", color=discord.Color.blue())
+
+            embed_color, avatar_image, has_custom_image = await self.utils.get_avatar_color_and_image(player)
+            pfp = discord.File(f"/usr/src/bot/profile_images/{player.id}.png", filename="image.png") if has_custom_image else None
+            
+            action_embed = discord.Embed(title=f"{player_stats['profile_name']}'s Actions", color=discord.Color.blue())
+            action_embed.set_thumbnail(url="attachment://image.png" if has_custom_image else player.avatar.url)
 
             item_slots = [
                 'head',
@@ -127,16 +134,28 @@ class Battle(commands.Cog):
                     armor += f"**{item_data['name']}**: +{item_data['base_defense']} Defense\n"
                 if 'base_heal' in item_data:
                     items += f"**{item_data['name']}**: Heals {item_data['base_heal']} HP\n"
+                    
+            ic(actions)
+        
 
-                
-            action_embed.add_field(name="Actions", value="\n".join([f"**{action['name']}**: {action['description']}" for action in actions]) or "No actions available", inline=False)
+            action_embed.add_field(name="Actions", 
+                                   value="\n".join(
+                                       [f"**{action['name']}** – *{action['type']}*\n{action['description']}\n" for action in actions]
+                                       ) or "No actions available", 
+                                   inline=False)
             action_embed.add_field(name="Armor", value=armor or "No armor equipped", inline=False)
             action_embed.add_field(name="Items", value=items or "No items available", inline=False)
 
-            return actions, action_embed
+            return actions, action_embed, pfp
+
+        async def selected_action_embed(player, player_name):
+            embed_color, avatar_image, has_custom_image = await self.utils.get_avatar_color_and_image(player)
+            embed = discord.Embed(title=f"{player_name} made a decision!")
+            embed.set_thumbnail(url="attachment://image.png" if has_custom_image else player.avatar.url)
+            return embed
 
         class ActionSelection(discord.ui.View):
-            def __init__(self, actions, player):
+            def __init__(self, actions, player, player_stats):
                 super().__init__(timeout=600)  # Set a timeout for the view
                 self.actions = actions
                 self.player = player
@@ -150,60 +169,133 @@ class Battle(commands.Cog):
                             await interaction.response.send_message("It's not your turn!", ephemeral=True)
                             return
                         self.selected_action = action
-                        await interaction.response.edit_message(content=f"You selected: {action['name']}", view=None)
+                        embed = await selected_action_embed(player, player_stats['profile_name'])
+                        await interaction.response.edit_message(embed=embed, view=None)
                         self.stop()
 
                     button.callback = callback
                     self.add_item(button)
 
         # Player 1 action
-        actions, player1_embed = await get_player_info(player1, player1_stats)
-        view1 = ActionSelection(actions, player1)
-        player1_message = await thread.send(embed=player1_embed, view=view1)
+        actions, player1_embed, pfp = await get_player_info(player1, player1_stats)
+        view1 = ActionSelection(actions, player1, player1_stats)
+        player1_message = await thread.send(embed=player1_embed, view=view1, file=pfp)
         await view1.wait()  # Wait for user interaction
         if not view1.selected_action:
-            await thread.send(f"{player1.mention} did not select an action in time!")
+            await thread.send(f"{player1.mention}, please make an action!")
             return
         player1_action = view1.selected_action  # Retrieve selected action
 
         # Player 2 action
-        actions, player2_embed = await get_player_info(player2, player2_stats)
-        view2 = ActionSelection(actions, player2)
-        player2_message = await thread.send(embed=player2_embed, view=view2)
+        actions, player2_embed, pfp = await get_player_info(player2, player2_stats)
+        view2 = ActionSelection(actions, player2, player2_stats)
+        player2_message = await thread.send(embed=player2_embed, view=view2, file=pfp)
         await view2.wait()  # Wait for user interaction
         if not view2.selected_action:
-            await thread.send(f"{player2.mention} did not select an action in time!")
+            await thread.send(f"{player2.mention}, please make an action!")
             return
         player2_action = view2.selected_action  # Retrieve selected action
+        
+        text = ""
+        
+        # Calculate Values
+        action1_strength = player1_action['strength']
+        action2_strength = player2_action['strength']
+        
+        action1_type = player1_action['type']
+        action2_type = player2_action['type']
+        
+        damage_to_player1 = 0
+        damage_to_player2 = 0
+        
+        # Both Players Attack...
+        if action1_type in ['Physical Offense', 'Magic Offense'] and action2_type in ['Physical Offense', 'Magic Offense']:
+            p1_strength_advantage = max((action2_strength - action1_strength) - (player2_stats['defense'] + player2_stats['defense_boost']), 0)
+            p2_strength_advantage = max((action1_strength - action2_strength) - (player1_stats['defense'] + player1_stats['defense_boost']), 0)
 
-        # Calculate damage
-        player1_attack = player1_action['damage']
-        player2_attack = player2_action['damage']
-        player1_defense = player1_stats['defense']  # Assuming player1_stats has a defense value
-        player2_defense = player2_stats['defense']  # Assuming player2_stats has a defense value
-
-        damage_to_player2 = max((player1_attack) - (player2_defense), 0)
-        damage_to_player1 = max((player2_attack) - (player1_defense), 0)
-
+            damage_to_player1 = math.ceil(p1_strength_advantage)
+            damage_to_player2 = math.ceil(p2_strength_advantage)
+            if damage_to_player1 == damage_to_player2:
+                text = "Both combatants' weapons clashed together, but neither came out on top! Both left unscathed."
+            elif damage_to_player1 > 0: 
+                text = f"Both combatants' weapons clashed together!\n{player1.display_name} took **{damage_to_player1} damage!**"
+            elif damage_to_player2 > 0: 
+                text = f"Both combatants' weapons clashed together!\n{player2.display_name} took **{damage_to_player2} damage!**"
+        
+        # Both Players Defend...
+        elif action1_type in ['Physical Defense', 'Magic Defense'] and action2_type in ['Physical Defense', 'Magic Defense']:
+            text = "Both combatants went on the defensive!\nUnsurprisingly, **nothing happened.**"
+            return
+        
+        def defense_win(attacker_stats, defender_stats, attack_strength, defense_strength, defense_is_magical):
+            damage_to_defender = max((attack_strength - (2 * defense_strength)) - (defender_stats['defense'] + defender_stats['defense_boost']), 1)
+            if defense_is_magical:
+                text = f"{defender_stats['profile_name']}'s magical defence dulled {attacker_stats['profile_name']}'s attack!\n{attacker_stats['profile_name']} dealt **{damage_to_defender} damage**!"
+            else:
+                text = f"{defender_stats['profile_name']}'s defence dulled {attacker_stats['profile_name']}'s attack!\n{attacker_stats['profile_name']} dealt **{damage_to_defender} damage**!" 
+            return damage_to_defender, text
+        
+        def attack_win(attacker_stats, defender_stats, attack_strength, defense_strength, attack_is_magical):
+            damage_to_defender = max(((2 * attack_strength) - defense_strength) - (defender_stats['defense'] + defender_stats['defense_boost']), 1)
+            if attack_is_magical:
+                text = f"{attacker_stats['profile_name']}'s magical offensive won out against {defender_stats['profile_name']}'s defenses!\n{attacker_stats['profile_name']} dealt **{damage_to_defender} damage**!"
+            else:
+                text = f"{attacker_stats['profile_name']}'s brute force won out against {defender_stats['profile_name']}'s magical shielding!\n{attacker_stats['profile_name']} dealt **{damage_to_defender} damage**!" 
+            return damage_to_defender, text
+        
+        # Defense Wins...
+            ## magic defense beats magic attack
+        if action1_type == 'Magic Defense' and action2_type == 'Magic Offense':
+            damage_to_player1, text = defense_win(player2_stats, player1_stats, action2_strength, action1_strength, True)
+            
+        elif action2_type == 'Magic Defense' and action1_type == 'Magic Offense':
+            damage_to_player2, text = defense_win(player1_stats, player2_stats, action1_strength, action2_strength, True)
+            
+            ## phys defense beats phys attack
+        elif action1_type == 'Physical Defense' and action2_type == 'Physical Offense':
+            damage_to_player1, text = defense_win(player2_stats, player1_stats, action2_strength, action1_strength, False)
+            
+        elif action2_type == 'Physical Defense' and action1_type == 'Physical Offense':
+            damage_to_player2, text = defense_win(player1_stats, player2_stats, action1_strength, action2_strength, False)
+            
+        # Attack Wins...
+            ## magic attack beats phys defense
+        elif action1_type == 'Magic Offense' and action2_type == 'Physical Defense':
+            damage_to_player2, text = attack_win(player1_stats, player2_stats, action1_strength, action2_strength, True)
+            
+        elif action2_type == 'Magic Offense' and action1_type == 'Physical Defense':
+            damage_to_player1, text = attack_win(player2_stats, player1_stats, action2_strength, action1_strength, True)
+            
+            ## phys attack beats magic defense
+        elif action1_type == 'Physical Offense' and action2_type == 'Magic Defense':
+            damage_to_player2, text = attack_win(player1_stats, player2_stats, action1_strength, action2_strength, False)
+            
+        elif action2_type == 'Physical Offense' and action1_type == 'Magic Defense':
+            damage_to_player1, text = attack_win(player2_stats, player1_stats, action2_strength, action1_strength, False)
+            
+        
         # Modify stats
-        print(f"Damage Calculation - {player1.display_name} deals {damage_to_player2}, {player2.display_name} deals {damage_to_player1}")
         await self.stats_manager.modify_user_stat(player1, 'health', -damage_to_player1) # Update Database
         await self.stats_manager.modify_user_stat(player2, 'health', -damage_to_player2) # Update Database
         player1_stats['health'] = player1_stats['health'] - damage_to_player1 # Update Local
         player2_stats['health'] = player2_stats['health'] - damage_to_player2 # Update Local
 
-        print(f"Updated Health - {player1.display_name}: {player1_stats['health']}, {player2.display_name}: {player2_stats['health']}")
-
         # Send battle update
-        battle_embed = discord.Embed(title="Battle Update", color=discord.Color.blue())
-        battle_embed.add_field(name="Attack Results", value=f"{player1.mention} dealt **{damage_to_player2}** damage to {player2.mention}!\n"
-                                                            f"{player2.mention} dealt **{damage_to_player1}** damage to {player1.mention}!", inline=False)
-        battle_embed.add_field(name=f"{player1.display_name}'s Health", value=f"{player1_stats['health']} HP", inline=True)
-        battle_embed.add_field(name=f"{player2.display_name}'s Health", value=f"{player2_stats['health']} HP", inline=True)
+        battle_embed = discord.Embed(title="Battle Update", 
+                                     color=discord.Color.red(), 
+                                     description=f"{player1_stats['profile_name']} used **{player1_action['name']}**! *(strength {action1_strength})*\n"
+                                                 f"***\"{random.choice(player1_action['lines'])}\"***\n\n"
+                                                 f"{player2_stats['profile_name']} used **{player2_action['name']}**! *(strength {action2_strength})*\n"
+                                                 f"***\"{random.choice(player2_action['lines'])}\"***\n\n\n"
+                                                 f"{text}",
+                                     )
+        battle_embed.add_field(name=f"{player1_stats['profile_name']}'s Health", value=f"{player1_stats['health']} HP", inline=True)
+        battle_embed.add_field(name=f"{player2_stats['profile_name']}'s Health", value=f"{player2_stats['health']} HP", inline=True)
         await thread.send(embed=battle_embed)
 
+        time.sleep(5)
+
         # Check if anyone has won
-        print("Checking for battle winner")
         if player1_stats['health'] <= 0:
             # Steal 20% of player1's coins
             player1_coins = player1_stats.get('coins', 0)
@@ -216,8 +308,8 @@ class Battle(commands.Cog):
                 description=f"{player2.mention} wins!\n{player2.mention} stole {stolen_coins} coins from {player1.mention}!",
                 color=discord.Color.green()
             )
-            victory_embed.add_field(name=f"{player1.display_name}'s Final Health", value=f"{max(0, player1_stats['health'])} HP", inline=True)
-            victory_embed.add_field(name=f"{player2.display_name}'s Final Health", value=f"{max(0, player2_stats['health'])} HP", inline=True)
+            victory_embed.add_field(name=f"{player1_stats['profile_name']}'s Final Health", value=f"{max(0, player1_stats['health'])} HP", inline=True)
+            victory_embed.add_field(name=f"{player2_stats['profile_name']}'s Final Health", value=f"{max(0, player2_stats['health'])} HP", inline=True)
             await thread.send(embed=victory_embed)
 
         elif player2_stats['health'] <= 0:
@@ -232,8 +324,8 @@ class Battle(commands.Cog):
                 description=f"{player1.mention} wins!\n{player1.mention} stole {stolen_coins} coins from {player2.mention}!",
                 color=discord.Color.green()
             )
-            victory_embed.add_field(name=f"{player1.display_name}'s Final Health", value=f"{player1_stats['health']} HP", inline=True)
-            victory_embed.add_field(name=f"{player2.display_name}'s Final Health", value=f"{player2_stats['health']} HP", inline=True)
+            victory_embed.add_field(name=f"{player1_stats['profile_name']}'s Final Health", value=f"{max(0, player1_stats['health'])} HP", inline=True)
+            victory_embed.add_field(name=f"{player2_stats['profile_name']}'s Final Health", value=f"{max(0, player2_stats['health'])} HP", inline=True)
             await thread.send(embed=victory_embed)
 
     async def cog_unload(self):

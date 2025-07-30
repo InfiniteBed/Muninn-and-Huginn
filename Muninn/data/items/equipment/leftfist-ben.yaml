@@ -4,7 +4,9 @@ description: Your left fist.
 slot: hand
 base_price: 999
 actions:
-- name: Punch
+- type: Physical Offense
+  name: Punch
   description: Take a swing at your enemy, gangsta style.
-  damage: 2
-  defense: -2
+  strength: 1
+  lines:
+  - Uhhhh ok.

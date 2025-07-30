@@ -1,0 +1,10 @@
+name: Health Jug
+type: single_use
+skill: alchemy
+recipe:
+- name: River Water
+  amount: 3
+- name: Kenko Berries
+  amount: 2
+- name: Ygeia Berries
+  amount: 3

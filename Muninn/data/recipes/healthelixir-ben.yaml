@@ -1,0 +1,8 @@
+name: Health Elixir
+type: single_use
+skill: alchemy
+recipe:
+- name: River Water
+  amount: 1
+- name: Kenko Berries
+  amount: 4

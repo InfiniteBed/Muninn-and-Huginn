@@ -3,13 +3,17 @@ type: equipment
 description: A basic iron sword for melee attacks
 shop: true
 slot: hand
-base_price: 50
+base_price: 12
 actions:
-- name: Swing
+- type: Physical Offense
+  name: Steel Slash
   description: Take a slice at your enemy.
-  damage: 10
-  defense: -1
-- name: Parry
-  description: Extend your sword to block the enemy's attack.
-  damage: 4
-  defense: 6
+  strength: 6
+  lines:
+  - Alright, let's do this!
+- type: Physical Defense
+  name: Blade Block
+  description: Block an attack with the flat of your blade.
+  strength: 4
+  lines:
+  - Think again.

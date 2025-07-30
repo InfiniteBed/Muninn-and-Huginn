@@ -19,7 +19,7 @@ class StatsManager(commands.Cog):
         conn = sqlite3.connect('discord.db')
         c = conn.cursor()
 
-        c.execute('SELECT health, health_max, defense, attack, level, activity, coins, job1, job2, job3, found_jobs FROM stats WHERE user_id = ?', (user.id,))
+        c.execute('SELECT health, health_max, defense, defense_boost, attack, level, activity, coins, job1, job2, job3, found_jobs FROM stats WHERE user_id = ?', (user.id,))
         stats_data = c.fetchone()
 
         c.execute('SELECT class, gender, alignment, race, name, bio, ability_scores FROM profiles WHERE user_id = ?', (user.id,))
@@ -49,7 +49,7 @@ class StatsManager(commands.Cog):
         
         #Retrieve Variables from Dictionaries
         profile_class, profile_gender, profile_alignment, profile_race, profile_name, profile_bio, ability_scores_str = profile_data
-        health, health_max, defense, attack, level, activity, coins, job1, job2, job3, available_jobs = stats_data
+        health, health_max, defense, defense_boost, attack, level, activity, coins, job1, job2, job3, available_jobs = stats_data
         _, head, upper, lower, feet, hand_left, hand_right = equipped_armor
 
         #Process Bio
@@ -94,6 +94,7 @@ class StatsManager(commands.Cog):
             'health_max': health_max,
             'health_display': health_display,
             'defense': defense,
+            'defense_boost': defense_boost,
             'defense_display': defense_display,
             'attack': attack,
             'attack_display': attack_display,
@@ -213,6 +214,10 @@ class StatsManager(commands.Cog):
             inventory.append(json.loads(current_equipped))
 
         c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user_id))
+        
+        ## Update item defense
+        if item_data['defense']:
+            c.execute("UPDATE stats SET defense_boost = defense_boost + ? WHERE user_id = ?", (item_data['defense'], user_id))
 
         conn.commit()
         conn.close()
@@ -300,6 +305,9 @@ class StatsManager(commands.Cog):
         # Update inventory (store it back as JSON string)
         await ctx.send(json.dumps(inventory))
         c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user.id))
+        
+        if item_data['defense']:
+            c.execute("UPDATE stats SET defense_boost = defense_boost - ? WHERE user_id = ?", (item_data['defense'], user_id))
 
         conn.commit()
         conn.close()

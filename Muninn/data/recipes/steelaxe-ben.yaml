@@ -1,0 +1,7 @@
+name: Steel Axe
+type: equipment
+recipe:
+- name: Steel Axe Head
+  amount: 1
+- name: Branch
+  amount: 4

@@ -1,0 +1,14 @@
+name: Steel Axe
+type: equipment
+description: A heavy steel axe. It can be used to chop wood or as a weapon.
+slot: hand
+base_price: 16
+actions:
+- type: Physical Offense
+  name: Chop
+  description: A powerful swing of the axe.
+  strength: 7
+  lines:
+  - Feel the weight of the steel!
+  - You're nothing more than a twig!
+  - A swing of the axe is all it takes!

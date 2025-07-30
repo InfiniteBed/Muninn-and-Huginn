@@ -7,6 +7,26 @@ skill_test: 1
 money_reward_base: 0
 money_reward_deviation: 0
 item_pool:
+- name: Kenko Berries
+  type: crafting
+  chance_to_appear: 0.8
+  std_amount: 10
+  std_deviation: 5
+- name: Ygeia Berries
+  type: crafting
+  chance_to_appear: 0.5
+  std_amount: 6
+  std_deviation: 5
+- name: Sani Berries
+  type: crafting
+  chance_to_appear: 0.1
+  std_amount: 20
+  std_deviation: 15
+- name: River Water
+  type: crafting
+  chance_to_appear: 0.7
+  std_amount: 3
+  std_deviation: 3
 - name: Branch
   type: crafting
   chance_to_appear: 0.6

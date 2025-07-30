@@ -2,5 +2,5 @@ name: Health Potion
 description: A palm sized spherical bottle, filled with a shimmering red liquid. The
   glass is warm to the touch.
 type: consumable
-base_heal: 10
+base_heal: 5
 base_price: 10

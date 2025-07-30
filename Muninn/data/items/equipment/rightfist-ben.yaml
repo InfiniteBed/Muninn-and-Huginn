@@ -4,7 +4,16 @@ description: Your right fist.
 slot: hand
 base_price: 999
 actions:
-- name: Hook
+- type: Physical Offense
+  name: Hook
   description: LEFT HOOK! RIGHT HOOK!!!
-  damage: 2
-  defense: -2
+  strength: 1
+  lines:
+  - Uhhhh alright.
+- type: Physical Defense
+  name: Block
+  description: Block with your right forearm.
+  strength: 1
+  lines:
+  - This is gonna hurt...
+

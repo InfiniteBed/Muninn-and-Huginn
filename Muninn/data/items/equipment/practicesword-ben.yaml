@@ -6,9 +6,9 @@ description: A finely crafted wooden sword, designed for training and practice.
 slot: hand
 base_price: 25
 actions:
-- name: Practice Slash
+- type: Physical Offense
+  name: Practice Slash
   description: A swift slash with the practice sword, perfect for training.
+  strength: 4
   lines:
   - "Focus on your form!"
-  damage: 5
-  defense: 0
