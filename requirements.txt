@@ -7,3 +7,4 @@ seaborn
 psycopg2
 regex
 icecream
+plexapi

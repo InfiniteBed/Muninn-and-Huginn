@@ -40,6 +40,7 @@ class GoMarket(commands.Cog):
         conn.commit()
         conn.close()
         
+        
     def market_serialize(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -173,7 +174,7 @@ class GoMarket(commands.Cog):
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT OR REPLACE INTO vendors (user, name, description, items) VALUES (?, ?, ?, ?)", (vendor_id, vendor_name, description, json.dumps(new_shop_data)))
+            cursor.execute("INSERT OR REPLACE INTO vendors (user, name, description, items) VALUES (?, ?, ?, ?)", (vendor_id, vendor_name, vendor_description, json.dumps(new_shop_data)))
         finally:
             conn.commit()
             conn.close()
@@ -448,6 +449,69 @@ class GoMarket(commands.Cog):
             color=0xFF8250
         )
 
+        class SellValueModal(Modal):
+            def __init__(self, ctx, item_index, user_data, market_cog):
+                super().__init__(title="Sell Item")
+
+                # Store the necessary data
+                self.ctx = ctx
+                self.item_index = item_index
+                self.user_data = user_data
+                self.market_cog = market_cog
+
+                # Create input fields first
+                self.sellvalue = SellValue("How many coins will you sell your item for?", ctx)
+
+                # Then add them to the modal
+                self.add_item(self.sellvalue)
+
+            async def on_submit(self, interaction: discord.Interaction):
+                sell_value_str = self.sellvalue.value
+            
+                ic('made it here!')
+                
+                # Try to convert the string to an integer
+                try:
+                    sell_value = int(sell_value_str)
+                    # Optional: Check if the value is positive
+                    if sell_value <= 0:
+                        await interaction.response.send_message(embed=discord.Embed(
+                            title="Invalid price!",
+                            description="Please enter a positive number greater than 0.",
+                            color=discord.Color.red()
+                        ), view=None, ephemeral=True)
+                        return
+                except ValueError:
+                    await interaction.response.send_message(embed=discord.Embed(
+                            title="You did not enter a number!",
+                            description="Please enter only a number next time. :(",
+                            color=discord.Color.red()
+                        ), view=None, ephemeral=True)
+                    return
+                
+                # Process the item sale here
+                item = self.user_data['inventory'][self.item_index]
+                item['base_price'] = sell_value
+
+                embed = discord.Embed(
+                    title=f"{self.user_data['profile_name']} put the {item['name']} up for sale for {item['base_price']} coins! You've made the stall happy :)", 
+                    color=0xFF8250, 
+                    description=""
+                )
+                
+                # Remove item from the user's inventory and add to vendor
+                self.market_cog.add_item_to_vendor(interaction.user.id, item)
+                user_manager.remove_from_user_inventory(interaction.user.id, item)
+                
+                await interaction.response.edit_message(embed=embed, view=None)
+                
+        class SellValue(TextInput):
+            def __init__(self, label, ctx):
+                super().__init__(label=label, placeholder="Type a number here...", default=None, required=True)
+            
+            async def callback(self, interaction: discord.Interaction):
+                sellvalue = self.value
+
         class VendorDropdown(Select):
             def __init__(self, options):
                 super().__init__(
@@ -476,20 +540,11 @@ class GoMarket(commands.Cog):
                     await interaction.response.send_message("Sorry, this menu isn't for you.", ephemeral=True)
                     return
                 
-                index = int(self.values[0])           
-                item = user_data['inventory'][index]
-
                 index = int(self.values[0])
-                embed = discord.Embed(title=f"{user_data['profile_name']} put the {item['name']} up for sale! You've made the stall happy :)", 
-                                      color=0xFF8250, 
-                                      description="")
-                
-                ## Remove item from the user's inventory
-                market_cog.add_item_to_vendor(interaction.user.id, item)
-                user_manager.remove_from_user_inventory(interaction.user.id, item)
-                
-                await interaction.response.edit_message(embed=embed, view=None)
+                modal = SellValueModal(ctx, index, user_data, market_cog)
+                await interaction.response.send_modal(modal)
 
+    
         class VendorDropdownView(View):
             def __init__(self, dropdown: VendorDropdown):
                 super().__init__(timeout=60)
@@ -498,7 +553,7 @@ class GoMarket(commands.Cog):
         dropdown = await VendorDropdown.create()
 
         view = VendorDropdownView(dropdown)
-
+        
         return embed, view
     
     def if_user_has_stall(self, ctx):

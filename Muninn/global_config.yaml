@@ -1,0 +1,11 @@
+# Global configuration for Muninn/Huginn bot
+# Update the Plex section with your server details.
+plex:
+  enabled: false
+  base_url: "http://localhost:32400"
+  token: "YOUR_PLEX_TOKEN"
+  music_library: "Music"
+  allow_transcode: true
+  timeout: 10
+music:
+  default_provider: "youtube"

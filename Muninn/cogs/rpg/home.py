@@ -110,7 +110,8 @@ class Home(commands.Cog):
                 for index in reversed(range(len(user_stats['inventory']))):
                     inv_item = user_stats['inventory'][index]
                     if inv_item['name'] == item_name:
-                        item_data = self.user_manager.get_item_in_inventory(interaction.author.id, index)
+                        # Use the actual item data from the user_stats inventory instead of fetching by index
+                        item_data = inv_item
                         self.user_manager.remove_from_user_inventory(user_id, item_data)
                         removed += 1
                         if removed >= amount_to_remove:

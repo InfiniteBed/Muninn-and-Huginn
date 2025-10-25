@@ -1,4 +1,6 @@
 matplotlib
+seaborn
 discord.py
 yt-dlp==2025.6.25
 PyNaCl
+plexapi

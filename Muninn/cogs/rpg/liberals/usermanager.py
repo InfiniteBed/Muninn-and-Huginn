@@ -50,7 +50,12 @@ class StatsManager(commands.Cog):
         #Retrieve Variables from Dictionaries
         profile_class, profile_gender, profile_alignment, profile_race, profile_name, profile_bio, ability_scores_str = profile_data
         health, health_max, defense, defense_boost, attack, level, activity, coins, job1, job2, job3, available_jobs = stats_data
-        _, head, upper, lower, feet, hand_left, hand_right = equipped_armor
+        
+        # Handle case where user has no equipped items
+        if equipped_armor:
+            _, head, upper, lower, feet, hand_left, hand_right = equipped_armor
+        else:
+            head, upper, lower, feet, hand_left, hand_right = None, None, None, None, None, None
 
         #Process Bio
         if profile_bio is None:
@@ -216,7 +221,7 @@ class StatsManager(commands.Cog):
         c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user_id))
         
         ## Update item defense
-        if item_data['defense']:
+        if item_data.get('defense'):
             c.execute("UPDATE stats SET defense_boost = defense_boost + ? WHERE user_id = ?", (item_data['defense'], user_id))
 
         conn.commit()
@@ -306,8 +311,10 @@ class StatsManager(commands.Cog):
         await ctx.send(json.dumps(inventory))
         c.execute("UPDATE inventory SET inventory = ? WHERE user_id = ?", (json.dumps(inventory), user.id))
         
-        if item_data['defense']:
-            c.execute("UPDATE stats SET defense_boost = defense_boost - ? WHERE user_id = ?", (item_data['defense'], user_id))
+        # Parse equipped item data and update defense if it exists
+        equipped_item_data = json.loads(equipped_item)
+        if equipped_item_data.get('defense'):
+            c.execute("UPDATE stats SET defense_boost = defense_boost - ? WHERE user_id = ?", (equipped_item_data['defense'], user.id))
 
         conn.commit()
         conn.close()
@@ -346,7 +353,7 @@ class StatsManager(commands.Cog):
         conn = sqlite3.connect('discord.db')
         cursor = conn.cursor()
 
-        #Check if inventotry is empty, then skip if empty.
+        #Check if inventory is empty, then skip if empty.
         cursor.execute("SELECT inventory FROM inventory WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
         ic(result)

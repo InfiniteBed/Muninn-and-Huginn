@@ -1,11 +1,10 @@
 import discord
 from discord.ext import commands
-import yaml
+import json
 from discord.ui import View, Button
 import asyncio
 import sqlite3
 import datetime
-import os
 
 class ContributionApprovalView(View):
     def __init__(self, contribution_id, bot_owner_id):
@@ -19,25 +18,30 @@ class ContributionApprovalView(View):
             await interaction.response.send_message("Only the bot owner can approve.", ephemeral=True)
             return
         
+        # Mark approved in DB and apply the contribution to its destination
         submitter_id = None
         guild_id = None
         content = None
         contribution_type = None
-        
+        now_iso = datetime.datetime.utcnow().isoformat()
+
         with sqlite3.connect("discord.db") as conn:
             c = conn.cursor()
-            c.execute("UPDATE contributions SET approved = 1, approved_at = ? WHERE id = ?", 
-                     (datetime.datetime.utcnow().isoformat(), self.contribution_id))
             c.execute("SELECT submitter_id, guild_id, content, contribution_type FROM contributions WHERE id = ?", (self.contribution_id,))
             row = c.fetchone()
             if row:
                 submitter_id, guild_id, content, contribution_type = row
+
+            c.execute("UPDATE contributions SET approved = 1, approved_at = ? WHERE id = ?", (now_iso, self.contribution_id))
             conn.commit()
-        
-        # Special handling for Random Prompts - communicate with Huginn
-        if contribution_type == "Random Prompts":
-            await self.add_prompt_to_huginn(content, submitter_id, interaction.client)
-        
+
+        # Try to apply the contribution to the appropriate storage by delegating to the Contribution cog
+        cog = interaction.client.get_cog('Contribution')
+        if cog:
+            applied_ok, note = await cog._apply_contribution(content, contribution_type, guild_id)
+        else:
+            applied_ok, note = False, "Contribution cog not loaded; manual action required."
+
         # Award a star to the submitter
         if submitter_id and guild_id:
             with sqlite3.connect("discord.db") as conn:
@@ -52,63 +56,9 @@ class ContributionApprovalView(View):
                     c.execute('INSERT INTO stars (guild_id, user_id, stars) VALUES (?, ?, ?)', 
                              (guild_id, submitter_id, 1))
                 conn.commit()
-        
-        await interaction.response.send_message("Contribution approved! Submitter awarded a star.", ephemeral=True)
-        await interaction.message.edit(view=None)
 
-    async def add_prompt_to_huginn(self, content, submitter_id, bot):
-        """Add approved prompt to shared communication for Huginn to pick up"""
-        try:
-            # Get submitter name
-            submitter_name = "Anonymous"
-            try:
-                user = await bot.fetch_user(submitter_id)
-                submitter_name = user.display_name
-            except:
-                pass
-            
-            # Create new prompt object
-            new_prompt = {
-                "text": content,
-                "contributor": submitter_name,
-                "downvotes": 0,
-                "downvoted_by": [],
-                "added_at": datetime.datetime.utcnow().isoformat(),
-                "status": "pending_addition"
-            }
-            
-            # Add to shared communication file for Huginn to pick up
-            shared_comm_path = "/mnt/Lake/Starboard/Discord/shared_communication.yaml"
-            try:
-                # Load existing communication data
-                if os.path.exists(shared_comm_path):
-                    with open(shared_comm_path, 'r', encoding='utf-8') as f:
-                        comm_data = yaml.safe_load(f) or {}
-                else:
-                    comm_data = {}
-                
-                if "communication" not in comm_data:
-                    comm_data["communication"] = {}
-                if "pending_prompts" not in comm_data["communication"]:
-                    comm_data["communication"]["pending_prompts"] = []
-                
-                # Add the new prompt to pending list
-                comm_data["communication"]["pending_prompts"].append(new_prompt)
-                
-                # Update last check time to signal new data
-                comm_data["communication"]["last_update"] = datetime.datetime.utcnow().isoformat()
-                
-                # Write back to shared file
-                with open(shared_comm_path, 'w', encoding='utf-8') as f:
-                    yaml.dump(comm_data, f, default_flow_style=False, allow_unicode=True, indent=2)
-                
-                print(f"Added prompt to shared communication for Huginn: {content}")
-                
-            except Exception as e:
-                print(f"Error updating shared communication: {e}")
-            
-        except Exception as e:
-            print(f"Error in add_prompt_to_huginn: {e}")
+        await interaction.response.send_message(f"Contribution approved! Applied: {applied_ok}. {note}", ephemeral=True)
+        await interaction.message.edit(view=None)
 
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.red, custom_id="reject_contribution")
     async def reject(self, interaction: discord.Interaction, button: Button):
@@ -160,6 +110,86 @@ class Contribution(commands.Cog):
         conn.commit()
         conn.close()
 
+    async def _apply_contribution(self, content: str, contribution_type: str, guild_id: int):
+        """Apply an approved contribution to the appropriate data store.
+
+        Returns (success: bool, note: str)
+        """
+        import pathlib, json, yaml
+
+        try:
+            # Simple types handled by file updates
+            if contribution_type in ("Muninn @ Response", "Huginn @ Response", "Mention Response"):
+                # Use InterBotCommunication cog to add @ responses which handles file paths
+                ibc = self.bot.get_cog('InterBotCommunication')
+                if ibc:
+                    # For Huginn @ Response, try to send to other bot and also add locally
+                    if contribution_type == "Huginn @ Response":
+                        # Attempt to ask other bot to add it
+                        success = await ibc.send_to_other_bot("at_response_update", {"response": content}, guild_id)
+                        # Always try to add locally as well (for Muninn)
+                        await ibc.add_at_response(content, guild_id)
+                        if not success:
+                            return True, "Added locally; failed to reach other bot — manual sync may be required."
+                        return True, "Added @ response to bot(s)."
+                    else:
+                        await ibc.add_at_response(content, guild_id)
+                        return True, "Added @ response."
+                else:
+                    return False, "Inter-bot cog not found; manual action required."
+
+            if contribution_type == "Message Rewards":
+                # Update Muninn/responses.yaml -> message_rewards with next numeric key
+                resp_path = pathlib.Path(__file__).resolve().parent.parent / 'responses.yaml'
+                if not resp_path.exists():
+                    return False, f"responses.yaml not found at {resp_path}"
+                with open(resp_path, 'r', encoding='utf-8') as f:
+                    data = yaml.safe_load(f)
+
+                msg_rewards = data.get('message_rewards', {})
+                # compute next key: max existing numeric key + 100
+                numeric_keys = [int(k) for k in msg_rewards.keys() if str(k).isdigit()]
+                next_key = (max(numeric_keys) if numeric_keys else 100) + 100
+                msg_rewards[str(next_key)] = content
+                data['message_rewards'] = msg_rewards
+                with open(resp_path, 'w', encoding='utf-8') as f:
+                    yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+                return True, f"Added message reward at {next_key}."
+
+            if contribution_type in ("Random Insults", "Random Prompts", "Message Rewards", "Mention Response", "GIF Ban Response"):
+                # Append to contributions.json to keep historical randomized pools
+                contrib_path = pathlib.Path(__file__).resolve().parent.parent / 'contributions.json'
+                if contrib_path.exists():
+                    with open(contrib_path, 'r', encoding='utf-8') as f:
+                        cj = json.load(f)
+                else:
+                    cj = {"submissions": []}
+
+                entry = {"user": "approved", "type": contribution_type if contribution_type else "Unknown", "initial_response": content}
+                cj.setdefault('submissions', []).append(entry)
+                with open(contrib_path, 'w', encoding='utf-8') as f:
+                    json.dump(cj, f, indent=2, ensure_ascii=False)
+                return True, "Appended to contributions.json"
+
+            # Types that are too complex or RPG-related
+            if contribution_type and any(x in contribution_type for x in ("Items", "Weapons", "Armor", "Jobs", "Commands", "Expeditions")):
+                # Leave approved flag set but inform owner manual steps are required
+                owner = self.bot.get_user(self.bot.owner_id)
+                if owner is None:
+                    try:
+                        owner = await self.bot.fetch_user(self.bot.owner_id)
+                    except Exception:
+                        owner = None
+                if owner:
+                    await owner.send(f"Contribution approved but requires manual integration: type={contribution_type}\nContent: {content}")
+                return True, "Marked approved; manual integration required (RPG/complex)."
+
+            # Default fallback: mark approved but no automated action
+            return True, "Approved but no automated handler for this contribution type."
+
+        except Exception as e:
+            return False, f"Error applying contribution: {e}"
+
     @commands.command()
     async def contribute(self, ctx, *, initial_response: str = None):
         if not initial_response:
@@ -189,6 +219,8 @@ class ContributionTypeView(View):
         self.add_item(ContributionButton("Huginn @ Response", "Huginn @ Response", bot, author, initial_response))
         self.add_item(ContributionButton("Random Insults", "Random Insults", bot, author, initial_response))
         self.add_item(ContributionButton("Random Prompts", "Random Prompts", bot, author, initial_response))
+        # Allow contributors to submit messages that will be used when GIF enforcement triggers
+        self.add_item(ContributionButton("GIF Ban Response", "GIF Ban Response", bot, author, initial_response))
         self.add_item(ContributionButton("Message Rewards", "Message Rewards", bot, author, initial_response))
         self.add_item(ContributionButton("Items/Weapons/Armor", "Items/Weapons/Armor", bot, author, initial_response))
         self.add_item(ContributionButton("Jobs", "Jobs", bot, author, initial_response))
@@ -378,10 +410,6 @@ class ContributionButton(Button):
         cursor.execute("UPDATE contributions SET approved = 1, approved_at = ? WHERE id = ?", 
                       (datetime.datetime.utcnow().isoformat(), contribution_id))
         
-        # Special handling for Random Prompts
-        if contribution_type == "Random Prompts":
-            await self.add_prompt_to_huginn(content, submitter_id, self.bot)
-        
         # Award star
         cursor.execute('SELECT stars FROM stars WHERE guild_id = ? AND user_id = ?', (guild_id, submitter_id))
         result = cursor.fetchone()
@@ -439,6 +467,45 @@ class ContributionButton(Button):
             description=f"**ID:** {contribution_id}\n**Type:** {contribution_type}\n**Content:** {content[:500]}...\n**Submitter:** {submitter.mention if submitter else 'Unknown'}"
         )
         await ctx.send(embed=embed)
+
+    @commands.command(name='resend_approval')
+    @commands.is_owner()
+    async def resend_approval(self, ctx, contribution_id: int):
+        """Resend the approval DM for a pending contribution (owner only)."""
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, submitter_id, guild_id, content, contribution_type, submitted_at FROM contributions WHERE id = ? AND approved = 0', (contribution_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if not row:
+            await ctx.send(f"No pending contribution found with ID {contribution_id}.")
+            return
+
+        _, submitter_id, guild_id, content, contribution_type, submitted_at = row
+
+        # Send DM with approval buttons to owner
+        owner = ctx.bot.get_user(ctx.bot.owner_id)
+        if not owner:
+            try:
+                owner = await ctx.bot.fetch_user(ctx.bot.owner_id)
+            except Exception:
+                await ctx.send("Could not find bot owner to send approval.")
+                return
+
+        embed_to_owner = discord.Embed(
+            title="Pending Contribution Awaiting Approval (Resent)",
+            color=discord.Color.orange(),
+            description=(
+                f"**Type:** {contribution_type}\n"
+                f"**Content:** {content}\n"
+                f"**Submitted at:** {submitted_at}\n"
+            )
+        )
+        embed_to_owner.set_footer(text=f"Contribution ID: {contribution_id}")
+        view = ContributionApprovalView(contribution_id, ctx.bot.owner_id)
+        await owner.send(embed=embed_to_owner, view=view)
+        await ctx.send(f"Resent approval DM for contribution {contribution_id}.")
 
 async def setup(bot):
     await bot.add_cog(Contribution(bot))

@@ -5,6 +5,8 @@ import sqlite3
 import os
 from pathlib import Path
 from cogs.graphs.discord_theme import DiscordTheme
+from cogs.graphs.discord_theme import font_manager as _fm  # type: ignore
+from ..advanced_graphs import sanitize_text
 import pytz
 from datetime import datetime, timedelta
 import numpy as np
@@ -16,6 +18,8 @@ class MealStatsGraph(commands.Cog):
         self.db_path = "discord.db"
         self.california_tz = pytz.timezone('US/Pacific')
         self.emoji_renderer = TwemojiRenderer(bot)
+        # emoji_prop will be set when needed; fallback to regular prop if font missing
+        self.emoji_prop = None
         
     def _get_emoji_name(self, emoji):
         """Extract readable name from emoji"""
@@ -103,9 +107,9 @@ class MealStatsGraph(commands.Cog):
         # If it's a regular emoji, look up its name
         if emoji in emoji_names:
             return emoji_names[emoji]
-        
-        # If we don't recognize it, return the emoji itself
-        return f"UNKNOWN ({emoji})"
+
+        # If we don't recognize it, return a generic UNKNOWN label (do not return the raw glyph)
+        return "UNKNOWN"
 
     @commands.command(name="top_emojis")
     async def show_top_emojis(self, ctx, user: discord.User = None, days: int = 30):
@@ -171,18 +175,11 @@ class MealStatsGraph(commands.Cog):
             ax = plt.gca()
             ax.set_yticks(y_pos)
             
-            # Create labels by combining emoji and name
-            labels = []
-            for emoji in emojis:
-                name = self._get_emoji_name(emoji)
-                # For custom Discord emojis, just use the name
-                if emoji.startswith('<') and emoji.endswith('>'):
-                    labels.append(name)
-                else:
-                    # For regular emojis, show both emoji and name
-                    labels.append(f"{emoji}  {name}")
-            
-            ax.set_yticklabels(labels, fontproperties=prop)
+            # Create labels by using only the readable name (no emoji glyphs)
+            labels_text = [sanitize_text(self._get_emoji_name(e)) for e in emojis]
+
+            ax.set_yticks(y_pos)
+            ax.set_yticklabels(labels_text, fontproperties=prop)
             
             # Add count labels on the bars
             for i, v in enumerate(counts):

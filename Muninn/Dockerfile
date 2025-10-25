@@ -19,9 +19,11 @@ RUN pip install regex
 RUN pip install ollama
 RUN pip install pyyaml
 RUN pip install mplcairo
-RUN pip install yt-dlp==2025.6.25
+RUN pip install yt-dlp
 RUN pip install PyNaCl
 RUN pip install icecream
+RUN pip install aiohttp
+RUN pip install postgresql
 
 # Create the directory for the bot and set it as the working directory
 WORKDIR /usr/src/bot

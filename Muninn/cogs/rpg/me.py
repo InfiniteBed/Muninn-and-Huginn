@@ -510,7 +510,7 @@ class Status(commands.Cog):
                         ic(is_promotion)
                                                                                         
                         if is_promotion:
-                            description += f"**{user_stats['profile_name']} got a raise to {activity_data['promotion_title']}!**\n\n"
+                            description += f"**{user_stats['profile_name']} got a promotion to {activity_data['promotion_title']}!**\n\n"
                         if activity_data.get('xp_change'):
                             description += f"Increased **{activity_data['proficiency'].title()}** proficiency by `{activity_data['xp_change']}`.\n\n"
 
@@ -521,6 +521,7 @@ class Status(commands.Cog):
                         embed = discord.Embed(title=f"{user_stats['profile_name']} got {activity_data['coins_change']} coins for {activity_data['hours']} hours of work!", 
                                               description=description, 
                                               color=discord.Color.green())
+                        embed.set_thumbnail(url="attachment://image.png" if has_custom_image else user.avatar.url)
                         
                         class SeeExpeditionResults(View):
                             def __init__(self):

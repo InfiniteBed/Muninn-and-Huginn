@@ -441,22 +441,12 @@ class DevotionAccountability(commands.Cog):
     async def send_devotion_message(self, channel):
         """Send the daily devotion accountability message."""
         embed = discord.Embed(
-            title="Daily Faith Check-In 🙏",
+            title="Faith Check-In",
             description=(
-                "Hey everyone! Time for our daily accountability check-in!\n\n"
-                "**Did you read your Bible and/or talk to God today?**\n\n"
-                "📝 Use the dropdown below to submit your devotion, or use these commands:\n"
-                "• `!devo yes` - I had my devotion time today\n"
-                "• `!devo no` - I didn't have devotion time today\n"
-                "• `!devo later` - I haven't had my devotion time yet\n\n"
-                "💡 *If you select 'Yes', you'll be asked to share when and optionally what "
-                "the Holy Spirit was leading you to. Your response will be shared publicly to encourage "
-                "others, but feel free to be as vague or detailed as you're comfortable with!*"
+                "Time for our daily accountability check-in!"
             ),
             color=discord.Color.blue()
         )
-        embed.set_footer(text="Let's grow in our faith together!")
-        
         view = DevotionSelectView()
         message = await channel.send(embed=embed, view=view)
         

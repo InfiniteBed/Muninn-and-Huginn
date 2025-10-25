@@ -58,6 +58,9 @@ async def load_cogs():
     for foldername, subfolders, files in os.walk("./cogs"):
         for filename in files:
             if filename.endswith(".py"):
+                if filename == "profile_setup.py" and relative_path == ".":
+                    # Skip legacy duplicate; RPG version provides the cog
+                    continue
                 relative_path = os.path.relpath(foldername, "./cogs")
                 if relative_path == ".":
                     cog_path = f"cogs.{filename[:-3]}"

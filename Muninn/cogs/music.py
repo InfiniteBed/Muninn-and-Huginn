@@ -13,7 +13,50 @@ import logging
 import traceback
 import aiohttp
 import json
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
+
+try:
+    from plexapi.server import PlexServer
+    from plexapi.exceptions import PlexApiException
+except Exception:  # pragma: no cover - fallback when plexapi isn't installed yet
+    PlexServer = None
+    PlexApiException = Exception  # type: ignore
+
+def _import_load_global_config():
+    # Try multiple import strategies so this cog can be loaded whether the
+    # package is imported as `Muninn` (package-absolute) or as a top-level
+    # `cogs` module. Falls back to loading the configuration.py file by path.
+    try:
+        from Muninn.configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+    try:
+        # Try top-level import if the project root is on sys.path
+        from configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+    try:
+        # Try relative import when package context is different
+        from ..configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+
+    # Last resort: import by file path relative to this file
+    import importlib.util, os
+    config_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'configuration.py'))
+    if os.path.exists(config_path):
+        spec = importlib.util.spec_from_file_location('muninn_configuration', config_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)  # type: ignore
+        return getattr(module, 'load_global_config')
+
+    raise ImportError('Could not import load_global_config from Muninn.configuration or configuration.py')
+
+
+load_global_config = _import_load_global_config()
 
 # Set up logging
 logger = logging.getLogger('music_bot')
@@ -686,6 +729,33 @@ FFMPEG_OPTIONS = {
     'options': '-vn',
 }
 
+_FFMPEG_EXECUTABLE_CACHE: Optional[str] = None
+
+
+def get_ffmpeg_executable() -> str:
+    global _FFMPEG_EXECUTABLE_CACHE
+    if _FFMPEG_EXECUTABLE_CACHE:
+        return _FFMPEG_EXECUTABLE_CACHE
+
+    possible_paths = [
+        './ffmpeg',
+        './bin/ffmpeg',
+        '/usr/bin/ffmpeg',
+        '/usr/local/bin/ffmpeg',
+        'ffmpeg',
+    ]
+
+    for path in possible_paths:
+        if path == 'ffmpeg':
+            _FFMPEG_EXECUTABLE_CACHE = path
+            return path
+        if os.path.exists(path):
+            _FFMPEG_EXECUTABLE_CACHE = path
+            return path
+
+    _FFMPEG_EXECUTABLE_CACHE = 'ffmpeg'
+    return _FFMPEG_EXECUTABLE_CACHE
+
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
@@ -697,6 +767,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.thumbnail = data.get('thumbnail')
         self.uploader = data.get('uploader')
         self.webpage_url = data.get('webpage_url')
+        self.provider = data.get('provider', 'youtube')
         self.downloaded_file = None  # Will be set if file was downloaded
         self.original = source  # Add reference to original source for Discord.py compatibility
     
@@ -897,27 +968,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # Create FFmpeg audio source with explicit options
             try:
                 logger.debug(f"Creating FFmpeg audio source from: {'file' if downloaded_file else 'stream'}")
-                
-                # Try to find FFmpeg executable
-                ffmpeg_executable = None
-                possible_paths = [
-                    './ffmpeg',  # In current directory
-                    './bin/ffmpeg',  # In bin subdirectory
-                    '/usr/bin/ffmpeg',  # System installation
-                    '/usr/local/bin/ffmpeg',  # Local installation
-                    'ffmpeg'  # In PATH
-                ]
-                
-                for path in possible_paths:
-                    if os.path.exists(path) or path == 'ffmpeg':
-                        ffmpeg_executable = path
-                        logger.debug(f"Found FFmpeg at: {path}")
-                        break
-                
-                if not ffmpeg_executable:
-                    logger.error("FFmpeg not found in any expected location")
-                    raise commands.CommandError("❌ FFmpeg not found. Please install FFmpeg or place the binary in the project folder.")
-                
+                ffmpeg_executable = get_ffmpeg_executable()
+
                 if downloaded_file:
                     # For downloaded files, use simpler options
                     ffmpeg_source = discord.FFmpegPCMAudio(
@@ -990,6 +1042,97 @@ class YTDLSource(discord.PCMVolumeTransformer):
             logger.error(f"Full traceback: {tb_str}")
             raise commands.CommandError(f"❌ Error extracting audio: {type(e).__name__}: {str(e)}")
 
+
+class PlexAudioSource(discord.PCMVolumeTransformer):
+    def __init__(self, source: discord.AudioSource, *, data: Dict[str, Any], volume: float = 0.5):
+        super().__init__(source, volume)
+        self.data = data
+        self.title = data.get('title')
+        self.url = data.get('stream_url')
+        self.duration = data.get('duration')
+        self.thumbnail = data.get('thumbnail')
+        self.uploader = data.get('artist')
+        self.album = data.get('album')
+        self.webpage_url = data.get('webpage_url')
+        self.provider = 'plex'
+        self.downloaded_file = None
+        self.original = source
+
+    def cleanup(self):
+        """Plex streams are remote; nothing to clean up."""
+        return
+
+
+class PlexMusicProvider:
+    def __init__(self, *, base_url: str, token: str, allow_transcode: bool = True, timeout: int = 10):
+        if not PlexServer:
+            raise RuntimeError("plexapi is not installed; install plexapi to enable Plex integration")
+
+        self.base_url = base_url.rstrip('/')
+        self.token = token
+        self.allow_transcode = allow_transcode
+        self.timeout = timeout
+        self._client: Any = None
+        self._library_cache: Dict[str, Any] = {}
+        self._signature = (self.base_url, self.token, self.allow_transcode, self.timeout)
+
+    @property
+    def signature(self) -> tuple[str, str, bool, int]:
+        return self._signature
+
+    def _connect(self):
+        if not self._client:
+            self._client = PlexServer(self.base_url, self.token, timeout=self.timeout)
+        return self._client
+
+    def _get_library(self, library_name: str):
+        library_key = library_name or '__default__'
+        if library_key in self._library_cache:
+            return self._library_cache[library_key]
+
+        server = self._connect()
+        library = server.library.section(library_name)
+        self._library_cache[library_key] = library
+        return library
+
+    async def resolve_track(self, query: str, library_name: str) -> Optional[Dict[str, Any]]:
+        def _resolve() -> Optional[Dict[str, Any]]:
+            library = self._get_library(library_name)
+            results = library.searchTracks(query, maxresults=5)
+            if not results:
+                return None
+
+            track = results[0]
+            if self.allow_transcode:
+                stream_url = track.getStreamURL()
+            else:
+                media = track.media[0]
+                part = media.parts[0]
+                stream_url = f"{self.base_url}{part.key}?X-Plex-Token={self.token}"
+
+            duration_seconds = int((track.duration or 0) / 1000)
+            artist = getattr(track, 'grandparentTitle', None) or getattr(track, 'artist', None)
+            album = getattr(track, 'parentTitle', None)
+            thumbnail = getattr(track, 'thumbUrl', None) if getattr(track, 'thumb', None) else None
+            deep_link = f"{self.base_url}{track.key}?X-Plex-Token={self.token}"
+
+            return {
+                'title': track.title,
+                'artist': artist,
+                'album': album,
+                'duration': duration_seconds,
+                'thumbnail': thumbnail,
+                'stream_url': stream_url,
+                'webpage_url': deep_link,
+                'rating_key': getattr(track, 'ratingKey', None),
+                'library': library.title,
+            }
+
+        try:
+            return await asyncio.to_thread(_resolve)
+        except PlexApiException as exc:
+            logger.error(f"Plex query failed: {exc}")
+            return None
 class Song:
     def __init__(self, source, requester):
         self.source = source
@@ -1005,6 +1148,14 @@ class Song:
             color=color
         )
         embed.add_field(name="Requested by", value=self.requester.mention, inline=True)
+
+        if hasattr(self.source, 'provider'):
+            provider_display = getattr(self.source, 'provider', 'youtube').title()
+            if provider_display == 'Plex' and getattr(self.source, 'data', None):
+                library = self.source.data.get('library')
+                if library:
+                    provider_display = f"Plex ({library})"
+            embed.add_field(name="Source", value=provider_display, inline=True)
         
         if self.source.duration:
             minutes, seconds = divmod(self.source.duration, 60)
@@ -1367,6 +1518,9 @@ class Music(commands.Cog):
         self.last_music_channels: Dict[int, int] = {}  # guild_id -> channel_id for now playing messages
         self.rating_messages: Dict[int, Dict[str, any]] = {}  # message_id -> {"guild_id": int, "song_url": str, "expires_at": float}
         self.now_playing_messages: Dict[int, int] = {}  # guild_id -> message_id for current now playing messages
+        self.global_config = load_global_config()
+        self._plex_provider: Optional[PlexMusicProvider] = None
+        self._plex_provider_signature: Optional[tuple[str, str, bool, int]] = None
         # Don't start the cleanup task immediately
     
     async def cog_load(self):
@@ -1418,6 +1572,91 @@ class Music(commands.Cog):
         if guild_id not in self.music_queues:
             self.music_queues[guild_id] = MusicQueue()
         return self.music_queues[guild_id]
+
+    def _reload_global_config(self) -> None:
+        self.global_config = load_global_config(refresh=True)
+
+    def get_server_config_value(self, guild_id: int, key: str, default: Any = None) -> Any:
+        server_config_cog = self.bot.get_cog('ServerConfig')
+        if server_config_cog:
+            return server_config_cog.get_config(guild_id, key, default)
+        return default
+
+    def get_music_provider_for_guild(self, guild_id: int) -> str:
+        self._reload_global_config()
+        default_provider = self.global_config.get('music', {}).get('default_provider', 'youtube')
+        provider = self.get_server_config_value(guild_id, 'music_provider', default_provider)
+        return (provider or 'youtube').lower()
+
+    def get_plex_library_for_guild(self, guild_id: int) -> str:
+        override = self.get_server_config_value(guild_id, 'plex_library', None)
+        if override:
+            return override
+        self._reload_global_config()
+        return self.global_config.get('plex', {}).get('music_library', 'Music')
+
+    def _get_or_create_plex_provider(self) -> Optional[PlexMusicProvider]:
+        self._reload_global_config()
+        plex_cfg = self.global_config.get('plex', {})
+
+        if not plex_cfg.get('enabled'):
+            return None
+        if not plex_cfg.get('base_url') or not plex_cfg.get('token'):
+            logger.debug("Plex integration disabled: base_url/token missing")
+            return None
+        if PlexServer is None:
+            logger.warning("plexapi is not installed, cannot enable Plex provider")
+            return None
+
+        signature = (
+            plex_cfg.get('base_url', ''),
+            plex_cfg.get('token', ''),
+            bool(plex_cfg.get('allow_transcode', True)),
+            int(plex_cfg.get('timeout', 10)),
+        )
+
+        if self._plex_provider is None or self._plex_provider_signature != signature:
+            try:
+                self._plex_provider = PlexMusicProvider(
+                    base_url=plex_cfg['base_url'],
+                    token=plex_cfg['token'],
+                    allow_transcode=plex_cfg.get('allow_transcode', True),
+                    timeout=plex_cfg.get('timeout', 10),
+                )
+                self._plex_provider_signature = signature
+            except Exception as exc:
+                logger.error(f"Failed to initialise Plex provider: {exc}")
+                self._plex_provider = None
+                self._plex_provider_signature = None
+        return self._plex_provider
+
+    def should_use_plex(self, guild_id: int) -> bool:
+        provider = self.get_music_provider_for_guild(guild_id)
+        if provider != 'plex':
+            return False
+        provider_instance = self._get_or_create_plex_provider()
+        return provider_instance is not None
+
+    async def create_plex_source(self, query: str, guild_id: int) -> Optional[PlexAudioSource]:
+        provider = self._get_or_create_plex_provider()
+        if not provider:
+            return None
+
+        library_name = self.get_plex_library_for_guild(guild_id)
+        metadata = await provider.resolve_track(query, library_name)
+        if not metadata:
+            return None
+
+        ffmpeg_executable = get_ffmpeg_executable()
+        ffmpeg_source = discord.FFmpegPCMAudio(
+            metadata['stream_url'],
+            executable=ffmpeg_executable,
+            before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+            options='-vn'
+        )
+
+        metadata['provider'] = 'plex'
+        return PlexAudioSource(ffmpeg_source, data=metadata)
     
     async def update_bot_status(self, song: Optional[Song] = None):
         """Update bot's Discord activity status"""
@@ -2024,6 +2263,7 @@ class Music(commands.Cog):
                             source.thumbnail = entry_data.get('thumbnail')  # This will be None if not present
                             source.uploader = entry_data.get('uploader')
                             source.webpage_url = entry_data.get('webpage_url', entry_data.get('url', ''))
+                            source.provider = entry_data.get('provider', 'youtube')
                             source.downloaded_file = None
                             source.original = None  # Set to None for playlist entries, will be created when played
                             source.volume = 0.5  # Set default volume
@@ -2078,9 +2318,29 @@ class Music(commands.Cog):
                         await ctx.send(embed=embed)
             else:
                 # Handle single song
-                await ctx.send(f"🔍 Searching for: **{query}**...")
-                
-                source = await YTDLSource.create_source(ctx, query, loop=self.bot.loop)
+                provider_preference = self.get_music_provider_for_guild(guild_id)
+                use_plex = provider_preference == 'plex' and self.should_use_plex(guild_id)
+                provider_label = "Plex" if use_plex else "YouTube"
+                status_message = await ctx.send(f"🔍 Searching {provider_label} for: **{query}**...")
+
+                source = None
+                used_provider = 'plex' if use_plex else provider_preference
+
+                if use_plex:
+                    source = await self.create_plex_source(query, guild_id)
+                    if source is None:
+                        used_provider = 'youtube'
+                        try:
+                            await status_message.edit(content=f"⚠️ Plex couldn't find **{query}**. Searching YouTube instead...")
+                        except discord.HTTPException:
+                            await ctx.send(f"⚠️ Plex couldn't find **{query}**. Searching YouTube instead...")
+                else:
+                    used_provider = 'youtube'
+
+                if source is None:
+                    source = await YTDLSource.create_source(ctx, query, loop=self.bot.loop)
+                    used_provider = 'youtube'
+
                 song = Song(source, ctx.author)
                 music_queue.add_song(song)
                 
@@ -2102,10 +2362,20 @@ class Music(commands.Cog):
                     minutes, seconds = divmod(source.duration, 60)
                     embed.add_field(name="Duration", value=f"{int(minutes)}:{int(seconds):02d}", inline=True)
                 
+                provider_display = used_provider.title()
+                if used_provider == 'plex' and getattr(source, 'data', None):
+                    library = source.data.get('library')
+                    if library:
+                        provider_display = f"Plex ({library})"
+                embed.add_field(name="Source", value=provider_display, inline=True)
+
                 if source.thumbnail:
                     embed.set_thumbnail(url=source.thumbnail)
-                
-                await ctx.send(embed=embed)
+
+                try:
+                    await status_message.edit(content="", embed=embed)
+                except discord.HTTPException:
+                    await ctx.send(embed=embed)
             
             # Start playing if nothing is currently playing
             if not music_queue.is_playing:
@@ -2155,6 +2425,746 @@ class Music(commands.Cog):
             
         finally:
             conn.close()
+
+    @commands.hybrid_command(name='volume', aliases=['v'])
+    @app_commands.describe(volume="Volume level (0-100). Leave empty to show current volume.")
+    async def volume(self, ctx, volume: int = None):
+        """Set or display the music volume (0-100%)"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        voice_client = self.voice_clients.get(guild_id)
+        
+        if volume is None:
+            # Show current volume
+            current_volume = int(music_queue.volume * 100)
+            embed = discord.Embed(
+                title="🔊 Current Volume",
+                description=f"Volume is set to **{current_volume}%**",
+                color=0x1DB954
+            )
+            await ctx.send(embed=embed)
+            return
+        
+        # Validate volume range
+        if volume < 0 or volume > 100:
+            await ctx.send("❌ Volume must be between 0 and 100!")
+            return
+        
+        # Convert percentage to decimal
+        volume_decimal = volume / 100.0
+        
+        # Update queue volume setting
+        music_queue.volume = volume_decimal
+        
+        # Update current song volume if playing
+        if voice_client and voice_client.source and hasattr(voice_client.source, 'volume'):
+            voice_client.source.volume = volume_decimal
+        
+        # Send confirmation
+        embed = discord.Embed(
+            title="🔊 Volume Updated",
+            description=f"Volume set to **{volume}%**",
+            color=0x00FF00
+        )
+        
+        # Add volume bar visualization
+        filled_blocks = int(volume / 5)  # 20 blocks for 100%
+        empty_blocks = 20 - filled_blocks
+        volume_bar = "█" * filled_blocks + "░" * empty_blocks
+        embed.add_field(name="Volume Bar", value=f"`{volume_bar}` {volume}%", inline=False)
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='shuffle')
+    async def shuffle(self, ctx):
+        """Shuffle the music queue (works with both regular queue and automesh mode)"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        if music_queue.automesh_mode:
+            # Shuffle automesh queues
+            shuffled_users = 0
+            total_songs = 0
+            
+            for user_id, user_queue in music_queue.automesh_queues.items():
+                if len(user_queue) > 1:  # Only shuffle if there's more than 1 song
+                    # Convert deque to list, shuffle, convert back to deque
+                    songs_list = list(user_queue)
+                    import random
+                    random.shuffle(songs_list)
+                    music_queue.automesh_queues[user_id] = deque(songs_list)
+                    shuffled_users += 1
+                total_songs += len(user_queue)
+            
+            if shuffled_users == 0:
+                await ctx.send("❌ No user queues to shuffle! Add more songs first.")
+                return
+            
+            embed = discord.Embed(
+                title="🔀 Automesh Queues Shuffled",
+                description=f"Shuffled queues for **{shuffled_users}** users",
+                color=0x9B59B6
+            )
+            embed.add_field(name="Total Songs", value=str(total_songs), inline=True)
+            embed.add_field(name="Users Affected", value=str(shuffled_users), inline=True)
+            embed.add_field(name="Mode", value="🔀 Automesh", inline=True)
+            
+        else:
+            # Shuffle regular queue
+            if len(music_queue.queue) <= 1:
+                await ctx.send("❌ Not enough songs in queue to shuffle! Add more songs first.")
+                return
+            
+            # Convert deque to list, shuffle, convert back to deque
+            songs_list = list(music_queue.queue)
+            import random
+            random.shuffle(songs_list)
+            music_queue.queue = deque(songs_list)
+            
+            embed = discord.Embed(
+                title="🔀 Queue Shuffled",
+                description=f"Shuffled **{len(songs_list)}** songs in the queue",
+                color=0x1DB954
+            )
+            embed.add_field(name="Songs Shuffled", value=str(len(songs_list)), inline=True)
+            embed.add_field(name="Mode", value="📋 Normal Queue", inline=True)
+            
+            # Show first few songs after shuffle
+            if len(songs_list) > 0:
+                next_songs = []
+                for i, song in enumerate(list(music_queue.queue)[:3]):
+                    next_songs.append(f"{i+1}. {song.source.title}")
+                embed.add_field(
+                    name="Next Songs",
+                    value='\n'.join(next_songs),
+                    inline=False
+                )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='skip', aliases=['s'])
+    async def skip(self, ctx):
+        """Skip the current song"""
+        guild_id = ctx.guild.id
+        voice_client = self.voice_clients.get(guild_id)
+        music_queue = self.get_music_queue(guild_id)
+        
+        if not voice_client or not voice_client.is_connected():
+            await ctx.send("❌ Not connected to a voice channel!")
+            return
+        
+        if not music_queue.current_song:
+            await ctx.send("❌ Nothing is currently playing!")
+            return
+        
+        current_song = music_queue.current_song
+        
+        # Stop current song (this will trigger play_next_song)
+        voice_client.stop()
+        
+        embed = discord.Embed(
+            title="⏭️ Song Skipped",
+            description=f"Skipped **{current_song.source.title}**",
+            color=0x1DB954
+        )
+        embed.add_field(name="Requested by", value=current_song.requester.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='stop')
+    async def stop(self, ctx):
+        """Stop playback and clear the queue"""
+        guild_id = ctx.guild.id
+        voice_client = self.voice_clients.get(guild_id)
+        music_queue = self.get_music_queue(guild_id)
+        
+        if not voice_client or not voice_client.is_connected():
+            await ctx.send("❌ Not connected to a voice channel!")
+            return
+        
+        # Stop playback
+        voice_client.stop()
+        
+        # Clear queue and current song
+        music_queue.clear()
+        music_queue.current_song = None
+        music_queue.is_playing = False
+        
+        # Clean up now playing message
+        await self.cleanup_now_playing_message(guild_id)
+        
+        # Update bot status
+        await self.update_bot_status()
+        
+        embed = discord.Embed(
+            title="⏹️ Playback Stopped",
+            description="Stopped playback and cleared the queue",
+            color=0xFF6B6B
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='pause')
+    async def pause(self, ctx):
+        """Pause the current song"""
+        guild_id = ctx.guild.id
+        voice_client = self.voice_clients.get(guild_id)
+        music_queue = self.get_music_queue(guild_id)
+        
+        if not voice_client or not voice_client.is_connected():
+            await ctx.send("❌ Not connected to a voice channel!")
+            return
+        
+        if not voice_client.is_playing():
+            await ctx.send("❌ Nothing is currently playing!")
+            return
+        
+        if voice_client.is_paused():
+            await ctx.send("❌ Playback is already paused!")
+            return
+        
+        voice_client.pause()
+        music_queue.pause_time = time.time()
+        
+        embed = discord.Embed(
+            title="⏸️ Playback Paused",
+            description=f"Paused **{music_queue.current_song.source.title}**",
+            color=0xFFD700
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='resume')
+    async def resume(self, ctx):
+        """Resume paused playback"""
+        guild_id = ctx.guild.id
+        voice_client = self.voice_clients.get(guild_id)
+        music_queue = self.get_music_queue(guild_id)
+        
+        if not voice_client or not voice_client.is_connected():
+            await ctx.send("❌ Not connected to a voice channel!")
+            return
+        
+        if not voice_client.is_paused():
+            await ctx.send("❌ Playback is not paused!")
+            return
+        
+        voice_client.resume()
+        
+        # Adjust song start time for the pause duration
+        if hasattr(music_queue, 'pause_time') and hasattr(music_queue, 'song_start_time'):
+            pause_duration = time.time() - music_queue.pause_time
+            music_queue.song_start_time += pause_duration
+            delattr(music_queue, 'pause_time')
+        
+        embed = discord.Embed(
+            title="▶️ Playback Resumed",
+            description=f"Resumed **{music_queue.current_song.source.title}**",
+            color=0x00FF00
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='queue', aliases=['q'])
+    @app_commands.describe(page="Page number (default 1)")
+    async def queue(self, ctx, page: int = 1):
+        """Show the current music queue"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        # Determine if we're in automesh mode
+        if music_queue.automesh_mode:
+            # Show automesh queues
+            total_songs = sum(len(queue) for queue in music_queue.automesh_queues.values())
+            
+            if total_songs == 0:
+                embed = discord.Embed(
+                    title="📋 Queue (Automesh Mode)",
+                    description="No songs in any user queues",
+                    color=0x9B59B6
+                )
+                if music_queue.current_song:
+                    embed.add_field(
+                        name="🎵 Currently Playing",
+                        value=f"**{music_queue.current_song.source.title}**\nRequested by {music_queue.current_song.requester.mention}",
+                        inline=False
+                    )
+                await ctx.send(embed=embed)
+                return
+            
+            embed = discord.Embed(
+                title="📋 Queue (Automesh Mode)",
+                description=f"Total songs: **{total_songs}** across **{len(music_queue.automesh_queues)}** users",
+                color=0x9B59B6
+            )
+            
+            # Show current song
+            if music_queue.current_song:
+                embed.add_field(
+                    name="🎵 Currently Playing",
+                    value=f"**{music_queue.current_song.source.title}**\nRequested by {music_queue.current_song.requester.mention}",
+                    inline=False
+                )
+            
+            # Show each user's queue
+            for user_id, user_queue in music_queue.automesh_queues.items():
+                if len(user_queue) > 0:
+                    user = self.bot.get_user(user_id)
+                    user_name = user.display_name if user else f"User {user_id}"
+                    
+                    queue_text = []
+                    for i, song in enumerate(list(user_queue)[:5]):  # Show first 5 songs
+                        queue_text.append(f"{i+1}. {song.source.title}")
+                    
+                    if len(user_queue) > 5:
+                        queue_text.append(f"... and {len(user_queue) - 5} more")
+                    
+                    embed.add_field(
+                        name=f"🎤 {user_name} ({len(user_queue)} songs)",
+                        value='\n'.join(queue_text),
+                        inline=True
+                    )
+        else:
+            # Show regular queue
+            queue_length = len(music_queue.queue)
+            
+            if queue_length == 0:
+                embed = discord.Embed(
+                    title="📋 Queue",
+                    description="No songs in queue",
+                    color=0x1DB954
+                )
+                if music_queue.current_song:
+                    embed.add_field(
+                        name="🎵 Currently Playing",
+                        value=f"**{music_queue.current_song.source.title}**\nRequested by {music_queue.current_song.requester.mention}",
+                        inline=False
+                    )
+                await ctx.send(embed=embed)
+                return
+            
+            # Pagination
+            per_page = 10
+            total_pages = (queue_length + per_page - 1) // per_page
+            page = max(1, min(page, total_pages))
+            
+            start_idx = (page - 1) * per_page
+            end_idx = start_idx + per_page
+            
+            embed = discord.Embed(
+                title="📋 Queue",
+                description=f"Page {page}/{total_pages} • {queue_length} songs total",
+                color=0x1DB954
+            )
+            
+            # Show current song
+            if music_queue.current_song:
+                embed.add_field(
+                    name="🎵 Currently Playing",
+                    value=f"**{music_queue.current_song.source.title}**\nRequested by {music_queue.current_song.requester.mention}",
+                    inline=False
+                )
+            
+            # Show queue songs
+            queue_list = list(music_queue.queue)
+            queue_text = []
+            for i, song in enumerate(queue_list[start_idx:end_idx], start=start_idx + 1):
+                duration = ""
+                if hasattr(song.source, 'duration') and song.source.duration:
+                    minutes, seconds = divmod(song.source.duration, 60)
+                    duration = f" [{int(minutes)}:{int(seconds):02d}]"
+                
+                queue_text.append(f"{i}. **{song.source.title}**{duration}\n    Requested by {song.requester.mention}")
+            
+            if queue_text:
+                embed.add_field(
+                    name="Up Next",
+                    value='\n'.join(queue_text),
+                    inline=False
+                )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='nowplaying', aliases=['np'])
+    async def nowplaying(self, ctx):
+        """Show information about the currently playing song"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        voice_client = self.voice_clients.get(guild_id)
+        
+        if not music_queue.current_song:
+            await ctx.send("❌ Nothing is currently playing!")
+            return
+        
+        song = music_queue.current_song
+        current_pos = self.get_song_position(guild_id)
+        total_duration = getattr(song.source, 'duration', 0)
+        is_paused = voice_client and voice_client.is_paused()
+        volume_percentage = int(music_queue.volume * 100)
+        
+        # Create embed
+        color = 0x9B59B6 if music_queue.automesh_mode else 0x1DB954
+        embed = discord.Embed(
+            title="🎵 Now Playing",
+            color=color
+        )
+        
+        # Progress bar
+        progress_bar = self.create_progress_bar(current_pos, total_duration, is_paused)
+        
+        # Build description
+        description = f"**{song.source.title}**\n{progress_bar}\n\n"
+        description += f"**🎤 Requested by:** {song.requester.mention}\n"
+        description += f"**🔊 Volume:** {volume_percentage}%"
+        
+        if song.source.uploader:
+            description += f"\n**📺 Channel:** {song.source.uploader}"
+        
+        if song.source.webpage_url:
+            description += f"\n**🔗 Link:** [Watch on YouTube]({song.source.webpage_url})"
+        
+        # Mode indicators
+        mode_parts = []
+        if music_queue.automesh_mode:
+            mode_parts.append("🔀 Automesh")
+        else:
+            mode_parts.append("📋 Normal Queue")
+        
+        if music_queue.shuffle_mode:
+            mode_parts.append("🔀 Shuffle")
+        if music_queue.loop_mode:
+            mode_parts.append("🔁 Loop")
+        
+        description += f"\n\n**Mode:** {' | '.join(mode_parts)}"
+        
+        embed.description = description
+        
+        # Set thumbnail
+        if song.source.thumbnail:
+            embed.set_thumbnail(url=song.source.thumbnail)
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='previous', aliases=['prev'])
+    async def previous(self, ctx):
+        """Play the previous song from history"""
+        guild_id = ctx.guild.id
+        result = await self.play_previous_song(guild_id)
+        
+        if result:
+            embed = discord.Embed(
+                title="⏮️ Playing Previous Song",
+                description="Successfully switched to the previous song",
+                color=0x00FF00
+            )
+        else:
+            embed = discord.Embed(
+                title="❌ No Previous Song",
+                description="No previous song available in history",
+                color=0xFF6B6B
+            )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='restart')
+    async def restart(self, ctx):
+        """Restart the current song from the beginning"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        if not music_queue.current_song:
+            await ctx.send("❌ Nothing is currently playing!")
+            return
+        
+        result = await self.restart_current_song(guild_id)
+        
+        if result:
+            embed = discord.Embed(
+                title="🔄 Song Restarted",
+                description=f"Restarted **{music_queue.current_song.source.title}**",
+                color=0x00FF00
+            )
+        else:
+            embed = discord.Embed(
+                title="❌ Restart Failed",
+                description="Failed to restart the current song",
+                color=0xFF6B6B
+            )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='clear')
+    async def clear(self, ctx):
+        """Clear the music queue"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        if music_queue.automesh_mode:
+            total_songs = sum(len(queue) for queue in music_queue.automesh_queues.values())
+            if total_songs == 0:
+                await ctx.send("❌ No songs in queue to clear!")
+                return
+            
+            music_queue.automesh_queues.clear()
+            
+            embed = discord.Embed(
+                title="🗑️ Queue Cleared",
+                description=f"Cleared all automesh queues ({total_songs} songs)",
+                color=0x9B59B6
+            )
+        else:
+            if len(music_queue.queue) == 0:
+                await ctx.send("❌ No songs in queue to clear!")
+                return
+            
+            queue_length = len(music_queue.queue)
+            music_queue.queue.clear()
+            
+            embed = discord.Embed(
+                title="🗑️ Queue Cleared",
+                description=f"Cleared {queue_length} songs from the queue",
+                color=0x1DB954
+            )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='loop')
+    async def loop(self, ctx):
+        """Toggle loop mode for the current song"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        # Toggle loop mode
+        music_queue.loop_mode = not music_queue.loop_mode
+        
+        embed = discord.Embed(
+            title="🔁 Loop Mode",
+            description=f"Loop mode **{'enabled' if music_queue.loop_mode else 'disabled'}**",
+            color=0x00FF00 if music_queue.loop_mode else 0xFF6B6B
+        )
+        
+        if music_queue.loop_mode and music_queue.current_song:
+            embed.add_field(
+                name="Current Song",
+                value=f"**{music_queue.current_song.source.title}** will loop",
+                inline=False
+            )
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='move')
+    @app_commands.describe(
+        from_pos="Position of song to move (1-based)",
+        to_pos="New position for the song (1-based)"
+    )
+    async def move(self, ctx, from_pos: int, to_pos: int):
+        """Move a song to a different position in the queue"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        if music_queue.automesh_mode:
+            await ctx.send("❌ Move command is not available in automesh mode!")
+            return
+        
+        queue_length = len(music_queue.queue)
+        
+        if queue_length == 0:
+            await ctx.send("❌ No songs in queue to move!")
+            return
+        
+        # Validate positions
+        if from_pos < 1 or from_pos > queue_length:
+            await ctx.send(f"❌ Invalid source position! Must be between 1 and {queue_length}")
+            return
+        
+        if to_pos < 1 or to_pos > queue_length:
+            await ctx.send(f"❌ Invalid target position! Must be between 1 and {queue_length}")
+            return
+        
+        if from_pos == to_pos:
+            await ctx.send("❌ Source and target positions are the same!")
+            return
+        
+        # Convert to 0-based indexing
+        from_idx = from_pos - 1
+        to_idx = to_pos - 1
+        
+        # Get the song to move
+        queue_list = list(music_queue.queue)
+        song = queue_list[from_idx]
+        
+        # Remove from old position and insert at new position
+        queue_list.pop(from_idx)
+        queue_list.insert(to_idx, song)
+        
+        # Update the queue
+        music_queue.queue = deque(queue_list)
+        
+        embed = discord.Embed(
+            title="↕️ Song Moved",
+            description=f"Moved **{song.source.title}** from position {from_pos} to {to_pos}",
+            color=0x1DB954
+        )
+        embed.add_field(name="Requested by", value=song.requester.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='automesh')
+    async def automesh(self, ctx):
+        """Toggle automesh mode"""
+        guild_id = ctx.guild.id
+        music_queue = self.get_music_queue(guild_id)
+        
+        # Toggle automesh mode
+        old_mode = music_queue.automesh_mode
+        music_queue.automesh_mode = not music_queue.automesh_mode
+        
+        if music_queue.automesh_mode:
+            # Switching to automesh mode
+            # Move existing queue songs to the user's automesh queue
+            if len(music_queue.queue) > 0:
+                user_id = ctx.author.id
+                if user_id not in music_queue.automesh_queues:
+                    music_queue.automesh_queues[user_id] = deque()
+                
+                # Move songs to user's automesh queue
+                songs_moved = 0
+                while music_queue.queue:
+                    song = music_queue.queue.popleft()
+                    music_queue.automesh_queues[song.requester.id] = music_queue.automesh_queues.get(song.requester.id, deque())
+                    music_queue.automesh_queues[song.requester.id].append(song)
+                    songs_moved += 1
+                
+                embed = discord.Embed(
+                    title="🔀 Automesh Mode Enabled",
+                    description=f"Switched to automesh mode and organized {songs_moved} songs by requester",
+                    color=0x9B59B6
+                )
+            else:
+                embed = discord.Embed(
+                    title="🔀 Automesh Mode Enabled",
+                    description="Songs will now be organized by user in separate queues",
+                    color=0x9B59B6
+                )
+        else:
+            # Switching to normal mode
+            # Move all automesh songs to the regular queue
+            if music_queue.automesh_queues:
+                songs_moved = 0
+                for user_queue in music_queue.automesh_queues.values():
+                    while user_queue:
+                        song = user_queue.popleft()
+                        music_queue.queue.append(song)
+                        songs_moved += 1
+                
+                music_queue.automesh_queues.clear()
+                
+                embed = discord.Embed(
+                    title="📋 Normal Mode Enabled",
+                    description=f"Switched to normal queue mode and merged {songs_moved} songs",
+                    color=0x1DB954
+                )
+            else:
+                embed = discord.Embed(
+                    title="📋 Normal Mode Enabled",
+                    description="Songs will now be played in a single queue",
+                    color=0x1DB954
+                )
+        
+        embed.add_field(
+            name="How it works",
+            value="🔀 **Automesh**: Each user has their own queue, played in round-robin\n📋 **Normal**: All songs in one shared queue",
+            inline=False
+        )
+        
+        await ctx.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        """Handle music control reactions on now playing messages"""
+        # Ignore bot reactions
+        if user.bot:
+            return
+        
+        # Check if this is a now playing message
+        message = reaction.message
+        guild_id = message.guild.id if message.guild else None
+        
+        if not guild_id or guild_id not in self.now_playing_messages:
+            return
+        
+        # Check if this is the current now playing message
+        if self.now_playing_messages[guild_id] != message.id:
+            return
+        
+        # Get music queue and voice client
+        music_queue = self.get_music_queue(guild_id)
+        voice_client = self.voice_clients.get(guild_id)
+        
+        if not voice_client or not voice_client.is_connected():
+            return
+        
+        # Remove the user's reaction
+        try:
+            await reaction.remove(user)
+        except:
+            pass  # Ignore if we can't remove the reaction
+        
+        # Handle different emoji reactions
+        emoji = str(reaction.emoji)
+        
+        try:
+            if emoji == '⏮️':  # Previous
+                await self.play_previous_song(guild_id)
+                
+            elif emoji == '🔄':  # Restart
+                await self.restart_current_song(guild_id)
+                
+            elif emoji == '⏸️':  # Pause
+                if voice_client.is_playing():
+                    voice_client.pause()
+                    music_queue.pause_time = time.time()
+                    
+            elif emoji == '▶️':  # Resume/Play
+                if voice_client.is_paused():
+                    voice_client.resume()
+                    # Adjust song start time for the pause duration
+                    if hasattr(music_queue, 'pause_time') and hasattr(music_queue, 'song_start_time'):
+                        pause_duration = time.time() - music_queue.pause_time
+                        music_queue.song_start_time += pause_duration
+                        delattr(music_queue, 'pause_time')
+                        
+            elif emoji == '⏭️':  # Skip
+                voice_client.stop()  # This will trigger play_next_song
+                
+            elif emoji == '🔀':  # Shuffle
+                if music_queue.automesh_mode:
+                    # Shuffle automesh queues
+                    for user_id, user_queue in music_queue.automesh_queues.items():
+                        if len(user_queue) > 1:
+                            songs_list = list(user_queue)
+                            random.shuffle(songs_list)
+                            music_queue.automesh_queues[user_id] = deque(songs_list)
+                else:
+                    # Shuffle regular queue
+                    if len(music_queue.queue) > 1:
+                        songs_list = list(music_queue.queue)
+                        random.shuffle(songs_list)
+                        music_queue.queue = deque(songs_list)
+                        
+            elif emoji == '🔉':  # Volume down
+                current_volume = music_queue.volume
+                new_volume = max(0.0, current_volume - 0.1)  # Decrease by 10%
+                music_queue.volume = new_volume
+                if voice_client.source and hasattr(voice_client.source, 'volume'):
+                    voice_client.source.volume = new_volume
+                    
+            elif emoji == '🔊':  # Volume up
+                current_volume = music_queue.volume
+                new_volume = min(1.0, current_volume + 0.1)  # Increase by 10%
+                music_queue.volume = new_volume
+                if voice_client.source and hasattr(voice_client.source, 'volume'):
+                    voice_client.source.volume = new_volume
+                    
+        except Exception as e:
+            logger.error(f"Error handling music control reaction {emoji}: {e}")
 
     # --- Song Rating System Integration ---
     @commands.hybrid_command(name='rate')

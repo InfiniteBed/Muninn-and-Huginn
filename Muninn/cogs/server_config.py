@@ -2,7 +2,36 @@ import discord
 from discord.ext import commands
 import sqlite3
 import asyncio
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+def _import_load_global_config():
+    try:
+        from Muninn.configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+    try:
+        from configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+    try:
+        from ..configuration import load_global_config
+        return load_global_config
+    except Exception:
+        pass
+
+    import importlib.util, os
+    config_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'configuration.py'))
+    if os.path.exists(config_path):
+        spec = importlib.util.spec_from_file_location('muninn_configuration', config_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)  # type: ignore
+        return getattr(module, 'load_global_config')
+
+    raise ImportError('Could not import load_global_config from Muninn.configuration or configuration.py')
+
+
+load_global_config = _import_load_global_config()
 
 class ServerConfig(commands.Cog):
     """Handles server-wide configuration settings in an extensible way."""
@@ -11,6 +40,7 @@ class ServerConfig(commands.Cog):
         self.bot = bot
         self.db_path = "discord.db"
         self._initialize_database()
+        self.global_config = load_global_config()
         
     def _initialize_database(self):
         """Initialize the server configuration database table."""
@@ -35,6 +65,22 @@ class ServerConfig(commands.Cog):
                 ON server_config(guild_id)
             """)
             conn.commit()
+
+    def refresh_global_config(self) -> None:
+        self.global_config = load_global_config(refresh=True)
+
+    def get_default_music_provider(self) -> str:
+        return self.global_config.get('music', {}).get('default_provider', 'youtube')
+
+    def is_plex_ready(self) -> bool:
+        plex_cfg = self.global_config.get('plex', {})
+        token = plex_cfg.get('token', '')
+        return (
+            plex_cfg.get('enabled', False)
+            and bool(plex_cfg.get('base_url'))
+            and bool(token)
+            and token != "YOUR_PLEX_TOKEN"
+        )
     
     def set_config(self, guild_id: int, key: str, value: Any, 
                    config_type: str = 'string', description: str = None) -> bool:
@@ -195,76 +241,95 @@ class ServerConfig(commands.Cog):
     async def config_group(self, ctx):
         """Server configuration commands. Requires administrator permissions."""
         if ctx.invoked_subcommand is None:
-            # Show the main server settings interface
-            await self.show_main_settings_interface(ctx)
+            await self.start_interactive_session(ctx)
     
-    async def show_main_settings_interface(self, ctx):
-        """Show the main server settings interface with emojis and navigation."""
+    def _build_overview_embed(self, guild: discord.Guild, configs: Optional[Dict[str, Any]] = None) -> discord.Embed:
+        if configs is None:
+            configs = self.get_all_config(guild.id)
+        self.refresh_global_config()
+
         embed = discord.Embed(
             title="🔧 Server Configuration Panel",
-            description="Welcome to the comprehensive server settings panel! Navigate through different categories to configure your server.",
+            description="Use the interactive controls below to configure your server.",
             color=discord.Color.blue()
         )
-        
-        # Get current configurations to show status
-        configs = self.get_all_config(ctx.guild.id)
-        
-        # Devotion Settings Section
+
         devotion_channel = configs.get('devotion_channel', {}).get('value')
-        devotion_hour = configs.get('devotion_hour', {}).get('value', 17)  # Default 5 PM
-        devotion_minute = configs.get('devotion_minute', {}).get('value', 30)  # Default :30
-        
+        devotion_hour = configs.get('devotion_hour', {}).get('value', 17)
+        devotion_minute = configs.get('devotion_minute', {}).get('value', 30)
+
         if devotion_channel:
             channel = self.bot.get_channel(devotion_channel)
             channel_status = f"✅ {channel.mention}" if channel else "❌ Channel not found"
         else:
             channel_status = "❌ Not configured"
-        
+
         embed.add_field(
             name="🙏 **Devotion & Faith Settings**",
             value=(
                 f"**Channel:** {channel_status}\n"
                 f"**Daily Time:** {devotion_hour:02d}:{devotion_minute:02d} Pacific Time\n"
-                f"📝 `!config devotion` - Configure devotion settings"
+                "Select the 📿 option below to adjust"
             ),
             inline=False
         )
-        
-        # Music Settings Section  
+
+        default_volume = configs.get('music_default_volume', {}).get('value', 50)
+        auto_queue = configs.get('music_auto_queue', {}).get('value', False)
+        stream_mode = configs.get('music_stream_mode', {}).get('value', False)
+        provider_value = configs.get('music_provider', {}).get('value', self.get_default_music_provider())
+        provider_value = (provider_value or 'youtube').lower()
+        plex_library = configs.get('plex_library', {}).get('value')
+        plex_library = plex_library or self.global_config.get('plex', {}).get('music_library', 'Music')
+        provider_label = "Plex" if provider_value == 'plex' else "YouTube"
+        plex_status = "—"
+        if provider_value == 'plex':
+            provider_label = f"Plex ({plex_library})"
+            plex_status = "✅ Ready" if self.is_plex_ready() else "⚠️ Configure global Plex settings"
+
         embed.add_field(
             name="🎵 **Music System Settings**",
             value=(
-                "**Stream Mode:** Configure continuous playback\n"
-                "**Cache Settings:** Audio caching preferences\n"
-                "📝 `!config music` - Configure music settings"
+                f"**Provider:** {provider_label}\n"
+                f"**Default Volume:** {default_volume}%\n"
+                f"**Auto Queue:** {'✅ Enabled' if auto_queue else '❌ Disabled'}\n"
+                f"**Stream Mode:** {'✅ Enabled' if stream_mode else '❌ Disabled'}\n"
+                f"**Plex Status:** {plex_status}\n"
+                "Select the 🎶 option below to adjust"
             ),
             inline=False
         )
-        
-        # General Server Settings
+
+        server_prefix = configs.get('command_prefix', {}).get('value', '!')
+        auto_responses = configs.get('auto_responses', {}).get('value', True)
+        logging_enabled = configs.get('logging_enabled', {}).get('value', True)
+
         embed.add_field(
             name="⚙️ **General Server Settings**",
             value=(
-                "**Server Name:** Display preferences\n"
-                "**Notifications:** Global notification settings\n"
-                "📝 `!config general` - Configure general settings"
+                f"**Command Prefix:** `{server_prefix}`\n"
+                f"**Auto Responses:** {'✅ Enabled' if auto_responses else '❌ Disabled'}\n"
+                f"**Activity Logging:** {'✅ Enabled' if logging_enabled else '❌ Disabled'}\n"
+                "Select the ⚙️ option below to adjust"
             ),
             inline=False
         )
-        
-        # Quick Actions
-        embed.add_field(
-            name="🚀 **Quick Actions**",
-            value=(
-                "`!config list` - View all current settings\n"
-                "`!config backup` - Export server configuration\n"
-                "`!config reset` - Reset all settings (dangerous!)"
-            ),
-            inline=False
-        )
-        
-        embed.set_footer(text="💡 Use the specific category commands above or use !config list to see all settings")
+
+        embed.set_footer(text="Changes made through the panel apply immediately.")
+        return embed
+
+    async def show_main_settings_interface(self, ctx):
+        """Show the main server settings interface."""
+        embed = self._build_overview_embed(ctx.guild)
         await ctx.send(embed=embed)
+
+    async def start_interactive_session(self, ctx: commands.Context) -> None:
+        if not ctx.guild:
+            await ctx.send("This command must be used within a server context.")
+            return
+
+        session = ConfigSession(self, ctx)
+        await session.start()
 
     @config_group.command(name="list")
     @commands.has_permissions(administrator=True)
@@ -348,54 +413,38 @@ class ServerConfig(commands.Cog):
         
         await ctx.send(embed=embed)
 
-    @config_group.command(name="devotion")
-    @commands.has_permissions(administrator=True)
-    async def configure_devotion(self, ctx):
-        """Configure devotion system settings with interactive interface."""
-        configs = self.get_all_config(ctx.guild.id)
-        
-        # Get current settings
+    def _build_devotion_embed(self, guild: discord.Guild, configs: Optional[Dict[str, Any]] = None) -> discord.Embed:
+        if configs is None:
+            configs = self.get_all_config(guild.id)
+
         devotion_channel = configs.get('devotion_channel', {}).get('value')
         devotion_hour = configs.get('devotion_hour', {}).get('value', 17)
         devotion_minute = configs.get('devotion_minute', {}).get('value', 30)
         devotion_enabled = configs.get('devotion_enabled', {}).get('value', True)
-        
+
         embed = discord.Embed(
             title="🙏 Devotion System Configuration",
             description="Configure your server's daily devotion accountability system",
             color=discord.Color.green()
         )
-        
-        # Current Channel Status
+
         if devotion_channel:
             channel = self.bot.get_channel(devotion_channel)
             channel_status = f"✅ {channel.mention}" if channel else "❌ Channel not found"
         else:
             channel_status = "❌ Not configured"
-        
-        embed.add_field(
-            name="📺 Current Channel",
-            value=channel_status,
-            inline=True
-        )
-        
-        # Current Schedule
+
+        embed.add_field(name="📺 Current Channel", value=channel_status, inline=True)
         embed.add_field(
             name="🕐 Daily Schedule",
             value=f"{'✅' if devotion_enabled else '❌'} {devotion_hour:02d}:{devotion_minute:02d} Pacific Time",
             inline=True
         )
-        
-        # Status
+
         status_emoji = "🟢" if devotion_enabled and devotion_channel else "🔴"
         status_text = "Active" if devotion_enabled and devotion_channel else "Inactive"
-        embed.add_field(
-            name="📊 System Status",
-            value=f"{status_emoji} {status_text}",
-            inline=True
-        )
-        
-        # Configuration Commands
+        embed.add_field(name="📊 System Status", value=f"{status_emoji} {status_text}", inline=True)
+
         embed.add_field(
             name="⚙️ Configuration Commands",
             value=(
@@ -406,8 +455,7 @@ class ServerConfig(commands.Cog):
             ),
             inline=False
         )
-        
-        # Quick Setup Examples
+
         embed.add_field(
             name="💡 Quick Setup Examples",
             value=(
@@ -417,8 +465,15 @@ class ServerConfig(commands.Cog):
             ),
             inline=False
         )
-        
+
         embed.set_footer(text="💡 All times are in Pacific Time Zone • Changes take effect immediately")
+        return embed
+
+    @config_group.command(name="devotion")
+    @commands.has_permissions(administrator=True)
+    async def configure_devotion(self, ctx):
+        """Configure devotion system settings with interactive interface."""
+        embed = self._build_devotion_embed(ctx.guild)
         await ctx.send(embed=embed)
 
     @config_group.command(name="devotion_time")
@@ -590,34 +645,44 @@ class ServerConfig(commands.Cog):
         
         await ctx.send(embed=embed)
 
-    @config_group.command(name="music")
-    @commands.has_permissions(administrator=True)
-    async def configure_music(self, ctx):
-        """Configure music system settings."""
-        configs = self.get_all_config(ctx.guild.id)
-        
-        # Get current music settings
+    def _build_music_embed(self, guild: discord.Guild, configs: Optional[Dict[str, Any]] = None) -> discord.Embed:
+        if configs is None:
+            configs = self.get_all_config(guild.id)
+        self.refresh_global_config()
+
         default_volume = configs.get('music_default_volume', {}).get('value', 50)
         auto_queue = configs.get('music_auto_queue', {}).get('value', False)
         stream_mode = configs.get('music_stream_mode', {}).get('value', False)
         cache_limit = configs.get('music_cache_limit', {}).get('value', 100)
-        
+        provider_value = configs.get('music_provider', {}).get('value', self.get_default_music_provider())
+        provider_value = (provider_value or 'youtube').lower()
+        plex_library = configs.get('plex_library', {}).get('value')
+        plex_library = plex_library or self.global_config.get('plex', {}).get('music_library', 'Music')
+        provider_label = "Plex" if provider_value == 'plex' else "YouTube"
+        plex_status = "✅ Ready" if self.is_plex_ready() else "⚠️ Configure global Plex settings"
+        if provider_value == 'plex':
+            provider_detail = f"Plex ({plex_library})"
+        else:
+            provider_detail = "YouTube"
+            plex_status = "—"
+
         embed = discord.Embed(
             title="🎵 Music System Configuration",
             description="Configure your server's music playback settings",
             color=discord.Color.purple()
         )
-        
+
         embed.add_field(
             name="🔊 Playback Settings",
             value=(
+                f"**Provider:** {provider_detail}\n"
                 f"**Default Volume:** {default_volume}%\n"
                 f"**Auto Queue:** {'✅ Enabled' if auto_queue else '❌ Disabled'}\n"
                 f"**Stream Mode:** {'✅ Enabled' if stream_mode else '❌ Disabled'}"
             ),
             inline=True
         )
-        
+
         embed.add_field(
             name="💾 Cache Settings",
             value=(
@@ -627,7 +692,7 @@ class ServerConfig(commands.Cog):
             ),
             inline=True
         )
-        
+
         embed.add_field(
             name="⚙️ Configuration Commands",
             value=(
@@ -638,27 +703,42 @@ class ServerConfig(commands.Cog):
             ),
             inline=False
         )
-        
+
+        if provider_value == 'plex':
+            embed.add_field(
+                name="🎼 Plex Integration",
+                value=(
+                    f"**Status:** {plex_status}\n"
+                    f"**Library:** {plex_library}\n"
+                    "Configure Plex credentials via `global_config.yaml`."
+                ),
+                inline=False
+            )
+
         embed.set_footer(text="💡 Music settings affect all future playback sessions")
+        return embed
+
+    @config_group.command(name="music")
+    @commands.has_permissions(administrator=True)
+    async def configure_music(self, ctx):
+        """Configure music system settings."""
+        embed = self._build_music_embed(ctx.guild)
         await ctx.send(embed=embed)
 
-    @config_group.command(name="general")
-    @commands.has_permissions(administrator=True)
-    async def configure_general(self, ctx):
-        """Configure general server settings."""
-        configs = self.get_all_config(ctx.guild.id)
-        
-        # Get current general settings
+    def _build_general_embed(self, guild: discord.Guild, configs: Optional[Dict[str, Any]] = None) -> discord.Embed:
+        if configs is None:
+            configs = self.get_all_config(guild.id)
+
         server_prefix = configs.get('command_prefix', {}).get('value', '!')
         auto_responses = configs.get('auto_responses', {}).get('value', True)
         logging_enabled = configs.get('logging_enabled', {}).get('value', True)
-        
+
         embed = discord.Embed(
             title="⚙️ General Server Configuration",
             description="Configure general bot behavior for your server",
             color=discord.Color.blue()
         )
-        
+
         embed.add_field(
             name="🤖 Bot Behavior",
             value=(
@@ -668,17 +748,17 @@ class ServerConfig(commands.Cog):
             ),
             inline=True
         )
-        
+
         embed.add_field(
             name="📊 Server Info",
             value=(
-                f"**Server ID:** {ctx.guild.id}\n"
-                f"**Member Count:** {ctx.guild.member_count}\n"
-                f"**Created:** {ctx.guild.created_at.strftime('%Y-%m-%d')}"
+                f"**Server ID:** {guild.id}\n"
+                f"**Member Count:** {guild.member_count}\n"
+                f"**Created:** {guild.created_at.strftime('%Y-%m-%d')}"
             ),
             inline=True
         )
-        
+
         embed.add_field(
             name="⚙️ Configuration Commands",
             value=(
@@ -689,8 +769,50 @@ class ServerConfig(commands.Cog):
             ),
             inline=False
         )
-        
+
         embed.set_footer(text="💡 General settings affect overall bot behavior")
+        return embed
+
+    def _toggle_boolean_config(
+        self,
+        guild_id: int,
+        key: str,
+        description: str,
+        default: bool = False
+    ) -> Optional[bool]:
+        current = self.get_config(guild_id, key, default)
+        new_value = not current
+        if self.set_config(guild_id, key, new_value, 'boolean', description):
+            return new_value
+        return None
+
+    def _set_devotion_time_values(self, guild_id: int, hour: int, minute: int) -> bool:
+        if not (0 <= hour <= 23) or not (0 <= minute <= 59):
+            return False
+
+        hour_success = self.set_config(
+            guild_id,
+            'devotion_hour',
+            hour,
+            'integer',
+            'Hour for daily devotion messages (Pacific Time, 24-hour format)'
+        )
+
+        minute_success = self.set_config(
+            guild_id,
+            'devotion_minute',
+            minute,
+            'integer',
+            'Minute for daily devotion messages'
+        )
+
+        return hour_success and minute_success
+
+    @config_group.command(name="general")
+    @commands.has_permissions(administrator=True)
+    async def configure_general(self, ctx):
+        """Configure general server settings."""
+        embed = self._build_general_embed(ctx.guild)
         await ctx.send(embed=embed)
 
     @config_group.command(name="backup")
@@ -791,3 +913,660 @@ class ServerConfig(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(ServerConfig(bot))
+
+
+class ConfigSession:
+    def __init__(self, cog: "ServerConfig", ctx: commands.Context):
+        self.cog = cog
+        self.ctx = ctx
+        self.guild = ctx.guild
+        self.message: Optional[discord.Message] = None
+        self.closed = False
+
+    def is_authorized(self, user: discord.abc.User) -> bool:
+        if not isinstance(user, discord.Member):
+            return False
+        if user.guild != self.guild:
+            return False
+        return user == self.ctx.author or user.guild_permissions.administrator
+
+    async def start(self) -> None:
+        embed = self.cog._build_overview_embed(self.guild)
+        view = ConfigOverviewView(self)
+        self.message = await self.ctx.send(embed=embed, view=view)
+
+    async def show_overview(self, interaction: Optional[discord.Interaction] = None) -> None:
+        if self.closed:
+            return
+        embed = self.cog._build_overview_embed(self.guild)
+        view = ConfigOverviewView(self)
+        await self._update_main_message(embed, view, interaction)
+
+    async def show_category(self, category: str, interaction: discord.Interaction) -> None:
+        if self.closed:
+            return
+
+        configs = self.cog.get_all_config(self.guild.id)
+        if category == "devotion":
+            embed = self.cog._build_devotion_embed(self.guild, configs)
+            view = DevotionConfigView(self, configs)
+        elif category == "music":
+            embed = self.cog._build_music_embed(self.guild, configs)
+            view = MusicConfigView(self, configs)
+        elif category == "general":
+            embed = self.cog._build_general_embed(self.guild, configs)
+            view = GeneralConfigView(self, configs)
+        else:
+            await interaction.response.send_message("Unknown configuration category.", ephemeral=True)
+            return
+
+        await self._update_main_message(embed, view, interaction)
+
+    async def refresh_category(self, category: str) -> None:
+        if not self.message or self.closed:
+            return
+        configs = self.cog.get_all_config(self.guild.id)
+        if category == "devotion":
+            embed = self.cog._build_devotion_embed(self.guild, configs)
+            view = DevotionConfigView(self, configs)
+        elif category == "music":
+            embed = self.cog._build_music_embed(self.guild, configs)
+            view = MusicConfigView(self, configs)
+        elif category == "general":
+            embed = self.cog._build_general_embed(self.guild, configs)
+            view = GeneralConfigView(self, configs)
+        else:
+            embed = self.cog._build_overview_embed(self.guild, configs)
+            view = ConfigOverviewView(self)
+
+        await self._edit_message(embed, view)
+
+    async def close(self, interaction: Optional[discord.Interaction] = None) -> None:
+        if self.closed:
+            return
+        self.closed = True
+        if self.message:
+            if interaction and not interaction.response.is_done():
+                await interaction.response.edit_message(view=None)
+            else:
+                await self.message.edit(view=None)
+
+    async def _update_main_message(
+        self,
+        embed: discord.Embed,
+        view: discord.ui.View,
+        interaction: Optional[discord.Interaction] = None
+    ) -> None:
+        if interaction and not interaction.response.is_done():
+            await interaction.response.edit_message(embed=embed, view=view)
+        else:
+            await self._edit_message(embed, view)
+
+    async def _edit_message(self, embed: discord.Embed, view: discord.ui.View) -> None:
+        if self.message:
+            await self.message.edit(embed=embed, view=view)
+
+
+class ConfigOverviewView(discord.ui.View):
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=300)
+        self.session = session
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.session.is_authorized(interaction.user):
+            return True
+        await interaction.response.send_message(
+            "You need administrator permissions to use this panel.",
+            ephemeral=True
+        )
+        return False
+
+    async def on_timeout(self) -> None:
+        await self.session.close()
+
+    @discord.ui.button(emoji="📿", label="Devotion", style=discord.ButtonStyle.primary)
+    async def devotion_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.show_category("devotion", interaction)
+
+    @discord.ui.button(emoji="🎶", label="Music", style=discord.ButtonStyle.primary)
+    async def music_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.show_category("music", interaction)
+
+    @discord.ui.button(emoji="⚙️", label="General", style=discord.ButtonStyle.primary)
+    async def general_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.show_category("general", interaction)
+
+    @discord.ui.button(emoji="🔄", label="Refresh", style=discord.ButtonStyle.secondary)
+    async def refresh_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.show_overview(interaction)
+
+    @discord.ui.button(emoji="🛑", label="Close", style=discord.ButtonStyle.danger)
+    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.close(interaction)
+
+
+class ConfigCategoryView(discord.ui.View):
+    def __init__(self, session: ConfigSession, category: str, configs: Dict[str, Any]):
+        super().__init__(timeout=300)
+        self.session = session
+        self.category = category
+        self.configs = configs
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.session.is_authorized(interaction.user):
+            return True
+        await interaction.response.send_message(
+            "You need administrator permissions to modify these settings.",
+            ephemeral=True
+        )
+        return False
+
+    async def on_timeout(self) -> None:
+        await self.session.close()
+
+    @discord.ui.button(emoji="⬅️", label="Back", style=discord.ButtonStyle.secondary)
+    async def back_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.show_overview(interaction)
+
+    @discord.ui.button(emoji="🛑", label="Close", style=discord.ButtonStyle.danger)
+    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await self.session.close(interaction)
+
+
+class DevotionConfigView(ConfigCategoryView):
+    def __init__(self, session: ConfigSession, configs: Dict[str, Any]):
+        super().__init__(session, "devotion", configs)
+
+    @discord.ui.button(emoji="#️⃣", label="Set Channel", style=discord.ButtonStyle.secondary)
+    async def set_channel(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        view = DevotionChannelSelectView(self.session)
+        await interaction.response.send_message(
+            "Select a channel to use for devotion reminders:",
+            view=view,
+            ephemeral=True
+        )
+
+    @discord.ui.button(emoji="🕰️", label="Set Time", style=discord.ButtonStyle.secondary)
+    async def set_time(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        modal = DevotionTimeModal(self.session)
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(emoji="🔀", label="Toggle", style=discord.ButtonStyle.primary)
+    async def toggle_devotion(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        result = self.session.cog._toggle_boolean_config(
+            interaction.guild.id,
+            'devotion_enabled',
+            'Whether daily devotion messages are enabled',
+            default=True
+        )
+
+        if result is None:
+            await interaction.response.send_message("Failed to toggle devotion system.", ephemeral=True)
+            return
+
+        status = "enabled" if result else "disabled"
+        await interaction.response.send_message(
+            f"Devotion system is now **{status}**.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("devotion")
+
+
+class DevotionChannelSelect(discord.ui.ChannelSelect):
+    def __init__(self, session: ConfigSession):
+        super().__init__(channel_types=[discord.ChannelType.text, discord.ChannelType.news], min_values=1, max_values=1)
+        self.session = session
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        channel_id = int(interaction.data["values"][0])
+        channel = interaction.guild.get_channel(channel_id)
+        if not channel:
+            await interaction.response.send_message("Could not resolve the selected channel.", ephemeral=True)
+            return
+
+        success = self.session.cog.set_config(
+            interaction.guild.id,
+            'devotion_channel',
+            channel.id,
+            'channel',
+            'Channel where daily devotion accountability messages are sent'
+        )
+
+        if success:
+            await interaction.response.send_message(
+                f"Devotion channel updated to {channel.mention}.",
+                ephemeral=True
+            )
+            await self.session.refresh_category("devotion")
+        else:
+            await interaction.response.send_message("Failed to update devotion channel.", ephemeral=True)
+
+
+class DevotionChannelSelectView(discord.ui.View):
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=60)
+        self.add_item(DevotionChannelSelect(session))
+
+
+class DevotionTimeModal(discord.ui.Modal, title="Set Devotion Time"):
+    hour: discord.ui.TextInput
+    minute: discord.ui.TextInput
+
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=None)
+        self.session = session
+        self.hour = discord.ui.TextInput(label="Hour (0-23)", min_length=1, max_length=2, default="17")
+        self.minute = discord.ui.TextInput(label="Minute (0-59)", min_length=1, max_length=2, default="30")
+        self.add_item(self.hour)
+        self.add_item(self.minute)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        try:
+            hour = int(self.hour.value)
+            minute = int(self.minute.value)
+        except ValueError:
+            await interaction.response.send_message("Please enter valid numbers for hour and minute.", ephemeral=True)
+            return
+
+        if not self.session.cog._set_devotion_time_values(interaction.guild.id, hour, minute):
+            await interaction.response.send_message(
+                "Hour must be 0-23 and minute must be 0-59.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.send_message(
+            f"Devotion time updated to {hour:02d}:{minute:02d} PT.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("devotion")
+
+
+class MusicProviderSelect(discord.ui.Select):
+    def __init__(self, session: ConfigSession, current_value: Optional[str]):
+        self.session = session
+        current_value = (current_value or session.cog.get_default_music_provider()).lower()
+        plex_ready = session.cog.is_plex_ready()
+
+        options = [
+            discord.SelectOption(
+                label="YouTube",
+                value="youtube",
+                description="Use YouTube via yt-dlp",
+                default=current_value == 'youtube',
+                emoji="📺"
+            ),
+            discord.SelectOption(
+                label="Plex",
+                value="plex",
+                description="Stream from your Plex music library",
+                default=current_value == 'plex',
+                emoji="🎼",
+                disabled=not plex_ready
+            ),
+        ]
+
+        placeholder = "Select music provider"
+        if not plex_ready:
+            placeholder += " (configure Plex globally to enable)"
+
+        super().__init__(
+            placeholder=placeholder,
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.session.is_authorized(interaction.user):
+            await interaction.response.send_message(
+                "You need administrator permissions to modify these settings.",
+                ephemeral=True
+            )
+            return
+
+        new_value = self.values[0]
+        if new_value == 'plex' and not self.session.cog.is_plex_ready():
+            await interaction.response.send_message(
+                "Plex integration isn't ready yet. Update `global_config.yaml` with your Plex details first.",
+                ephemeral=True
+            )
+            return
+
+        success = self.session.cog.set_config(
+            interaction.guild.id,
+            'music_provider',
+            new_value,
+            'string',
+            'Preferred music provider (youtube or plex)'
+        )
+
+        if success:
+            provider_name = 'Plex' if new_value == 'plex' else 'YouTube'
+            await interaction.response.send_message(
+                f"Music provider updated to **{provider_name}**.",
+                ephemeral=True
+            )
+            await self.session.refresh_category("music")
+        else:
+            await interaction.response.send_message(
+                "Failed to update music provider.",
+                ephemeral=True
+            )
+
+
+class PlexLibraryButton(discord.ui.Button):
+    def __init__(self, session: ConfigSession, current_library: Optional[str]):
+        disabled = not session.cog.is_plex_ready()
+        label = "Plex Library"
+        super().__init__(
+            label=label,
+            emoji="🎼",
+            style=discord.ButtonStyle.secondary,
+            disabled=disabled
+        )
+        self.session = session
+        self.current_library = current_library
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.session.is_authorized(interaction.user):
+            await interaction.response.send_message(
+                "You need administrator permissions to modify these settings.",
+                ephemeral=True
+            )
+            return
+
+        if not self.session.cog.is_plex_ready():
+            await interaction.response.send_message(
+                "Plex integration isn't configured yet. Update `global_config.yaml` with your Plex server details first.",
+                ephemeral=True
+            )
+            return
+
+        modal = PlexLibraryModal(self.session, self.current_library)
+        await interaction.response.send_modal(modal)
+
+
+class MusicConfigView(ConfigCategoryView):
+    def __init__(self, session: ConfigSession, configs: Dict[str, Any]):
+        super().__init__(session, "music", configs)
+        current_provider = configs.get('music_provider', {}).get('value')
+        self.add_item(MusicProviderSelect(session, current_provider))
+        current_library = configs.get('plex_library', {}).get('value')
+        self.add_item(PlexLibraryButton(session, current_library))
+
+    @discord.ui.button(emoji="🎚️", label="Volume", style=discord.ButtonStyle.secondary)
+    async def set_volume(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        modal = MusicVolumeModal(self.session)
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(emoji="🔁", label="Auto Queue", style=discord.ButtonStyle.primary)
+    async def toggle_auto_queue(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        result = self.session.cog._toggle_boolean_config(
+            interaction.guild.id,
+            'music_auto_queue',
+            'Automatically queue related tracks after the current playlist',
+            default=False
+        )
+
+        if result is None:
+            await interaction.response.send_message("Failed to toggle auto queue.", ephemeral=True)
+            return
+
+        status = "enabled" if result else "disabled"
+        await interaction.response.send_message(
+            f"Auto queue is now **{status}**.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("music")
+
+    @discord.ui.button(emoji="📡", label="Stream Mode", style=discord.ButtonStyle.primary)
+    async def toggle_stream_mode(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        result = self.session.cog._toggle_boolean_config(
+            interaction.guild.id,
+            'music_stream_mode',
+            'Enable low-latency stream mode for music playback',
+            default=False
+        )
+
+        if result is None:
+            await interaction.response.send_message("Failed to toggle stream mode.", ephemeral=True)
+            return
+
+        status = "enabled" if result else "disabled"
+        await interaction.response.send_message(
+            f"Stream mode is now **{status}**.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("music")
+
+    @discord.ui.button(emoji="📦", label="Cache Limit", style=discord.ButtonStyle.secondary)
+    async def set_cache_limit(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        modal = MusicCacheModal(self.session)
+        await interaction.response.send_modal(modal)
+
+
+class MusicVolumeModal(discord.ui.Modal, title="Set Music Volume"):
+    volume: discord.ui.TextInput
+
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=None)
+        self.session = session
+        self.volume = discord.ui.TextInput(label="Default Volume (1-100)", min_length=1, max_length=3, default="50")
+        self.add_item(self.volume)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        try:
+            volume = int(self.volume.value)
+        except ValueError:
+            await interaction.response.send_message("Please enter a whole number between 1 and 100.", ephemeral=True)
+            return
+
+        if not (1 <= volume <= 100):
+            await interaction.response.send_message("Volume must be between 1 and 100.", ephemeral=True)
+            return
+
+        success = self.session.cog.set_config(
+            interaction.guild.id,
+            'music_default_volume',
+            volume,
+            'integer',
+            'Default playback volume percentage for the music system'
+        )
+
+        if success:
+            await interaction.response.send_message(
+                f"Default music volume set to {volume}%.",
+                ephemeral=True
+            )
+            await self.session.refresh_category("music")
+        else:
+            await interaction.response.send_message("Failed to update music volume.", ephemeral=True)
+
+
+class MusicCacheModal(discord.ui.Modal, title="Set Music Cache Limit"):
+    limit: discord.ui.TextInput
+
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=None)
+        self.session = session
+        self.limit = discord.ui.TextInput(label="Cache Limit (songs)", min_length=1, max_length=4, default="100")
+        self.add_item(self.limit)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        try:
+            limit = int(self.limit.value)
+        except ValueError:
+            await interaction.response.send_message("Please enter a valid number of songs.", ephemeral=True)
+            return
+
+        if limit < 0:
+            await interaction.response.send_message("Cache limit must be positive.", ephemeral=True)
+            return
+
+        success = self.session.cog.set_config(
+            interaction.guild.id,
+            'music_cache_limit',
+            limit,
+            'integer',
+            'Maximum number of songs to retain in the music cache'
+        )
+
+        if success:
+            await interaction.response.send_message(
+                f"Music cache limit set to {limit} song(s).",
+                ephemeral=True
+            )
+            await self.session.refresh_category("music")
+        else:
+            await interaction.response.send_message("Failed to update cache limit.", ephemeral=True)
+
+
+class PlexLibraryModal(discord.ui.Modal, title="Set Plex Library"):
+    library: discord.ui.TextInput
+
+    def __init__(self, session: ConfigSession, current_library: Optional[str]):
+        super().__init__(timeout=None)
+        self.session = session
+        default_library = current_library or session.cog.global_config.get('plex', {}).get('music_library', 'Music')
+        self.library = discord.ui.TextInput(
+            label="Library Section Name",
+            default=default_library,
+            placeholder="Leave empty to use global default",
+            required=False,
+            max_length=100
+        )
+        self.add_item(self.library)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        if not self.session.is_authorized(interaction.user):
+            await interaction.response.send_message(
+                "You need administrator permissions to modify these settings.",
+                ephemeral=True
+            )
+            return
+
+        if not self.session.cog.is_plex_ready():
+            await interaction.response.send_message(
+                "Plex integration isn't configured yet. Update `global_config.yaml` first.",
+                ephemeral=True
+            )
+            return
+
+        value = self.library.value.strip()
+        if not value:
+            removed = self.session.cog.delete_config(interaction.guild.id, 'plex_library')
+            if removed:
+                await interaction.response.send_message(
+                    "Cleared Plex library override. Using global default.",
+                    ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(
+                    "There was no Plex library override to clear.",
+                    ephemeral=True
+                )
+        else:
+            success = self.session.cog.set_config(
+                interaction.guild.id,
+                'plex_library',
+                value,
+                'string',
+                'Preferred Plex library section for music playback'
+            )
+
+            if success:
+                await interaction.response.send_message(
+                    f"Plex library set to **{value}**.",
+                    ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(
+                    "Failed to update Plex library.",
+                    ephemeral=True
+                )
+
+        await self.session.refresh_category("music")
+
+
+class GeneralConfigView(ConfigCategoryView):
+    def __init__(self, session: ConfigSession, configs: Dict[str, Any]):
+        super().__init__(session, "general", configs)
+
+    @discord.ui.button(emoji="🔤", label="Prefix", style=discord.ButtonStyle.secondary)
+    async def set_prefix(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        modal = PrefixModal(self.session)
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(emoji="💬", label="Auto Responses", style=discord.ButtonStyle.primary)
+    async def toggle_auto_responses(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        result = self.session.cog._toggle_boolean_config(
+            interaction.guild.id,
+            'auto_responses',
+            'Enable automatic conversational responses from the bot',
+            default=True
+        )
+
+        if result is None:
+            await interaction.response.send_message("Failed to toggle auto responses.", ephemeral=True)
+            return
+
+        status = "enabled" if result else "disabled"
+        await interaction.response.send_message(
+            f"Auto responses are now **{status}**.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("general")
+
+    @discord.ui.button(emoji="📜", label="Logging", style=discord.ButtonStyle.primary)
+    async def toggle_logging(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        result = self.session.cog._toggle_boolean_config(
+            interaction.guild.id,
+            'logging_enabled',
+            'Enable activity logging features for the bot',
+            default=True
+        )
+
+        if result is None:
+            await interaction.response.send_message("Failed to toggle logging setting.", ephemeral=True)
+            return
+
+        status = "enabled" if result else "disabled"
+        await interaction.response.send_message(
+            f"Activity logging is now **{status}**.",
+            ephemeral=True
+        )
+        await self.session.refresh_category("general")
+
+
+class PrefixModal(discord.ui.Modal, title="Set Command Prefix"):
+    prefix: discord.ui.TextInput
+
+    def __init__(self, session: ConfigSession):
+        super().__init__(timeout=None)
+        self.session = session
+        self.prefix = discord.ui.TextInput(label="Prefix", min_length=1, max_length=5, default="!")
+        self.add_item(self.prefix)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        value = self.prefix.value.strip()
+        if not value:
+            await interaction.response.send_message("Prefix cannot be empty.", ephemeral=True)
+            return
+
+        success = self.session.cog.set_config(
+            interaction.guild.id,
+            'command_prefix',
+            value,
+            'string',
+            'Primary command prefix for the bot in this server'
+        )
+
+        if success:
+            await interaction.response.send_message(
+                f"Command prefix updated to `{value}`.",
+                ephemeral=True
+            )
+            await self.session.refresh_category("general")
+        else:
+            await interaction.response.send_message("Failed to update prefix.", ephemeral=True)
