@@ -33,19 +33,17 @@ class AutoPins(commands.Cog):
         self.state_file = "data/pin_state.yaml"
         self.first_run = True
         self.guild_pin_indices = {}
-        self.guild_seq_indices = {}  # Track sequential pin indices
         
         # Load existing pin indices or create new state file
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r') as f:
                 state = yaml.safe_load(f) or {}
                 self.guild_pin_indices = state.get('regular_pins', {})
-                self.guild_seq_indices = state.get('sequential_pins', {})
         else:
             # Create data directory if it doesn't exist
             os.makedirs('data', exist_ok=True)
             with open(self.state_file, 'w') as f:
-                yaml.dump({'regular_pins': {}, 'sequential_pins': {}}, f)
+                yaml.dump({'regular_pins': {}}, f)
     
         # Stop the loop if it is already running to prevent multiple instances
         if self.pinned_message_task.is_running():
@@ -59,7 +57,6 @@ class AutoPins(commands.Cog):
         with open(self.state_file, 'w') as f:
             yaml.dump({
                 'regular_pins': self.guild_pin_indices,
-                'sequential_pins': self.guild_seq_indices
             }, f)
 
     async def _notify_owner(self, subject: str, details: str):
@@ -99,163 +96,48 @@ class AutoPins(commands.Cog):
         name="testpin",
         description="Test pin display functionality"
     )
-    @app_commands.describe(
-        pin_type="The type of pin to test (regular or sequential). If not specified, chooses randomly."
-    )
-    async def test_pin(self, ctx, pin_type: str = None):
-        """Test the pin display functionality.
-        
-        Parameters
-        -----------
-        pin_type: Optional type of pin to test ('regular' or 'seq'). If not specified, chooses randomly.
-        """
+    async def test_pin(self, ctx):
+        """Test the pin display functionality."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 
-                # Get counts of both pin types
                 cursor.execute("SELECT COUNT(*) FROM pinned_messages WHERE guild_id = ?", (ctx.guild.id,))
                 regular_count = cursor.fetchone()[0]
-                
-                cursor.execute("""
-                    SELECT COUNT(DISTINCT sp.sequence_id)
-                    FROM sequential_pins sp
-                    JOIN sequential_pin_messages spm ON sp.sequence_id = spm.sequence_id
-                    WHERE sp.guild_id = ?
-                """, (ctx.guild.id,))
-                sequential_count = cursor.fetchone()[0]
 
-                if regular_count == 0 and sequential_count == 0:
+                if regular_count == 0:
                     await ctx.send("No pins found in this server.", ephemeral=True)
                     return
 
-                # Determine which type to show
-                show_sequential = False
-                if pin_type:
-                    pin_type = pin_type.lower()
-                    if pin_type in ['seq', 'sequential']:
-                        if sequential_count == 0:
-                            await ctx.send("No sequential pins found in this server.", ephemeral=True)
-                            return
-                        show_sequential = True
-                    elif pin_type in ['regular', 'normal']:
-                        if regular_count == 0:
-                            await ctx.send("No regular pins found in this server.", ephemeral=True)
-                            return
-                        show_sequential = False
-                    else:
-                        await ctx.send("Invalid pin type. Use 'regular' or 'seq'.", ephemeral=True)
+                cursor.execute("""
+                    SELECT message_id, channel_id
+                    FROM pinned_messages
+                    WHERE guild_id = ?
+                    ORDER BY RANDOM()
+                    LIMIT 1
+                """, (ctx.guild.id,))
+                pin_data = cursor.fetchone()
+                
+                if pin_data:
+                    message_id, channel_id = pin_data
+                    channel = self.bot.get_channel(channel_id)
+                    if not channel:
+                        await ctx.send("Could not find the channel for this pin.", ephemeral=True)
                         return
-                else:
-                    # Random choice if both types exist
-                    if regular_count > 0 and sequential_count > 0:
-                        show_sequential = random.random() < 0.5
-                    else:
-                        show_sequential = sequential_count > 0
-
-                # Get the pins based on type
-                if show_sequential:
                     try:
-                        cursor.execute("""
-                            SELECT sp.sequence_id, sp.channel_id, COUNT(spm.message_id) as msg_count
-                            FROM sequential_pins sp
-                            JOIN sequential_pin_messages spm ON sp.sequence_id = spm.sequence_id
-                            WHERE sp.guild_id = ?
-                            GROUP BY sp.sequence_id
-                            ORDER BY RANDOM()
-                            LIMIT 1
-                        """, (ctx.guild.id,))
-                        sequence_data = cursor.fetchone()
-                        
-                        if sequence_data:
-                            sequence_id, channel_id, msg_count = sequence_data
-                            
-                            # Get all messages in this sequence
-                            cursor.execute("""
-                                SELECT message_id, position
-                                FROM sequential_pin_messages
-                                WHERE sequence_id = ?
-                                ORDER BY position
-                            """, (sequence_id,))
-                            sequence_messages = cursor.fetchall()
-
-                            channel = self.bot.get_channel(channel_id)
-                            if not channel:
-                                await ctx.send("Could not find the channel for this pin.", ephemeral=True)
-                                return
-
-                            await ctx.send(f"Displaying sequential pin (ID: {sequence_id})")
-                            
-                            # Fetch all messages and group by author
-                            messages_by_author = {}
-                            for msg_id, _ in sequence_messages:
-                                try:
-                                    message = await channel.fetch_message(msg_id)
-                                    if message.author.id not in messages_by_author:
-                                        messages_by_author[message.author.id] = []
-                                    messages_by_author[message.author.id].append(message)
-                                except discord.NotFound:
-                                    continue
-                                except Exception as e:
-                                    print(f"Error fetching message {msg_id} in sequential pin: {e}")
-                                    continue
-
-                            # Create one embed per author
-                            embeds = []
-                            for author_messages in messages_by_author.values():
-                                if author_messages:  # Check if we have messages for this author
-                                    try:
-                                        embed = await self.create_message_embed(
-                                            author_messages[0],  # Use first message for author info
-                                            ctx.guild.id, 
-                                            channel_id,
-                                            sequence_id=sequence_id,
-                                            messages=author_messages
-                                        )
-                                        embeds.append(embed)
-                                    except Exception as e:
-                                        print(f"Error creating embed for sequential pin: {e}")
-
-                            if embeds:  # Only send if we have valid embeds
-                                await ctx.channel.send(embeds=embeds)
-                                await ctx.send("Sequential pin sent to channel.", ephemeral=True)
-                            else:
-                                await ctx.send("No valid messages found for this sequential pin.", ephemeral=True)
-                        else:
-                            await ctx.send("No sequential pin data found.", ephemeral=True)
+                        message = await channel.fetch_message(message_id)
+                        embed = await self.create_message_embed(message, ctx.guild.id, channel_id)
+                        await ctx.channel.send(embed=embed)
+                        await ctx.send("Regular pin sent to channel.", ephemeral=True)
+                    except discord.NotFound:
+                        cursor.execute("DELETE FROM pinned_messages WHERE message_id = ?", (message_id,))
+                        conn.commit()
+                        await ctx.send("This pin no longer exists. It has been removed from the database.", ephemeral=True)
                     except Exception as e:
-                        print(f"Error in sequential pin test: {e}")
-                        await ctx.send(f"Error displaying sequential pin: {e}", ephemeral=True)
+                        print(f"Error displaying regular pin: {e}")
+                        await ctx.send(f"Error displaying regular pin: {e}", ephemeral=True)
                 else:
-                    cursor.execute("""
-                        SELECT message_id, channel_id
-                        FROM pinned_messages
-                        WHERE guild_id = ?
-                        ORDER BY RANDOM()
-                        LIMIT 1
-                    """, (ctx.guild.id,))
-                    pin_data = cursor.fetchone()
-                    
-                    if pin_data:
-                        message_id, channel_id = pin_data
-                        channel = self.bot.get_channel(channel_id)
-                        if not channel:
-                            await ctx.send("Could not find the channel for this pin.", ephemeral=True)
-                            return
-                        try:
-                            message = await channel.fetch_message(message_id)
-                            embed = await self.create_message_embed(message, ctx.guild.id, channel_id)
-                            await ctx.channel.send(embed=embed)
-                            await ctx.send("Regular pin sent to channel.", ephemeral=True)
-                        except discord.NotFound:
-                            cursor.execute("DELETE FROM pinned_messages WHERE message_id = ?", (message_id,))
-                            conn.commit()
-                            await ctx.send("This pin no longer exists. It has been removed from the database.", ephemeral=True)
-                        except Exception as e:
-                            print(f"Error displaying regular pin: {e}")
-                            await ctx.send(f"Error displaying regular pin: {e}", ephemeral=True)
-                    else:
-                        await ctx.send("No regular pin data found.", ephemeral=True)
+                    await ctx.send("No regular pin data found.", ephemeral=True)
         except Exception as e:
             print(f"Error in test_pin: {e}")
             await ctx.send(f"Unexpected error: {e}", ephemeral=True)
@@ -396,6 +278,9 @@ class AutoPins(commands.Cog):
                     """, (guild.id,))
                     sequence_pins = cursor.fetchall()
                     
+                    if not sequence_pins:
+                        continue
+                    
                     current_index = self.guild_seq_indices[guild_id_str] % len(sequence_pins)
                     sequence_id, channel_id, msg_count = sequence_pins[current_index]
 
@@ -467,6 +352,9 @@ class AutoPins(commands.Cog):
                         WHERE guild_id = ?
                     """, (guild.id,))
                     regular_pins = cursor.fetchall()
+
+                    if not regular_pins:
+                        continue
 
                     current_index = self.guild_pin_indices[guild_id_str] % len(regular_pins)
                     message_id, channel_id = regular_pins[current_index]
